@@ -104,7 +104,7 @@ export interface Ocorrencia {
   description: string;
   service_type: string;
   priority: 'baixa' | 'media' | 'alta';
-  status: 'criada' | 'encaminhada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
+  status: 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
   
   // Campos atualizados RF010
   occurrence_date?: string;
@@ -124,6 +124,11 @@ export interface Ocorrencia {
   regional?: Regional;
   fiscal_id: string;
   fiscal?: Fiscal;
+  
+  // Campos de aprovação
+  approved_by?: string;
+  approved_at?: string;
+  cancel_reason?: string;
   
   // Agendamento
   scheduled_date?: string;
@@ -150,6 +155,6 @@ export interface BusinessRule {
   description: string;
 }
 
-export type OccurrenceStatus = 'criada' | 'encaminhada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
+export type OccurrenceStatus = 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
 export type Priority = 'baixa' | 'media' | 'alta';
 export type UserRole = 'cegor' | 'regional' | 'empresa';

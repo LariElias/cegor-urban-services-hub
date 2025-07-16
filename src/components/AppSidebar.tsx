@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation, NavLink } from 'react-router-dom';
 import { 
@@ -13,7 +12,10 @@ import {
   Home,
   FileText,
   Calendar,
-  Activity
+  Activity,
+  Clock,
+  History,
+  MapPin as MapPinIcon
 } from 'lucide-react';
 import {
   Sidebar,
@@ -41,7 +43,6 @@ const menuItems = [
       { title: 'ZGL', url: '/cadastros/zgl', icon: MapPin },
       { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building },
       { title: 'Empresas', url: '/cadastros/empresas', icon: Building },
-      // { title: 'Equipes', url: '/cadastros/equipes', icon: Users },
     ]
   },
   {
@@ -59,9 +60,11 @@ const menuItems = [
     role: ['cegor', 'regional', 'empresa'],
     items: [
       { title: 'Dashboard Geral', url: '/relatorios/dashboard', icon: Activity, role: ['cegor'] },
+      { title: 'Tempo de Execução', url: '/relatorios/tempo', icon: Clock, role: ['cegor', 'regional'] },
+      { title: 'Mapa de Ocorrências', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'] },
+      { title: 'Histórico', url: '/relatorios/historico', icon: History, role: ['cegor', 'regional', 'empresa'] },
       { title: 'Relatório Regional', url: '/relatorios/regional', icon: BarChart3, role: ['regional'] },
       { title: 'Serviços Programados', url: '/relatorios/programados', icon: Calendar, role: ['empresa'] },
-      { title: 'Tempo de Execução', url: '/relatorios/tempo', icon: BarChart3, role: ['cegor', 'regional'] },
       { title: 'Exportar CSV', url: '/relatorios/csv', icon: FileText, role: ['cegor'] },
     ]
   },

@@ -24,6 +24,9 @@ import AcompanhamentoDiario from "./pages/ocorrencias/AcompanhamentoDiario";
 // Importar páginas de relatórios
 import DashboardGeral from "./pages/relatorios/DashboardGeral";
 import ServicosEmpresa from "./pages/relatorios/ServicosEmpresa";
+import MapaOcorrencias from "./pages/relatorios/MapaOcorrencias";
+import HistoricoOcorrencias from "./pages/relatorios/HistoricoOcorrencias";
+import TempoExecucao from "./pages/relatorios/TempoExecucao";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +55,9 @@ const App = () => (
             {/* Rotas de relatórios - todas usando Layout */}
             <Route path="/relatorios/dashboard" element={<Layout><DashboardGeral /></Layout>} />
             <Route path="/relatorios/programados" element={<Layout><ServicosEmpresa /></Layout>} />
+            <Route path="/relatorios/mapa" element={<Layout><MapaOcorrencias /></Layout>} />
+            <Route path="/relatorios/historico" element={<Layout><HistoricoOcorrencias /></Layout>} />
+            <Route path="/relatorios/tempo" element={<Layout><TempoExecucao /></Layout>} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

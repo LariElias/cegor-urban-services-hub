@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus, Edit, Eye, Play, Send, CheckCircle, XCircle, Camera, FileText, Search } from 'lucide-react';
+import { Plus, Edit, Eye, Play, Send, CheckCircle, XCircle, Camera, FileText, Search, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useAuth } from '@/context/AuthContext';
 import { Ocorrencia } from '@/types';
 import { Link } from 'react-router-dom';
@@ -20,6 +28,8 @@ import { Link } from 'react-router-dom';
 export default function ListaOcorrencias() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
+  const [cancelReason, setCancelReason] = useState('');
+  const [selectedOcorrencia, setSelectedOcorrencia] = useState<string | null>(null);
 
   // Mock data - em produção viria da API
   const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>([
@@ -29,7 +39,7 @@ export default function ListaOcorrencias() {
       description: 'Limpeza de terreno baldio',
       service_type: 'Limpeza',
       priority: 'alta',
-      status: 'criada',
+      status: 'encaminhada',
       address: 'Rua das Flores, 123',
       regional_id: '1',
       fiscal_id: '1',
@@ -42,10 +52,12 @@ export default function ListaOcorrencias() {
       description: 'Reparo em calçada',
       service_type: 'Manutenção',
       priority: 'media',
-      status: 'agendada',
+      status: 'autorizada',
       address: 'Av. Brasil, 456',
       regional_id: '1',
       fiscal_id: '1',
+      approved_by: 'Admin CEGOR',
+      approved_at: new Date().toISOString(),
       scheduled_date: new Date().toISOString(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -69,10 +81,12 @@ export default function ListaOcorrencias() {
     switch (status) {
       case 'criada': return 'bg-gray-100 text-gray-800';
       case 'encaminhada': return 'bg-blue-100 text-blue-800';
-      case 'devolvida': return 'bg-red-100 text-red-800';
+      case 'autorizada': return 'bg-purple-100 text-purple-800';
+      case 'cancelada': return 'bg-red-100 text-red-800';
+      case 'devolvida': return 'bg-orange-100 text-orange-800';
       case 'em_analise': return 'bg-yellow-100 text-yellow-800';
       case 'agendada': return 'bg-purple-100 text-purple-800';
-      case 'em_execucao': return 'bg-orange-100 text-orange-800';
+      case 'em_execucao': return 'bg-blue-100 text-blue-800';
       case 'concluida': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -82,6 +96,8 @@ export default function ListaOcorrencias() {
     switch (status) {
       case 'criada': return 'Criada';
       case 'encaminhada': return 'Encaminhada';
+      case 'autorizada': return 'Autorizada';
+      case 'cancelada': return 'Cancelada';
       case 'devolvida': return 'Devolvida';
       case 'em_analise': return 'Em Análise';
       case 'agendada': return 'Agendada';
@@ -100,12 +116,38 @@ export default function ListaOcorrencias() {
     }
   };
 
-  const handleStatusChange = (id: string, newStatus: Ocorrencia['status']) => {
+  const handleStatusChange = (id: string, newStatus: Ocorrencia['status'], additionalData?: any) => {
     setOcorrencias(ocorrencias.map(o => 
       o.id === id 
-        ? { ...o, status: newStatus, updated_at: new Date().toISOString() }
+        ? { 
+            ...o, 
+            status: newStatus, 
+            updated_at: new Date().toISOString(),
+            ...additionalData
+          }
         : o
     ));
+  };
+
+  const handleApproval = (id: string) => {
+    handleStatusChange(id, 'autorizada', {
+      approved_by: user?.name,
+      approved_at: new Date().toISOString()
+    });
+  };
+
+  const handleCancellation = (id: string) => {
+    if (!cancelReason.trim()) {
+      alert('Motivo do cancelamento é obrigatório');
+      return;
+    }
+    
+    handleStatusChange(id, 'cancelada', {
+      cancel_reason: cancelReason
+    });
+    
+    setCancelReason('');
+    setSelectedOcorrencia(null);
   };
 
   const filteredOcorrencias = ocorrencias.filter(ocorrencia => {
@@ -117,13 +159,113 @@ export default function ListaOcorrencias() {
       return matchesSearch && ocorrencia.regional_id === user.regional_id;
     }
     if (user?.role === 'empresa') {
-      return matchesSearch && ['agendada', 'em_execucao'].includes(ocorrencia.status);
+      // Empresa só vê ocorrências autorizadas, agendadas ou em execução
+      return matchesSearch && ['autorizada', 'agendada', 'em_execucao'].includes(ocorrencia.status);
     }
     return matchesSearch;
   });
 
   const renderActionButtons = (ocorrencia: Ocorrencia) => {
     const buttons = [];
+
+    // Botões para CEGOR
+    if (user?.role === 'cegor') {
+      if (ocorrencia.status === 'encaminhada') {
+        buttons.push(
+          <Button
+            key="permitir"
+            variant="outline"
+            size="sm"
+            onClick={() => handleApproval(ocorrencia.id)}
+            title="Permitir Execução"
+            className="text-green-600 hover:text-green-700"
+          >
+            <Check className="w-4 h-4" />
+          </Button>
+        );
+        buttons.push(
+          <Dialog key="cancelar">
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedOcorrencia(ocorrencia.id)}
+                title="Cancelar"
+                className="text-red-600 hover:text-red-700"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Cancelar Ocorrência</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <p>Deseja cancelar a ocorrência {ocorrencia.protocol}?</p>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Motivo do cancelamento *
+                  </label>
+                  <Textarea
+                    value={cancelReason}
+                    onChange={(e) => setCancelReason(e.target.value)}
+                    placeholder="Informe o motivo do cancelamento"
+                    rows={3}
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setCancelReason('');
+                      setSelectedOcorrencia(null);
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleCancellation(ocorrencia.id)}
+                  >
+                    Confirmar Cancelamento
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        );
+      }
+
+      if (ocorrencia.status === 'autorizada') {
+        buttons.push(
+          <Button
+            key="agendar"
+            variant="outline"
+            size="sm"
+            asChild
+          >
+            <Link to={`/ocorrencias/${ocorrencia.id}/agendamento`}>
+              <CheckCircle className="w-4 h-4" />
+            </Link>
+          </Button>
+        );
+      }
+
+      if (ocorrencia.status === 'criada') {
+        buttons.push(
+          <Button
+            key="vistoria"
+            variant="outline"
+            size="sm"
+            asChild
+          >
+            <Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}>
+              <Camera className="w-4 h-4" />
+            </Link>
+          </Button>
+        );
+      }
+    }
 
     // Botões para Regional
     if (user?.role === 'regional') {
@@ -141,6 +283,21 @@ export default function ListaOcorrencias() {
         );
       }
       
+      if (ocorrencia.status === 'autorizada') {
+        buttons.push(
+          <Button
+            key="agendar"
+            variant="outline"
+            size="sm"
+            asChild
+          >
+            <Link to={`/ocorrencias/${ocorrencia.id}/agendamento`}>
+              <CheckCircle className="w-4 h-4" />
+            </Link>
+          </Button>
+        );
+      }
+
       if (ocorrencia.status === 'agendada') {
         buttons.push(
           <Button
@@ -165,49 +322,6 @@ export default function ListaOcorrencias() {
           >
             <Link to={`/ocorrencias/${ocorrencia.id}/detalhamento`}>
               <Edit className="w-4 h-4" />
-            </Link>
-          </Button>
-        );
-      }
-    }
-
-    // Botões para CEGOR
-    if (user?.role === 'cegor') {
-      if (ocorrencia.status === 'encaminhada') {
-        buttons.push(
-          <Button
-            key="executar"
-            variant="outline"
-            size="sm"
-            onClick={() => handleStatusChange(ocorrencia.id, 'agendada')}
-            title="Executar"
-          >
-            <CheckCircle className="w-4 h-4" />
-          </Button>
-        );
-        buttons.push(
-          <Button
-            key="devolver"
-            variant="outline"
-            size="sm"
-            onClick={() => handleStatusChange(ocorrencia.id, 'devolvida')}
-            title="Devolver"
-          >
-            <XCircle className="w-4 h-4" />
-          </Button>
-        );
-      }
-
-      if (ocorrencia.status === 'criada') {
-        buttons.push(
-          <Button
-            key="vistoria"
-            variant="outline"
-            size="sm"
-            asChild
-          >
-            <Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}>
-              <Camera className="w-4 h-4" />
             </Link>
           </Button>
         );
