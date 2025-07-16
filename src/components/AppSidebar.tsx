@@ -66,7 +66,7 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const { user, logout } = useAuth();
   const currentPath = location.pathname;
@@ -80,11 +80,13 @@ export function AppSidebar() {
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : 'hover:bg-sidebar-accent/50';
 
+  const isCollapsed = state === 'collapsed';
+
   return (
-    <Sidebar className={collapsed ? 'w-14' : 'w-64'} collapsible>
+    <Sidebar collapsible="icon">
       <SidebarContent className="bg-sidebar text-sidebar-foreground">
         <div className="p-4 border-b border-sidebar-border">
-          {!collapsed && (
+          {!isCollapsed && (
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-sidebar-primary rounded-lg flex items-center justify-center">
                 <Shield className="w-4 h-4 text-sidebar-primary-foreground" />
@@ -101,7 +103,7 @@ export function AppSidebar() {
           hasPermission(group.role) && (
             <SidebarGroup key={group.title}>
               <SidebarGroupLabel className="text-sidebar-foreground/70">
-                {!collapsed && group.title}
+                {!isCollapsed && group.title}
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
@@ -111,7 +113,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild>
                           <NavLink to={item.url} className={getNavCls}>
                             <item.icon className="w-4 h-4" />
-                            {!collapsed && <span className="text-sm">{item.title}</span>}
+                            {!isCollapsed && <span className="text-sm">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -130,7 +132,7 @@ export function AppSidebar() {
                 {user?.name.charAt(0).toUpperCase()}
               </span>
             </div>
-            {!collapsed && (
+            {!isCollapsed && (
               <div className="flex-1">
                 <p className="text-xs font-medium text-sidebar-primary">{user?.name}</p>
                 <p className="text-xs text-sidebar-foreground/70 capitalize">{user?.role}</p>
