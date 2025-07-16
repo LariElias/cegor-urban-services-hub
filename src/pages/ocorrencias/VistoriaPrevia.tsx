@@ -64,13 +64,13 @@ export default function VistoriaPrevia() {
     navigate('/ocorrencias');
   };
 
-  if (user?.role !== 'cegor') {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Acesso negado. Apenas usuários CEGOR podem realizar vistorias prévias.</p>
-      </div>
-    );
-  }
+  // if (user?.role !== 'cegor') {
+  //   return (
+  //     <div className="flex items-center justify-center h-64">
+  //       <p className="text-muted-foreground">Acesso negado. Apenas usuários CEGOR podem realizar vistorias prévias.</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="space-y-6">
