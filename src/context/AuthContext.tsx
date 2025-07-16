@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User } from '@/types';
 
 interface AuthContextType {
@@ -21,6 +22,7 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Verificar se há um usuário logado no localStorage
@@ -92,8 +94,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    console.log('Executing logout - clearing user state and localStorage');
     setUser(null);
     localStorage.removeItem('cegor-user');
+    
+    // Forçar redirecionamento para a página inicial
+    console.log('Redirecting to home page after logout');
+    navigate('/', { replace: true });
   };
 
   return (
