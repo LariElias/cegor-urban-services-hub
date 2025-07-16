@@ -91,7 +91,9 @@ export function LoginForm() {
             <p className="font-medium">Contas de demonstração:</p>
             <div className="space-y-1">
               <p><strong>CEGOR:</strong> admin@cegor.gov.br</p>
-              <p><strong>Regional:</strong> regional@centrosul.gov.br</p>
+              <p><strong>Regional Gestor:</strong> gestor@centrosul.gov.br</p>
+              <p><strong>Regional Operador:</strong> operador@centrosul.gov.br</p>
+              <p><strong>Regional Fiscal:</strong> fiscal@centrosul.gov.br</p>
               <p><strong>Empresa:</strong> empresa@limpezabh.com.br</p>
             </div>
             <p className="text-xs text-gray-500">Senha: qualquer valor</p>
