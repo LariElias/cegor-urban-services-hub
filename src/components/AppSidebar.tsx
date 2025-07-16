@@ -41,7 +41,7 @@ const menuItems = [
       { title: 'ZGL', url: '/cadastros/zgl', icon: MapPin },
       { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building },
       { title: 'Empresas', url: '/cadastros/empresas', icon: Building },
-      { title: 'Equipes', url: '/cadastros/equipes', icon: Users },
+      // { title: 'Equipes', url: '/cadastros/equipes', icon: Users },
     ]
   },
   {
