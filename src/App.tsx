@@ -12,6 +12,10 @@ import NotFound from "./pages/NotFound";
 // Importar páginas de cadastros
 import Regionais from "./pages/cadastros/Regionais";
 import Bairros from "./pages/cadastros/Bairros";
+import Territorios from "./pages/cadastros/Territorios";
+import Fiscais from "./pages/cadastros/Fiscais";
+import Equipamentos from "./pages/cadastros/Equipamentos";
+import Empresas from "./pages/cadastros/Empresas";
 
 // Importar páginas de ocorrências
 import ListaOcorrencias from "./pages/ocorrencias/ListaOcorrencias";
@@ -45,12 +49,17 @@ const App = () => (
             {/* Rotas de cadastros - todas usando Layout */}
             <Route path="/cadastros/regionais" element={<Layout><Regionais /></Layout>} />
             <Route path="/cadastros/bairros" element={<Layout><Bairros /></Layout>} />
+            <Route path="/cadastros/territorios" element={<Layout><Territorios /></Layout>} />
+            <Route path="/cadastros/fiscais" element={<Layout><Fiscais /></Layout>} />
+            <Route path="/cadastros/equipamentos" element={<Layout><Equipamentos /></Layout>} />
+            <Route path="/cadastros/empresas" element={<Layout><Empresas /></Layout>} />
             
             {/* Rotas de ocorrências - todas usando Layout */}
             <Route path="/ocorrencias" element={<Layout><ListaOcorrencias /></Layout>} />
             <Route path="/ocorrencias/nova" element={<Layout><NovaOcorrencia /></Layout>} />
             <Route path="/ocorrencias/aprovadas" element={<Layout><OcorrenciasAprovadas /></Layout>} />
             <Route path="/ocorrencias/demandas" element={<Layout><DemandasEmpresa /></Layout>} />
+            <Route path="/empresas/:id/demandas" element={<Layout><DemandasEmpresa /></Layout>} />
             <Route path="/ocorrencias/:id/agendamento" element={<Layout><Agendamento /></Layout>} />
             <Route path="/ocorrencias/:id/detalhamento" element={<Layout><DetalhamentoExecucao /></Layout>} />
             <Route path="/ocorrencias/:id/vistoria" element={<Layout><VistoriaPrevia /></Layout>} />

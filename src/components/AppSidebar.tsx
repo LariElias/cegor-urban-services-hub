@@ -32,7 +32,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
-import { isRegionalGestor, isRegionalOperador, isRegionalFiscal } from '@/types';
+import { isRegionalGestor, isRegionalOperador, isRegionalFiscal, isCegorGestor, isCegorOperador } from '@/types';
 
 const menuItems = [
   {
@@ -40,13 +40,12 @@ const menuItems = [
     icon: Settings,
     role: ['cegor'],
     items: [
-      { title: 'Regionais', url: '/cadastros/regionais', icon: Building },
-      { title: 'Bairros', url: '/cadastros/bairros', icon: MapPin },
-      { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin },
-      { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield },
-      { title: 'ZGL', url: '/cadastros/zgl', icon: MapPin },
-      { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building },
-      { title: 'Empresas', url: '/cadastros/empresas', icon: Building },
+      { title: 'Regionais', url: '/cadastros/regionais', icon: Building, role: ['cegor'] },
+      { title: 'Bairros', url: '/cadastros/bairros', icon: MapPin, role: ['cegor'] },
+      { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin, role: ['cegor'] },
+      { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield, role: ['cegor'] },
+      { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building, role: ['cegor'] },
+      { title: 'Empresas', url: '/cadastros/empresas', icon: Building, role: ['cegor'] },
     ]
   },
   {
@@ -55,7 +54,9 @@ const menuItems = [
     role: ['regional'],
     subrole: ['gestor'],
     items: [
-      { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building },
+      { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin, role: ['regional'], subrole: ['gestor'] },
+      { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield, role: ['regional'], subrole: ['gestor'] },
+      { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building, role: ['regional'], subrole: ['gestor'] },
     ]
   },
   {
