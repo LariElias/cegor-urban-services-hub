@@ -135,7 +135,7 @@ export default function MapaOcorrencias() {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="todos">Todos</SelectItem>
                   <SelectItem value="encaminhada">Encaminhada</SelectItem>
                   <SelectItem value="autorizada">Autorizada</SelectItem>
                   <SelectItem value="agendada">Agendada</SelectItem>
@@ -152,7 +152,7 @@ export default function MapaOcorrencias() {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="todos">Todos</SelectItem>
                   <SelectItem value="Limpeza">Limpeza</SelectItem>
                   <SelectItem value="Manutenção">Manutenção</SelectItem>
                   <SelectItem value="Conservação">Conservação</SelectItem>
@@ -167,7 +167,7 @@ export default function MapaOcorrencias() {
                   <SelectValue placeholder="Todas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas</SelectItem>
+                  <SelectItem value="todas">Todas</SelectItem>
                   <SelectItem value="baixa">Baixa</SelectItem>
                   <SelectItem value="media">Média</SelectItem>
                   <SelectItem value="alta">Alta</SelectItem>
