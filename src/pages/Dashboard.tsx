@@ -24,15 +24,15 @@ export default function Dashboard() {
 
   // Dados para o gráfico de demandas por regional
   const demandaRegionalData = [
-    { name: 'Centro-Sul', demandas: 45 },
-    { name: 'Norte', demandas: 38 },
-    { name: 'Leste', demandas: 32 },
-    { name: 'Oeste', demandas: 28 },
-    { name: 'Nordeste', demandas: 25 },
-    { name: 'Barreiro', demandas: 22 },
-    { name: 'Venda Nova', demandas: 20 },
-    { name: 'Pampulha', demandas: 18 },
-    { name: 'Noroeste', demandas: 15 },
+    { name: 'Regional 1', demandas: 45 },
+    { name: 'Regional 2', demandas: 38 },
+    { name: 'Regional 3', demandas: 32 },
+    { name: 'Regional 4', demandas: 28 },
+    { name: 'Regional 5', demandas: 25 },
+    { name: 'Regional 6', demandas: 22 },
+    { name: 'Regional 7', demandas: 20 },
+    { name: 'Regional 8', demandas: 18 },
+    { name: 'Regional 9', demandas: 15 },
   ];
 
   const recentOcorrencias = [
