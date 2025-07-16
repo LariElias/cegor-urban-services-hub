@@ -170,10 +170,10 @@ export type Priority = 'baixa' | 'media' | 'alta';
 export type UserRole = 'cegor' | 'regional' | 'empresa';
 export type UserSubrole = 'gestor' | 'operador' | 'fiscal';
 
-// Funções auxiliares para verificar permissões
-export const isRegionalGestor = (user: User) => user.role === 'regional' && user.subrole === 'gestor';
-export const isRegionalOperador = (user: User) => user.role === 'regional' && user.subrole === 'operador';
-export const isRegionalFiscal = (user: User) => user.role === 'regional' && user.subrole === 'fiscal';
-export const isCegorGestor = (user: User) => user.role === 'cegor' && user.subrole === 'gestor';
-export const isCegorOperador = (user: User) => user.role === 'cegor' && user.subrole === 'operador';
-export const isCegorFiscal = (user: User) => user.role === 'cegor' && user.subrole === 'fiscal';
+// Funções auxiliares para verificar permissões - com null checks
+export const isRegionalGestor = (user: User | null) => user?.role === 'regional' && user?.subrole === 'gestor';
+export const isRegionalOperador = (user: User | null) => user?.role === 'regional' && user?.subrole === 'operador';
+export const isRegionalFiscal = (user: User | null) => user?.role === 'regional' && user?.subrole === 'fiscal';
+export const isCegorGestor = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'gestor';
+export const isCegorOperador = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'operador';
+export const isCegorFiscal = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'fiscal';
