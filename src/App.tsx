@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
+import { Layout } from "@/components/Layout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -32,17 +33,17 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             
-            {/* Rotas de cadastros */}
-            <Route path="/cadastros/regionais" element={<Regionais />} />
-            <Route path="/cadastros/bairros" element={<Bairros />} />
+            {/* Rotas de cadastros - todas usando Layout */}
+            <Route path="/cadastros/regionais" element={<Layout><Regionais /></Layout>} />
+            <Route path="/cadastros/bairros" element={<Layout><Bairros /></Layout>} />
             
-            {/* Rotas de ocorrências */}
-            <Route path="/ocorrencias" element={<ListaOcorrencias />} />
-            <Route path="/ocorrencias/nova" element={<NovaOcorrencia />} />
+            {/* Rotas de ocorrências - todas usando Layout */}
+            <Route path="/ocorrencias" element={<Layout><ListaOcorrencias /></Layout>} />
+            <Route path="/ocorrencias/nova" element={<Layout><NovaOcorrencia /></Layout>} />
             
-            {/* Rotas de relatórios */}
-            <Route path="/relatorios/dashboard" element={<DashboardGeral />} />
-            <Route path="/relatorios/programados" element={<ServicosEmpresa />} />
+            {/* Rotas de relatórios - todas usando Layout */}
+            <Route path="/relatorios/dashboard" element={<Layout><DashboardGeral /></Layout>} />
+            <Route path="/relatorios/programados" element={<Layout><ServicosEmpresa /></Layout>} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

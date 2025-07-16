@@ -10,17 +10,17 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+    <SidebarProvider defaultOpen={true}>
+      <div className="min-h-screen flex w-full bg-gray-50">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-14 flex items-center justify-between border-b bg-white px-4 shadow-sm">
+          <header className="h-16 flex items-center justify-between border-b bg-white px-6 shadow-sm">
             <div className="flex items-center gap-4">
-              <SidebarTrigger className="p-2 hover:bg-gray-100 rounded-md" />
+              <SidebarTrigger className="p-2 hover:bg-gray-100 rounded-md lg:hidden" />
               <Breadcrumb />
             </div>
           </header>
-          <main className="flex-1 p-6 bg-gray-50">
+          <main className="flex-1 p-6 overflow-auto">
             {children}
           </main>
         </div>

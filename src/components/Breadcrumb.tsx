@@ -36,25 +36,26 @@ export function Breadcrumb() {
   };
 
   return (
-    <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+    <nav className="flex items-center space-x-2 text-sm text-gray-600">
       <Link 
         to="/" 
-        className="flex items-center hover:text-foreground transition-colors"
+        className="flex items-center hover:text-[#0B5CF0] transition-colors p-1 rounded-md hover:bg-gray-100"
       >
         <Home className="w-4 h-4" />
+        <span className="ml-1">Dashboard</span>
       </Link>
       
       {pathSegments.map((segment, index) => (
         <React.Fragment key={index}>
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-4 h-4 text-gray-400" />
           {index === pathSegments.length - 1 ? (
-            <span className="text-foreground font-medium">
+            <span className="text-gray-900 font-medium">
               {getBreadcrumbName(segment, index)}
             </span>
           ) : (
             <Link
               to={buildPath(index)}
-              className="hover:text-foreground transition-colors"
+              className="hover:text-[#0B5CF0] transition-colors p-1 rounded-md hover:bg-gray-100"
             >
               {getBreadcrumbName(segment, index)}
             </Link>
