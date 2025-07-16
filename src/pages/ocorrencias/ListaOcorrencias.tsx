@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus, Edit, Eye, Play, Send, CheckCircle, XCircle, Camera, FileText, Search, Check, X } from 'lucide-react';
+import { Plus, Edit, Eye, Play, Send, CheckCircle, XCircle, Camera, FileText, Search, Check, X, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useAuth } from '@/context/AuthContext';
-import { Ocorrencia } from '@/types';
+import { Ocorrencia, isRegionalGestor, isRegionalOperador, isRegionalFiscal } from '@/types';
 import { Link } from 'react-router-dom';
 
 export default function ListaOcorrencias() {
@@ -39,10 +39,12 @@ export default function ListaOcorrencias() {
       description: 'Limpeza de terreno baldio',
       service_type: 'Limpeza',
       priority: 'alta',
-      status: 'encaminhada',
+      status: 'criada',
       address: 'Rua das Flores, 123',
       regional_id: '1',
       fiscal_id: '1',
+      origin: 'SISGEP',
+      origin_number: 'SGP-2024-001',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
@@ -52,13 +54,12 @@ export default function ListaOcorrencias() {
       description: 'Reparo em calçada',
       service_type: 'Manutenção',
       priority: 'media',
-      status: 'autorizada',
+      status: 'encaminhada',
       address: 'Av. Brasil, 456',
       regional_id: '1',
       fiscal_id: '1',
-      approved_by: 'Admin CEGOR',
-      approved_at: new Date().toISOString(),
-      scheduled_date: new Date().toISOString(),
+      forwarded_by: '2',
+      forwarded_at: new Date().toISOString(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
@@ -68,10 +69,12 @@ export default function ListaOcorrencias() {
       description: 'Poda de árvores',
       service_type: 'Conservação',
       priority: 'baixa',
-      status: 'em_execucao',
+      status: 'autorizada',
       address: 'Praça Central, s/n',
       regional_id: '1',
       fiscal_id: '1',
+      approved_by_regional: '2',
+      approved_at_regional: new Date().toISOString(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
@@ -129,7 +132,21 @@ export default function ListaOcorrencias() {
     ));
   };
 
-  const handleApproval = (id: string) => {
+  const handleRegionalApproval = (id: string) => {
+    handleStatusChange(id, 'autorizada', {
+      approved_by_regional: user?.id,
+      approved_at_regional: new Date().toISOString()
+    });
+  };
+
+  const handleForwardToCegor = (id: string) => {
+    handleStatusChange(id, 'encaminhada', {
+      forwarded_by: user?.id,
+      forwarded_at: new Date().toISOString()
+    });
+  };
+
+  const handleCegorApproval = (id: string) => {
     handleStatusChange(id, 'autorizada', {
       approved_by: user?.name,
       approved_at: new Date().toISOString()
@@ -156,12 +173,25 @@ export default function ListaOcorrencias() {
     
     // Filtrar por permissões
     if (user?.role === 'regional') {
-      return matchesSearch && ocorrencia.regional_id === user.regional_id;
+      const regionalFilter = ocorrencia.regional_id === user.regional_id;
+      
+      if (isRegionalOperador(user)) {
+        // Operador vê apenas suas próprias ocorrências ou do SISGEP/SPU
+        return matchesSearch && regionalFilter && (
+          ocorrencia.origin === 'SISGEP' || 
+          ocorrencia.origin === 'SPU' || 
+          ocorrencia.fiscal_id === user.id
+        );
+      }
+      
+      return matchesSearch && regionalFilter;
     }
+    
     if (user?.role === 'empresa') {
       // Empresa só vê ocorrências autorizadas, agendadas ou em execução
       return matchesSearch && ['autorizada', 'agendada', 'em_execucao'].includes(ocorrencia.status);
     }
+    
     return matchesSearch;
   });
 
@@ -176,7 +206,7 @@ export default function ListaOcorrencias() {
             key="permitir"
             variant="outline"
             size="sm"
-            onClick={() => handleApproval(ocorrencia.id)}
+            onClick={() => handleCegorApproval(ocorrencia.id)}
             title="Permitir Execução"
             className="text-green-600 hover:text-green-700"
           >
@@ -267,16 +297,29 @@ export default function ListaOcorrencias() {
       }
     }
 
-    // Botões para Regional
-    if (user?.role === 'regional') {
+    // Botões para Regional Gestor
+    if (isRegionalGestor(user)) {
       if (ocorrencia.status === 'criada') {
+        buttons.push(
+          <Button
+            key="executar-regional"
+            variant="outline"
+            size="sm"
+            onClick={() => handleRegionalApproval(ocorrencia.id)}
+            title="Executar na Regional"
+            className="text-green-600 hover:text-green-700"
+          >
+            <Building className="w-4 h-4" />
+          </Button>
+        );
         buttons.push(
           <Button
             key="encaminhar"
             variant="outline"
             size="sm"
-            onClick={() => handleStatusChange(ocorrencia.id, 'encaminhada')}
+            onClick={() => handleForwardToCegor(ocorrencia.id)}
             title="Encaminhar para CEGOR"
+            className="text-blue-600 hover:text-blue-700"
           >
             <Send className="w-4 h-4" />
           </Button>
@@ -328,6 +371,22 @@ export default function ListaOcorrencias() {
       }
     }
 
+    // Botões para Regional Fiscal
+    if (isRegionalFiscal(user) && ocorrencia.status === 'criada') {
+      buttons.push(
+        <Button
+          key="vistoria"
+          variant="outline"
+          size="sm"
+          asChild
+        >
+          <Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}>
+            <Camera className="w-4 h-4" />
+          </Link>
+        </Button>
+      );
+    }
+
     // Botões para Empresa
     if (user?.role === 'empresa') {
       if (ocorrencia.status === 'em_execucao') {
@@ -367,7 +426,7 @@ export default function ListaOcorrencias() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Ocorrências</h1>
-        {user?.role === 'regional' && (
+        {(user?.role === 'regional' && (isRegionalOperador(user) || isRegionalGestor(user))) && (
           <Button asChild className="flex items-center gap-2">
             <Link to="/ocorrencias/nova">
               <Plus className="w-4 h-4" />
@@ -401,6 +460,7 @@ export default function ListaOcorrencias() {
                 <TableHead>Tipo</TableHead>
                 <TableHead>Prioridade</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Origem</TableHead>
                 <TableHead>Endereço</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
@@ -420,6 +480,13 @@ export default function ListaOcorrencias() {
                     <Badge className={getStatusColor(ocorrencia.status)}>
                       {getStatusLabel(ocorrencia.status)}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {ocorrencia.origin ? (
+                      <Badge variant="outline">{ocorrencia.origin}</Badge>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
                   </TableCell>
                   <TableCell>{ocorrencia.address}</TableCell>
                   <TableCell className="text-right">

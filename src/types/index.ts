@@ -4,6 +4,7 @@ export interface User {
   name: string;
   email: string;
   role: 'cegor' | 'regional' | 'empresa';
+  subrole?: 'gestor' | 'operador' | 'fiscal'; // null para empresas
   regional_id?: string;
   created_at: string;
   updated_at: string;
@@ -71,6 +72,8 @@ export interface EquipamentoPublico {
   longitude?: number;
   bairro_id: string;
   bairro?: Bairro;
+  regional_id: string;
+  regional?: Regional;
   created_at: string;
   updated_at: string;
 }
@@ -125,10 +128,16 @@ export interface Ocorrencia {
   fiscal_id: string;
   fiscal?: Fiscal;
   
-  // Campos de aprovação
+  // Campos de aprovação CEGOR
   approved_by?: string;
   approved_at?: string;
   cancel_reason?: string;
+  
+  // Campos de aprovação Regional (v1.3)
+  approved_by_regional?: string;
+  approved_at_regional?: string;
+  forwarded_by?: string;
+  forwarded_at?: string;
   
   // Agendamento
   scheduled_date?: string;
@@ -144,6 +153,7 @@ export interface Ocorrencia {
   completed_at?: string;
   actual_hours?: number;
   execution_notes?: string;
+  company_confirmed?: boolean; // Para empresa confirmar conclusão
   
   created_at: string;
   updated_at: string;
@@ -158,3 +168,12 @@ export interface BusinessRule {
 export type OccurrenceStatus = 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
 export type Priority = 'baixa' | 'media' | 'alta';
 export type UserRole = 'cegor' | 'regional' | 'empresa';
+export type UserSubrole = 'gestor' | 'operador' | 'fiscal';
+
+// Funções auxiliares para verificar permissões
+export const isRegionalGestor = (user: User) => user.role === 'regional' && user.subrole === 'gestor';
+export const isRegionalOperador = (user: User) => user.role === 'regional' && user.subrole === 'operador';
+export const isRegionalFiscal = (user: User) => user.role === 'regional' && user.subrole === 'fiscal';
+export const isCegorGestor = (user: User) => user.role === 'cegor' && user.subrole === 'gestor';
+export const isCegorOperador = (user: User) => user.role === 'cegor' && user.subrole === 'operador';
+export const isCegorFiscal = (user: User) => user.role === 'cegor' && user.subrole === 'fiscal';

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLocation, NavLink } from 'react-router-dom';
 import { 
@@ -15,7 +16,9 @@ import {
   Activity,
   Clock,
   History,
-  MapPin as MapPinIcon
+  MapPin as MapPinIcon,
+  CheckCircle,
+  Briefcase
 } from 'lucide-react';
 import {
   Sidebar,
@@ -29,6 +32,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
+import { isRegionalGestor, isRegionalOperador, isRegionalFiscal } from '@/types';
 
 const menuItems = [
   {
@@ -46,12 +50,23 @@ const menuItems = [
     ]
   },
   {
+    title: 'Cadastros Regionais',
+    icon: Settings,
+    role: ['regional'],
+    subrole: ['gestor'],
+    items: [
+      { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building },
+    ]
+  },
+  {
     title: 'Ocorrências',
     icon: AlertCircle,
     role: ['cegor', 'regional', 'empresa'],
     items: [
       { title: 'Lista de Ocorrências', url: '/ocorrencias', icon: FileText },
-      { title: 'Nova Ocorrência', url: '/ocorrencias/nova', icon: AlertCircle, role: ['regional'] },
+      { title: 'Nova Ocorrência', url: '/ocorrencias/nova', icon: AlertCircle, role: ['regional'], subrole: ['operador', 'gestor'] },
+      { title: 'Ocorrências Aprovadas', url: '/ocorrencias/aprovadas', icon: CheckCircle, role: ['cegor'] },
+      { title: 'Demandas da Empresa', url: '/ocorrencias/demandas', icon: Briefcase, role: ['empresa'] },
     ]
   },
   {
@@ -77,9 +92,17 @@ export function AppSidebar() {
   const currentPath = location.pathname;
 
   const isActive = (path: string) => currentPath === path;
-  const hasPermission = (roles?: string[]) => {
+  const hasPermission = (roles?: string[], subroles?: string[]) => {
     if (!roles || !user) return true;
-    return roles.includes(user.role);
+    
+    const roleMatch = roles.includes(user.role);
+    if (!roleMatch) return false;
+    
+    if (subroles && user.subrole) {
+      return subroles.includes(user.subrole);
+    }
+    
+    return true;
   };
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
@@ -118,7 +141,7 @@ export function AppSidebar() {
         </div>
 
         {menuItems.map((group) => (
-          hasPermission(group.role) && (
+          hasPermission(group.role, group.subrole) && (
             <SidebarGroup key={group.title}>
               <SidebarGroupLabel className="text-white/70 px-4">
                 {!isCollapsed && group.title}
@@ -126,7 +149,7 @@ export function AppSidebar() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {group.items.map((item) => (
-                    hasPermission(item.role) && (
+                    hasPermission(item.role, item.subrole) && (
                       <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton asChild>
                           <NavLink to={item.url} className={getNavCls}>
@@ -153,7 +176,9 @@ export function AppSidebar() {
             {!isCollapsed && (
               <div className="flex-1">
                 <p className="text-sm font-medium text-white">{user?.name}</p>
-                <p className="text-xs text-white/70 capitalize">{user?.role}</p>
+                <p className="text-xs text-white/70 capitalize">
+                  {user?.role} {user?.subrole && `- ${user.subrole}`}
+                </p>
               </div>
             )}
             <button

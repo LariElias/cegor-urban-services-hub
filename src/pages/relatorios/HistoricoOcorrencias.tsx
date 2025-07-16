@@ -61,7 +61,7 @@ export default function HistoricoOcorrencias() {
       priority: 'media',
       status: 'cancelada',
       address: 'Av. Brasil, 456',
-      regional_id: '1',
+      regional_id: '2',
       fiscal_id: '1',
       cancel_reason: 'Orçamento indisponível',
       created_at: '2024-01-12T09:00:00Z',
@@ -122,6 +122,16 @@ export default function HistoricoOcorrencias() {
     }
   };
 
+  const getRegionalName = (regionalId: string) => {
+    const regionais = {
+      '1': 'Centro-Sul',
+      '2': 'Norte',
+      '3': 'Leste',
+      '4': 'Oeste',
+    };
+    return regionais[regionalId as keyof typeof regionais] || 'Desconhecida';
+  };
+
   const filteredOcorrencias = ocorrencias.filter(ocorrencia => {
     const matchesSearch = ocorrencia.protocol.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          ocorrencia.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -133,11 +143,17 @@ export default function HistoricoOcorrencias() {
     if (user?.role === 'empresa') {
       return matchesSearch && ocorrencia.empresa_id === '1'; // Mock empresa ID
     }
+    
+    // Aplicar filtro de regional para CEGOR
+    if (filters.regional && filters.regional !== 'todas') {
+      return matchesSearch && ocorrencia.regional_id === filters.regional;
+    }
+    
     return matchesSearch;
   });
 
   const exportToCSV = () => {
-    const headers = ['Protocolo', 'Descrição', 'Tipo', 'Status', 'Prioridade', 'Data Criação', 'Data Conclusão'];
+    const headers = ['Protocolo', 'Descrição', 'Tipo', 'Status', 'Prioridade', 'Regional', 'Data Criação', 'Data Conclusão'];
     const csvContent = [
       headers.join(','),
       ...filteredOcorrencias.map(ocorrencia => [
@@ -146,6 +162,7 @@ export default function HistoricoOcorrencias() {
         ocorrencia.service_type,
         getStatusLabel(ocorrencia.status),
         ocorrencia.priority,
+        getRegionalName(ocorrencia.regional_id),
         new Date(ocorrencia.created_at).toLocaleDateString('pt-BR'),
         ocorrencia.completed_at ? new Date(ocorrencia.completed_at).toLocaleDateString('pt-BR') : '-'
       ].join(','))
@@ -205,7 +222,7 @@ export default function HistoricoOcorrencias() {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="todas">Todos</SelectItem>
                   <SelectItem value="concluida">Concluída</SelectItem>
                   <SelectItem value="cancelada">Cancelada</SelectItem>
                   <SelectItem value="em_execucao">Em Execução</SelectItem>
@@ -220,13 +237,32 @@ export default function HistoricoOcorrencias() {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="todas">Todos</SelectItem>
                   <SelectItem value="Limpeza">Limpeza</SelectItem>
                   <SelectItem value="Manutenção">Manutenção</SelectItem>
                   <SelectItem value="Conservação">Conservação</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Filtro de Regional - apenas para CEGOR */}
+            {user?.role === 'cegor' && (
+              <div>
+                <Label htmlFor="regional">Regional</Label>
+                <Select value={filters.regional} onValueChange={(value) => setFilters({...filters, regional: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todas">Todas</SelectItem>
+                    <SelectItem value="1">Centro-Sul</SelectItem>
+                    <SelectItem value="2">Norte</SelectItem>
+                    <SelectItem value="3">Leste</SelectItem>
+                    <SelectItem value="4">Oeste</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div>
               <Label htmlFor="prioridade">Prioridade</Label>
@@ -281,6 +317,7 @@ export default function HistoricoOcorrencias() {
                 <TableHead>Tipo</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Prioridade</TableHead>
+                {user?.role === 'cegor' && <TableHead>Regional</TableHead>}
                 <TableHead>Data Criação</TableHead>
                 <TableHead>Data Conclusão</TableHead>
               </TableRow>
@@ -301,6 +338,13 @@ export default function HistoricoOcorrencias() {
                       {ocorrencia.priority}
                     </Badge>
                   </TableCell>
+                  {user?.role === 'cegor' && (
+                    <TableCell>
+                      <Badge variant="outline">
+                        {getRegionalName(ocorrencia.regional_id)}
+                      </Badge>
+                    </TableCell>
+                  )}
                   <TableCell>
                     {new Date(ocorrencia.created_at).toLocaleDateString('pt-BR')}
                   </TableCell>

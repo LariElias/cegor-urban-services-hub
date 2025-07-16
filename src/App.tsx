@@ -16,6 +16,8 @@ import Bairros from "./pages/cadastros/Bairros";
 // Importar páginas de ocorrências
 import ListaOcorrencias from "./pages/ocorrencias/ListaOcorrencias";
 import NovaOcorrencia from "./pages/ocorrencias/NovaOcorrencia";
+import OcorrenciasAprovadas from "./pages/ocorrencias/OcorrenciasAprovadas";
+import DemandasEmpresa from "./pages/ocorrencias/DemandasEmpresa";
 import Agendamento from "./pages/ocorrencias/Agendamento";
 import DetalhamentoExecucao from "./pages/ocorrencias/DetalhamentoExecucao";
 import VistoriaPrevia from "./pages/ocorrencias/VistoriaPrevia";
@@ -47,6 +49,8 @@ const App = () => (
             {/* Rotas de ocorrências - todas usando Layout */}
             <Route path="/ocorrencias" element={<Layout><ListaOcorrencias /></Layout>} />
             <Route path="/ocorrencias/nova" element={<Layout><NovaOcorrencia /></Layout>} />
+            <Route path="/ocorrencias/aprovadas" element={<Layout><OcorrenciasAprovadas /></Layout>} />
+            <Route path="/ocorrencias/demandas" element={<Layout><DemandasEmpresa /></Layout>} />
             <Route path="/ocorrencias/:id/agendamento" element={<Layout><Agendamento /></Layout>} />
             <Route path="/ocorrencias/:id/detalhamento" element={<Layout><DetalhamentoExecucao /></Layout>} />
             <Route path="/ocorrencias/:id/vistoria" element={<Layout><VistoriaPrevia /></Layout>} />

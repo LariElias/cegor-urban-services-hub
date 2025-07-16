@@ -2,8 +2,11 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Clock, CheckCircle, TrendingUp, Users, Building } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, Clock, CheckCircle, TrendingUp, Users, Building, Download } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { isRegionalGestor, isCegorGestor } from '@/types';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -15,7 +18,22 @@ export default function Dashboard() {
     ocorrenciasConcluidas: 1002,
     regionaisAtivas: 9,
     empresasContratadas: 15,
+    demandasPorRegional: 284,
+    pendenteAprovacao: 23,
   };
+
+  // Dados para o gráfico de demandas por regional
+  const demandaRegionalData = [
+    { name: 'Centro-Sul', demandas: 45 },
+    { name: 'Norte', demandas: 38 },
+    { name: 'Leste', demandas: 32 },
+    { name: 'Oeste', demandas: 28 },
+    { name: 'Nordeste', demandas: 25 },
+    { name: 'Barreiro', demandas: 22 },
+    { name: 'Venda Nova', demandas: 20 },
+    { name: 'Pampulha', demandas: 18 },
+    { name: 'Noroeste', demandas: 15 },
+  ];
 
   const recentOcorrencias = [
     {
@@ -49,15 +67,15 @@ export default function Dashboard() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      criada: { label: 'Criada', className: 'status-criada' },
-      agendada: { label: 'Agendada', className: 'status-agendada' },
-      em_execucao: { label: 'Em Execução', className: 'status-em-execucao' },
-      concluida: { label: 'Concluída', className: 'status-concluida' },
+      criada: { label: 'Criada', className: 'bg-gray-100 text-gray-800' },
+      agendada: { label: 'Agendada', className: 'bg-blue-100 text-blue-800' },
+      em_execucao: { label: 'Em Execução', className: 'bg-yellow-100 text-yellow-800' },
+      concluida: { label: 'Concluída', className: 'bg-green-100 text-green-800' },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
     return (
-      <Badge className={`status-badge ${config.className}`}>
+      <Badge className={config.className}>
         {config.label}
       </Badge>
     );
@@ -73,10 +91,14 @@ export default function Dashboard() {
 
     const config = priorityConfig[priority as keyof typeof priorityConfig];
     return (
-      <Badge className={`status-badge ${config.className}`}>
+      <Badge className={config.className}>
         {config.label}
       </Badge>
     );
+  };
+
+  const exportarCSV = () => {
+    alert('Exportando relatório em CSV...');
   };
 
   return (
@@ -84,11 +106,24 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Visão geral do sistema CEGOR</p>
+          <p className="text-gray-600">
+            {user?.role === 'regional' ? 'Painel da Regional' : 'Visão geral do sistema CEGOR'}
+          </p>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-gray-500">Bem-vindo,</p>
-          <p className="font-medium text-gray-900">{user?.name}</p>
+        <div className="flex items-center gap-4">
+          {isCegorGestor(user) && (
+            <Button onClick={exportarCSV} variant="outline" className="flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              Exportar CSV
+            </Button>
+          )}
+          <div className="text-right">
+            <p className="text-sm text-gray-500">Bem-vindo,</p>
+            <p className="font-medium text-gray-900">{user?.name}</p>
+            <p className="text-xs text-gray-500 capitalize">
+              {user?.role} {user?.subrole && `- ${user.subrole}`}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -96,11 +131,15 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Ocorrências</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {user?.role === 'regional' ? 'Ocorrências da Regional' : 'Total de Ocorrências'}
+            </CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardData.totalOcorrencias}</div>
+            <div className="text-2xl font-bold">
+              {user?.role === 'regional' ? '45' : dashboardData.totalOcorrencias}
+            </div>
             <p className="text-xs text-muted-foreground">
               +12% em relação ao mês anterior
             </p>
@@ -109,13 +148,17 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pendentes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {isRegionalGestor(user) ? 'Pendentes de Aprovação' : 'Pendentes'}
+            </CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardData.ocorrenciasPendentes}</div>
+            <div className="text-2xl font-bold">
+              {isRegionalGestor(user) ? dashboardData.pendenteAprovacao : dashboardData.ocorrenciasPendentes}
+            </div>
             <p className="text-xs text-muted-foreground">
-              Aguardando agendamento
+              {isRegionalGestor(user) ? 'Aguardando sua aprovação' : 'Aguardando agendamento'}
             </p>
           </CardContent>
         </Card>
@@ -126,7 +169,9 @@ export default function Dashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardData.ocorrenciasAndamento}</div>
+            <div className="text-2xl font-bold">
+              {user?.role === 'regional' ? '12' : dashboardData.ocorrenciasAndamento}
+            </div>
             <p className="text-xs text-muted-foreground">
               Sendo executadas
             </p>
@@ -139,13 +184,42 @@ export default function Dashboard() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardData.ocorrenciasConcluidas}</div>
+            <div className="text-2xl font-bold">
+              {user?.role === 'regional' ? '28' : dashboardData.ocorrenciasConcluidas}
+            </div>
             <p className="text-xs text-muted-foreground">
               Finalizadas este mês
             </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Card adicional de demandas por regional para CEGOR */}
+      {isCegorGestor(user) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Demandas por Regional</CardTitle>
+            <CardDescription>
+              Distribuição de ocorrências criadas e encaminhadas por regional (últimos 30 dias)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-4">
+              <div className="text-2xl font-bold text-blue-600">{dashboardData.demandasPorRegional}</div>
+              <p className="text-sm text-muted-foreground">Total de demandas este mês</p>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={demandaRegionalData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="demandas" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Informações do sistema */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
