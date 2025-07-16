@@ -113,7 +113,7 @@ export default function TempoExecucao() {
                     <SelectValue placeholder="Todas" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todas</SelectItem>
+                    <SelectItem value="todas">Todas</SelectItem>
                     <SelectItem value="1">Empresa Limpeza BH</SelectItem>
                     <SelectItem value="2">Serviços Urbanos Ltda</SelectItem>
                   </SelectContent>
@@ -129,7 +129,7 @@ export default function TempoExecucao() {
                     <SelectValue placeholder="Todas" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todas</SelectItem>
+                    <SelectItem value="todas">Todas</SelectItem>
                     <SelectItem value="1">Regional Centro-Sul</SelectItem>
                     <SelectItem value="2">Regional Norte</SelectItem>
                   </SelectContent>
