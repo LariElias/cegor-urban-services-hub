@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus, Edit, Eye, Play, Search } from 'lucide-react';
+import { Plus, Edit, Eye, Play, Send, CheckCircle, XCircle, Camera, FileText, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,15 +50,44 @@ export default function ListaOcorrencias() {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
+    {
+      id: '3',
+      protocol: 'OCR-2024-003',
+      description: 'Poda de árvores',
+      service_type: 'Conservação',
+      priority: 'baixa',
+      status: 'em_execucao',
+      address: 'Praça Central, s/n',
+      regional_id: '1',
+      fiscal_id: '1',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
   ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'criada': return 'bg-gray-100 text-gray-800';
-      case 'agendada': return 'bg-blue-100 text-blue-800';
-      case 'em_execucao': return 'bg-yellow-100 text-yellow-800';
+      case 'encaminhada': return 'bg-blue-100 text-blue-800';
+      case 'devolvida': return 'bg-red-100 text-red-800';
+      case 'em_analise': return 'bg-yellow-100 text-yellow-800';
+      case 'agendada': return 'bg-purple-100 text-purple-800';
+      case 'em_execucao': return 'bg-orange-100 text-orange-800';
       case 'concluida': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'criada': return 'Criada';
+      case 'encaminhada': return 'Encaminhada';
+      case 'devolvida': return 'Devolvida';
+      case 'em_analise': return 'Em Análise';
+      case 'agendada': return 'Agendada';
+      case 'em_execucao': return 'Em Execução';
+      case 'concluida': return 'Concluída';
+      default: return status;
     }
   };
 
@@ -66,20 +95,17 @@ export default function ListaOcorrencias() {
     switch (priority) {
       case 'baixa': return 'bg-green-100 text-green-800';
       case 'media': return 'bg-yellow-100 text-yellow-800';
-      case 'alta': return 'bg-orange-100 text-orange-800';
-      case 'urgente': return 'bg-red-100 text-red-800';
+      case 'alta': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const handleStartExecution = (id: string) => {
-    if (confirm('Deseja iniciar a execução desta ocorrência?')) {
-      setOcorrencias(ocorrencias.map(o => 
-        o.id === id 
-          ? { ...o, status: 'em_execucao' as const, started_at: new Date().toISOString() }
-          : o
-      ));
-    }
+  const handleStatusChange = (id: string, newStatus: Ocorrencia['status']) => {
+    setOcorrencias(ocorrencias.map(o => 
+      o.id === id 
+        ? { ...o, status: newStatus, updated_at: new Date().toISOString() }
+        : o
+    ));
   };
 
   const filteredOcorrencias = ocorrencias.filter(ocorrencia => {
@@ -95,6 +121,133 @@ export default function ListaOcorrencias() {
     }
     return matchesSearch;
   });
+
+  const renderActionButtons = (ocorrencia: Ocorrencia) => {
+    const buttons = [];
+
+    // Botões para Regional
+    if (user?.role === 'regional') {
+      if (ocorrencia.status === 'criada') {
+        buttons.push(
+          <Button
+            key="encaminhar"
+            variant="outline"
+            size="sm"
+            onClick={() => handleStatusChange(ocorrencia.id, 'encaminhada')}
+            title="Encaminhar para CEGOR"
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+        );
+      }
+      
+      if (ocorrencia.status === 'agendada') {
+        buttons.push(
+          <Button
+            key="executar"
+            variant="outline"
+            size="sm"
+            onClick={() => handleStatusChange(ocorrencia.id, 'em_execucao')}
+            title="Iniciar execução"
+          >
+            <Play className="w-4 h-4" />
+          </Button>
+        );
+      }
+
+      if (ocorrencia.status === 'em_execucao') {
+        buttons.push(
+          <Button
+            key="detalhar"
+            variant="outline"
+            size="sm"
+            asChild
+          >
+            <Link to={`/ocorrencias/${ocorrencia.id}/detalhamento`}>
+              <Edit className="w-4 h-4" />
+            </Link>
+          </Button>
+        );
+      }
+    }
+
+    // Botões para CEGOR
+    if (user?.role === 'cegor') {
+      if (ocorrencia.status === 'encaminhada') {
+        buttons.push(
+          <Button
+            key="executar"
+            variant="outline"
+            size="sm"
+            onClick={() => handleStatusChange(ocorrencia.id, 'agendada')}
+            title="Executar"
+          >
+            <CheckCircle className="w-4 h-4" />
+          </Button>
+        );
+        buttons.push(
+          <Button
+            key="devolver"
+            variant="outline"
+            size="sm"
+            onClick={() => handleStatusChange(ocorrencia.id, 'devolvida')}
+            title="Devolver"
+          >
+            <XCircle className="w-4 h-4" />
+          </Button>
+        );
+      }
+
+      if (ocorrencia.status === 'criada') {
+        buttons.push(
+          <Button
+            key="vistoria"
+            variant="outline"
+            size="sm"
+            asChild
+          >
+            <Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}>
+              <Camera className="w-4 h-4" />
+            </Link>
+          </Button>
+        );
+      }
+    }
+
+    // Botões para Empresa
+    if (user?.role === 'empresa') {
+      if (ocorrencia.status === 'em_execucao') {
+        buttons.push(
+          <Button
+            key="acompanhamento"
+            variant="outline"
+            size="sm"
+            asChild
+          >
+            <Link to={`/ocorrencias/${ocorrencia.id}/acompanhamento`}>
+              <FileText className="w-4 h-4" />
+            </Link>
+          </Button>
+        );
+      }
+    }
+
+    // Botão de visualizar sempre presente
+    buttons.push(
+      <Button
+        key="visualizar"
+        variant="outline"
+        size="sm"
+        asChild
+      >
+        <Link to={`/ocorrencias/${ocorrencia.id}`}>
+          <Eye className="w-4 h-4" />
+        </Link>
+      </Button>
+    );
+
+    return buttons;
+  };
 
   return (
     <div className="space-y-6">
@@ -151,34 +304,13 @@ export default function ListaOcorrencias() {
                   </TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(ocorrencia.status)}>
-                      {ocorrencia.status.replace('_', ' ')}
+                      {getStatusLabel(ocorrencia.status)}
                     </Badge>
                   </TableCell>
                   <TableCell>{ocorrencia.address}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Button variant="outline" size="sm" asChild>
-                        <Link to={`/ocorrencias/${ocorrencia.id}`}>
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                      {user?.role === 'regional' && ocorrencia.status === 'agendada' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleStartExecution(ocorrencia.id)}
-                          title="Iniciar execução"
-                        >
-                          <Play className="w-4 h-4" />
-                        </Button>
-                      )}
-                      {user?.role === 'regional' && ocorrencia.status === 'em_execucao' && (
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={`/ocorrencias/${ocorrencia.id}/detalhamento`}>
-                            <Edit className="w-4 h-4" />
-                          </Link>
-                        </Button>
-                      )}
+                      {renderActionButtons(ocorrencia)}
                     </div>
                   </TableCell>
                 </TableRow>

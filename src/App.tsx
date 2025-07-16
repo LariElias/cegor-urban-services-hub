@@ -16,6 +16,10 @@ import Bairros from "./pages/cadastros/Bairros";
 // Importar páginas de ocorrências
 import ListaOcorrencias from "./pages/ocorrencias/ListaOcorrencias";
 import NovaOcorrencia from "./pages/ocorrencias/NovaOcorrencia";
+import Agendamento from "./pages/ocorrencias/Agendamento";
+import DetalhamentoExecucao from "./pages/ocorrencias/DetalhamentoExecucao";
+import VistoriaPrevia from "./pages/ocorrencias/VistoriaPrevia";
+import AcompanhamentoDiario from "./pages/ocorrencias/AcompanhamentoDiario";
 
 // Importar páginas de relatórios
 import DashboardGeral from "./pages/relatorios/DashboardGeral";
@@ -40,6 +44,10 @@ const App = () => (
             {/* Rotas de ocorrências - todas usando Layout */}
             <Route path="/ocorrencias" element={<Layout><ListaOcorrencias /></Layout>} />
             <Route path="/ocorrencias/nova" element={<Layout><NovaOcorrencia /></Layout>} />
+            <Route path="/ocorrencias/:id/agendamento" element={<Layout><Agendamento /></Layout>} />
+            <Route path="/ocorrencias/:id/detalhamento" element={<Layout><DetalhamentoExecucao /></Layout>} />
+            <Route path="/ocorrencias/:id/vistoria" element={<Layout><VistoriaPrevia /></Layout>} />
+            <Route path="/ocorrencias/:id/acompanhamento" element={<Layout><AcompanhamentoDiario /></Layout>} />
             
             {/* Rotas de relatórios - todas usando Layout */}
             <Route path="/relatorios/dashboard" element={<Layout><DashboardGeral /></Layout>} />

@@ -103,8 +103,14 @@ export interface Ocorrencia {
   protocol: string;
   description: string;
   service_type: string;
-  priority: 'baixa' | 'media' | 'alta' | 'urgente';
-  status: 'criada' | 'agendada' | 'em_execucao' | 'concluida';
+  priority: 'baixa' | 'media' | 'alta';
+  status: 'criada' | 'encaminhada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
+  
+  // Campos atualizados RF010
+  occurrence_date?: string;
+  occurrence_type?: string;
+  origin?: string;
+  origin_number?: string;
   
   // Localização
   address: string;
@@ -138,6 +144,12 @@ export interface Ocorrencia {
   updated_at: string;
 }
 
-export type OccurrenceStatus = 'criada' | 'agendada' | 'em_execucao' | 'concluida';
-export type Priority = 'baixa' | 'media' | 'alta' | 'urgente';
+export interface BusinessRule {
+  id: string;
+  code: string;
+  description: string;
+}
+
+export type OccurrenceStatus = 'criada' | 'encaminhada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
+export type Priority = 'baixa' | 'media' | 'alta';
 export type UserRole = 'cegor' | 'regional' | 'empresa';
