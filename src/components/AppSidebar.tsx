@@ -44,6 +44,7 @@ const menuItems = [
       { title: 'Bairros', url: '/cadastros/bairros', icon: MapPin, role: ['cegor'] },
       { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin, role: ['cegor'] },
       { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield, role: ['cegor'] },
+      { title: 'ZGL', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'] },
       { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building, role: ['cegor'] },
       { title: 'Empresas', url: '/cadastros/empresas', icon: Building, role: ['cegor'] },
     ]
@@ -77,7 +78,7 @@ const menuItems = [
     items: [
       { title: 'Dashboard Geral', url: '/relatorios/dashboard', icon: Activity, role: ['cegor'] },
       { title: 'Tempo de Execução', url: '/relatorios/tempo', icon: Clock, role: ['cegor', 'regional'] },
-      { title: 'Mapa de Ocorrências', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'] },
+      // { title: 'Mapa de Ocorrências', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'] },
       { title: 'Histórico', url: '/relatorios/historico', icon: History, role: ['cegor', 'regional', 'empresa'] },
       { title: 'Relatório Regional', url: '/relatorios/regional', icon: BarChart3, role: ['regional'] },
       { title: 'Serviços Programados', url: '/relatorios/programados', icon: Calendar, role: ['empresa'] },
