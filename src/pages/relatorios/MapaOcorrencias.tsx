@@ -215,7 +215,7 @@ export default function MapaOcorrencias() {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
                     <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-600">Mapa será implementado com Leaflet</p>
+                    <p className="text-gray-600">Mapa será implementado com mapas.fortaleza.ce.gov.br</p>
                     <p className="text-sm text-gray-500">Centro: Fortaleza (-3.732, -38.527)</p>
                   </div>
                 </div>
