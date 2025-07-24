@@ -170,6 +170,25 @@ export interface BusinessRule {
   description: string;
 }
 
+// Interfaces para formulários
+export interface EquipamentoFormProps {
+  equipamento?: any;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+}
+
+export interface FiscalFormProps {
+  fiscal?: any;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+}
+
+export interface TerritorioFormProps {
+  territorio?: any;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+}
+
 export type OccurrenceStatus = 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
 export type Priority = 'baixa' | 'media' | 'alta';
 export type UserRole = 'cegor' | 'regional' | 'empresa';
@@ -182,3 +201,30 @@ export const isRegionalFiscal = (user: User | null) => user?.role === 'regional'
 export const isCegorGestor = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'gestor';
 export const isCegorOperador = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'operador';
 export const isCegorFiscal = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'fiscal';
+
+// Função para obter permissões de botões baseado no role e subrole
+export const getPermittedActions = (role: string, subrole?: string): string[] => {
+  const permissions: Record<string, Record<string, string[]>> = {
+    cegor: {
+      gestor: ['visualizar', 'andamento_vistoria'],
+      fiscal: ['realizar_vistoria', 'acompanhamento', 'permitir_execucao'],
+      operador: ['agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao', 'visualizar']
+    },
+    regional: {
+      gestor: ['visualizar', 'acompanhamento'],
+      fiscal: ['realizar_vistoria', 'acompanhamento', 'permitir_execucao', 'encaminhar'],
+      operador: ['agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao', 'visualizar', 'encaminhar']
+    },
+    empresa: {
+      gestor: ['visualizar', 'acompanhamento'],
+      fiscal: ['visualizar', 'encerrar_ocorrencia', 'acompanhamento', 'realizar_vistoria'],
+      operador: ['visualizar', 'acompanhamento']
+    }
+  };
+
+  if (!subrole || !permissions[role] || !permissions[role][subrole]) {
+    return [];
+  }
+
+  return permissions[role][subrole];
+};

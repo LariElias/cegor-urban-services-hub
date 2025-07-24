@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Eye, Play, Send, CheckCircle, XCircle, Camera, FileText, Search, Check, X, Building, LayoutGrid, List, Calendar } from 'lucide-react';
+import { Plus, Search, LayoutGrid, List, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,13 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useAuth } from '@/context/AuthContext';
-import { Ocorrencia, isRegionalGestor, isRegionalOperador, isRegionalFiscal } from '@/types';
+import { Ocorrencia, getPermittedActions } from '@/types';
+import { getActionButton } from '@/utils/actionButtons';
 import { Link } from 'react-router-dom';
 
-// Mock data com status 'executada' para teste do fiscal
+// Mock data atualizado com public_equipment_name
 const mockOcorrencias: Ocorrencia[] = [
   {
     id: '1', protocol: 'OCR-2024-001', description: 'Limpeza de terreno baldio', service_type: 'Limpeza',
@@ -202,7 +203,11 @@ const ListView = ({ ocorrencias, renderActionButtons }) => (
                 ? new Date(ocorrencia.vistoria_pos_date).toLocaleDateString('pt-BR')
                 : '-'}
             </TableCell>
-            <TableCell className="text-right"><div className="flex items-center justify-end gap-2">{renderActionButtons(ocorrencia)}</div></TableCell>
+            <TableCell className="text-right">
+              <div className="flex items-center justify-end gap-2">
+                {renderActionButtons(ocorrencia)}
+              </div>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -229,6 +234,18 @@ const GridView = ({ ocorrencias, renderActionButtons }) => (
                         <span className="text-sm font-medium">Status:</span>
                         <Badge className={getStatusColor(ocorrencia.status)}>{getStatusLabel(ocorrencia.status)}</Badge>
                     </div>
+                    <div className="space-y-2 text-xs text-gray-500">
+                        <p><strong>Criação:</strong> {new Date(ocorrencia.created_at).toLocaleDateString('pt-BR')}</p>
+                        {ocorrencia.vistoria_previa_date && (
+                            <p><strong>Vistoria Prévia:</strong> {new Date(ocorrencia.vistoria_previa_date).toLocaleDateString('pt-BR')}</p>
+                        )}
+                        {ocorrencia.scheduled_date && (
+                            <p><strong>Agendamento:</strong> {new Date(ocorrencia.scheduled_date).toLocaleDateString('pt-BR')}</p>
+                        )}
+                        {ocorrencia.vistoria_pos_date && (
+                            <p><strong>Vistoria Pós:</strong> {new Date(ocorrencia.vistoria_pos_date).toLocaleDateString('pt-BR')}</p>
+                        )}
+                    </div>
                 </CardContent>
                 <div className="flex items-center justify-end gap-2 p-4 pt-2 border-t mt-auto">
                     {renderActionButtons(ocorrencia)}
@@ -238,16 +255,17 @@ const GridView = ({ ocorrencias, renderActionButtons }) => (
     </div>
 );
 
-
 export default function ListaOcorrencias() {
   const { user } = useAuth();
   const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>(mockOcorrencias);
+  
   // Estados para filtros
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedPriority, setSelectedPriority] = useState('');
   const [selectedEquipamento, setSelectedEquipamento] = useState('');
   const [scheduledDateFilter, setScheduledDateFilter] = useState('');
+  
   // Estados para UI e Dialogs
   const [viewMode, setViewMode] = useState('list');
   const [currentPage, setCurrentPage] = useState(1);
@@ -264,30 +282,37 @@ export default function ListaOcorrencias() {
   const handleStatusChange = (id: string, newStatus: Ocorrencia['status'], additionalData?: any) => {
     setOcorrencias(ocorrencias.map(o => o.id === id ? { ...o, status: newStatus, updated_at: new Date().toISOString(), ...additionalData } : o));
   };
-  const handleRegionalApproval = (id: string) => handleStatusChange(id, 'autorizada', { approved_by_regional: user?.id, approved_at_regional: new Date().toISOString() });
-  const handleForwardToCegor = (id: string) => handleStatusChange(id, 'encaminhada', { forwarded_by: user?.id, forwarded_at: new Date().toISOString() });
-  const handleCegorApproval = (id: string) => handleStatusChange(id, 'autorizada', { approved_by: user?.name, approved_at: new Date().toISOString() });
-  
-  const handleCancellation = () => {
-    if (!cancelingOcorrenciaId || !cancelReason.trim()) { alert('Motivo do cancelamento é obrigatório'); return; }
-    handleStatusChange(cancelingOcorrenciaId, 'cancelada', { cancel_reason: cancelReason });
-    setCancelReason('');
-    setCancelingOcorrenciaId(null);
+
+  const handleAction = (action: string, ocorrenciaId: string) => {
+    switch (action) {
+      case 'permitir_execucao':
+        handleStatusChange(ocorrenciaId, 'autorizada', { approved_by_regional: user?.id, approved_at_regional: new Date().toISOString() });
+        break;
+      case 'encaminhar':
+        handleStatusChange(ocorrenciaId, 'encaminhada', { forwarded_by: user?.id, forwarded_at: new Date().toISOString() });
+        break;
+      case 'agendar_ocorrencia':
+        const ocorrencia = ocorrencias.find(o => o.id === ocorrenciaId);
+        if (ocorrencia) {
+          setSchedulingOcorrencia(ocorrencia);
+        }
+        break;
+      default:
+        console.log(`Ação ${action} para ocorrência ${ocorrenciaId}`);
+    }
   };
 
   const handleSchedule = () => {
-    if (!schedulingOcorrencia || !newScheduleDate || !scheduleTime) { alert('A data e o horário do agendamento são obrigatórios.'); return; }
-    console.log({ responsibleCompany, teamSize });
+    if (!schedulingOcorrencia || !newScheduleDate || !scheduleTime) { 
+      alert('A data e o horário do agendamento são obrigatórios.'); 
+      return; 
+    }
     handleStatusChange(schedulingOcorrencia.id, 'agendada', { scheduled_date: new Date(newScheduleDate).toISOString() });
     setSchedulingOcorrencia(null);
     setNewScheduleDate('');
     setResponsibleCompany('');
     setTeamSize('');
     setScheduleTime('');
-  };
-
-  const handleFiscalApproval = (id: string) => {
-    handleStatusChange(id, 'concluida', { fiscal_approved_by: user?.id, fiscal_approved_at: new Date().toISOString() });
   };
 
   // --- Lógica de Filtragem ---
@@ -316,40 +341,48 @@ export default function ListaOcorrencias() {
   const currentListItems = filteredOcorrencias.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredOcorrencias.length / itemsPerPage);
 
-  // --- Renderização de Botões ---
+  // --- Renderização de Botões baseada em Permissões ---
   const renderActionButtons = (ocorrencia: Ocorrencia) => {
-    const buttons = [];
+    if (!user) return [];
 
-
-    buttons.push(<Button key="agendar" variant="outline" size="icon" onClick={() => setSchedulingOcorrencia(ocorrencia)} title="Agendar Ocorrência"><Calendar className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="vistoria" variant="outline" size="icon" asChild title="Realizar Vistoria"><Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}><Camera className="w-4 h-4" /></Link></Button>);
-    buttons.push(<Button key="acompanhamento" variant="outline" size="icon" asChild title="Acompanhamento"><Link to={`/ocorrencias/${ocorrencia.id}/acompanhamento`}><FileText className="w-4 h-4" /></Link></Button>);
-    buttons.push(<Button key="executar-regional" variant="outline" size="icon" onClick={() => handleRegionalApproval(ocorrencia.id)} title="Executar na Regional" className="text-green-600 hover:text-green-700"><Building className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="encaminhar" variant="outline" size="icon" onClick={() => handleForwardToCegor(ocorrencia.id)} title="Encaminhar para CEGOR" className="text-blue-600 hover:text-blue-700"><Send className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="executar" variant="outline" size="icon" onClick={() => handleStatusChange(ocorrencia.id, 'em_execucao')} title="Iniciar execução"><Play className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="detalhar" variant="outline" size="icon" asChild title="Detalhar Execução"><Link to={`/ocorrencias/${ocorrencia.id}/detalhamento`}><Edit className="w-4 h-4" /></Link></Button>);
-    buttons.push(<Button key="aprovar-fiscal" variant="outline" size="icon" asChild title="Concluir Ocorrência (Fiscal)" className="text-green-600 hover:text-green-700"><Link to={`/ocorrencias/${ocorrencia.id}/vistoria_final`}><CheckCircle className="w-4 h-4" /></Link></Button>);
-    buttons.push(<Button key="visualizar" variant="outline" size="icon" asChild title="Visualizar"><Link to={`/ocorrencias/${ocorrencia.id}`}><Eye className="w-4 h-4" /></Link></Button>);
+    const permittedActions = getPermittedActions(user.role, user.subrole);
     
-    return buttons;
+    return permittedActions.map(action => 
+      getActionButton(action, ocorrencia.id, (id) => handleAction(action, id))
+    ).filter(Boolean);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Ocorrências</h1>
-        {(isRegionalOperador(user) || isRegionalGestor(user)) && (
-          <Button asChild><Link to="/ocorrencias/nova"><Plus className="w-4 h-4 mr-2" />Nova Ocorrência</Link></Button>
-        )}
+        <Button asChild>
+          <Link to="/ocorrencias/nova">
+            <Plus className="w-4 h-4 mr-2" />Nova Ocorrência
+          </Link>
+        </Button>
       </div>
 
       <Card>
         <CardHeader><CardTitle className="flex items-center gap-2"><Search className="w-4 h-4" /> Filtros</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <Input placeholder="Buscar protocolo ou descrição..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="lg:col-span-2" />
-          <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm"><option value="">Todos os Status</option>{['criada', 'encaminhada', 'autorizada', 'agendada', 'em_execucao', 'executada', 'concluida', 'cancelada', 'devolvida'].map(s => <option key={s} value={s}>{getStatusLabel(s)}</option>)}</select>
-          <select value={selectedPriority} onChange={(e) => setSelectedPriority(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm"><option value="">Todas as Prioridades</option><option value="baixa">Baixa</option><option value="media">Média</option><option value="alta">Alta</option></select>
-          <select value={selectedEquipamento} onChange={(e) => setSelectedEquipamento(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm"><option value="">Todos Equipamentos</option>{uniqueEquipamentos.map(e => <option key={e} value={e}>{e}</option>)}</select>
+          <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm">
+            <option value="">Todos os Status</option>
+            {['criada', 'encaminhada', 'autorizada', 'agendada', 'em_execucao', 'executada', 'concluida', 'cancelada', 'devolvida'].map(s => 
+              <option key={s} value={s}>{getStatusLabel(s)}</option>
+            )}
+          </select>
+          <select value={selectedPriority} onChange={(e) => setSelectedPriority(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm">
+            <option value="">Todas as Prioridades</option>
+            <option value="baixa">Baixa</option>
+            <option value="media">Média</option>
+            <option value="alta">Alta</option>
+          </select>
+          <select value={selectedEquipamento} onChange={(e) => setSelectedEquipamento(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm">
+            <option value="">Todos Equipamentos</option>
+            {uniqueEquipamentos.map(e => <option key={e} value={e}>{e}</option>)}
+          </select>
           <Input type="date" value={scheduledDateFilter} onChange={(e) => setScheduledDateFilter(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm" />
         </CardContent>
       </Card>
@@ -357,8 +390,12 @@ export default function ListaOcorrencias() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">{filteredOcorrencias.length} ocorrências encontradas</p>
         <div className="flex items-center justify-end gap-2 p-1 bg-gray-100 rounded-lg">
-          <Button variant={viewMode === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('grid')}><LayoutGrid className="w-4 h-4" /></Button>
-          <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('list')}><List className="w-4 h-4" /></Button>
+          <Button variant={viewMode === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('grid')}>
+            <LayoutGrid className="w-4 h-4" />
+          </Button>
+          <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('list')}>
+            <List className="w-4 h-4" />
+          </Button>
         </div>
       </div>
       
@@ -372,35 +409,43 @@ export default function ListaOcorrencias() {
               {totalPages > 1 && (
                 <Pagination>
                   <PaginationContent>
-                    <PaginationItem><PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.max(p - 1, 1)); }} className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined} /></PaginationItem>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        href="#" 
+                        onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.max(p - 1, 1)); }} 
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined} 
+                      />
+                    </PaginationItem>
                     {[...Array(totalPages).keys()].map(num => (
-                      <PaginationItem key={num + 1}><PaginationLink href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(num + 1); }} isActive={currentPage === num + 1}>{num + 1}</PaginationLink></PaginationItem>
+                      <PaginationItem key={num + 1}>
+                        <PaginationLink 
+                          href="#" 
+                          onClick={(e) => { e.preventDefault(); setCurrentPage(num + 1); }} 
+                          isActive={currentPage === num + 1}
+                        >
+                          {num + 1}
+                        </PaginationLink>
+                      </PaginationItem>
                     ))}
-                    <PaginationItem><PaginationNext href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.min(p + 1, totalPages)); }} className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined} /></PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext 
+                        href="#" 
+                        onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.min(p + 1, totalPages)); }} 
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined} 
+                      />
+                    </PaginationItem>
                   </PaginationContent>
                 </Pagination>
               )}
             </div>
           )
         ) : (
-          <div className="text-center py-16 bg-gray-50 rounded-lg"><p className="text-gray-500">Nenhuma ocorrência encontrada.</p></div>
+          <div className="text-center py-16 bg-gray-50 rounded-lg">
+            <p className="text-gray-500">Nenhuma ocorrência encontrada.</p>
+          </div>
         )}
       </div>
 
-      <Dialog open={!!cancelingOcorrenciaId} onOpenChange={(isOpen) => !isOpen && setCancelingOcorrenciaId(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Cancelar Ocorrência</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <p>Deseja cancelar a ocorrência {ocorrencias.find(o => o.id === cancelingOcorrenciaId)?.protocol}?</p>
-            <Textarea value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} placeholder="Informe o motivo do cancelamento *" rows={3} />
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setCancelingOcorrenciaId(null)}>Voltar</Button>
-              <Button variant="destructive" onClick={handleCancellation}>Confirmar Cancelamento</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
       <Dialog open={!!schedulingOcorrencia} onOpenChange={(isOpen) => !isOpen && setSchedulingOcorrencia(null)}>
         <DialogContent className="sm:max-w-[600px]">
             <DialogHeader><DialogTitle>Agendamento da Ocorrência</DialogTitle></DialogHeader>
@@ -449,7 +494,6 @@ export default function ListaOcorrencias() {
             </div>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }
