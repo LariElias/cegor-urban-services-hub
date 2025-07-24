@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/AuthContext';
 import { Ocorrencia } from '@/types';
 
-// Schema de validação atualizado
+// Schema de validação atualizado com o campo fiscal_id
 const ocorrenciaSchema = z.object({
   occurrence_date: z.string().min(1, 'Data da ocorrência é obrigatória'),
   occurrence_type: z.string().min(1, 'Tipo de ocorrência é obrigatório'),
@@ -21,6 +21,7 @@ const ocorrenciaSchema = z.object({
   origin_number: z.string().min(1, 'Número de origem é obrigatório'),
   public_equipment_id: z.string().min(1, 'Equipamento público é obrigatório'),
   territory_id: z.string().optional(),
+  fiscal_id: z.string().min(1, 'É obrigatório selecionar um fiscal'), // Novo campo
   street_type: z.string().optional(),
   street_name: z.string().optional(),
   street_number: z.string().optional(),
@@ -32,16 +33,15 @@ const ocorrenciaSchema = z.object({
   attachments: z.array(z.string()).optional(),
   observations: z.string().optional(),
   should_schedule: z.boolean().default(false),
-  schedule_date: z.string().optional(), // Campo de data de agendamento
+  schedule_date: z.string().optional(),
 }).refine(data => {
-  // Torna a data de agendamento obrigatória se o checkbox estiver marcado
   if (data.should_schedule) {
     return !!data.schedule_date;
   }
   return true;
 }, {
   message: 'Data de agendamento é obrigatória.',
-  path: ['schedule_date'], // Associa o erro ao campo correto
+  path: ['schedule_date'],
 });
 
 type OcorrenciaFormData = z.infer<typeof ocorrenciaSchema>;
@@ -78,6 +78,12 @@ export default function NovaOcorrencia() {
     { id: '1', name: 'Centro' },
     { id: '2', name: 'Norte' },
     { id: '3', name: 'Sul' },
+  ];
+
+  const fiscais = [
+      { id: '1', name: 'João Silva (Fiscal)'},
+      { id: '2', name: 'Maria Santos (Fiscal)'},
+      { id: '3', name: 'Carlos Pereira (Fiscal)'},
   ];
 
   const handleEquipmentChange = (equipmentId: string) => {
@@ -140,11 +146,11 @@ export default function NovaOcorrencia() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* <div className="space-y-2">
+              <div className="space-y-2">
                 <Label htmlFor="occurrence_date">Data da Ocorrência *</Label>
                 <Input id="occurrence_date" type="date" {...register('occurrence_date')} />
                 {errors.occurrence_date && <p className="text-sm text-red-500">{errors.occurrence_date.message}</p>}
-              </div> */}
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="occurrence_type">Tipo de Ocorrência *</Label>
@@ -187,6 +193,15 @@ export default function NovaOcorrencia() {
                   <option value="">Selecione o território</option>
                   {territories.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="fiscal_id">Selecione o fiscal para vistoria *</Label>
+                <select id="fiscal_id" {...register('fiscal_id')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                  <option value="">Selecione o fiscal</option>
+                  {fiscais.map(fiscal => <option key={fiscal.id} value={fiscal.id}>{fiscal.name}</option>)}
+                </select>
+                {errors.fiscal_id && <p className="text-sm text-red-500">{errors.fiscal_id.message}</p>}
               </div>
 
               <div className="space-y-2">
@@ -267,33 +282,32 @@ export default function NovaOcorrencia() {
               <Label htmlFor="observations">Observações</Label>
               <Textarea id="observations" {...register('observations')} placeholder="Observações adicionais" rows={2} />
             </div>
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="should_schedule" checked={shouldSchedule} onCheckedChange={(checked) => setValue('should_schedule', checked as boolean)} />
-                  <Label htmlFor="should_schedule" className="flex items-center gap-2 cursor-pointer">
-                    <Calendar className="w-4 h-4" /> Deseja agendar esta ocorrência?
-                  </Label>
+            
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="should_schedule" checked={shouldSchedule} onCheckedChange={(checked) => setValue('should_schedule', checked as boolean)} />
+                <Label htmlFor="should_schedule" className="flex items-center gap-2 cursor-pointer">
+                  <Calendar className="w-4 h-4" /> Deseja agendar esta ocorrência?
+                </Label>
+              </div>
+
+              {shouldSchedule && (
+                <div className="space-y-2 pl-6 animate-in fade-in-50">
+                  <Label htmlFor="schedule_date">Data de Agendamento da Ocorrência *</Label>
+                  <Input id="schedule_date" type="date" {...register('schedule_date')} />
+                  {errors.schedule_date && <p className="text-sm text-red-500">{errors.schedule_date.message}</p>}
                 </div>
+              )}
+            </div>
 
-                {shouldSchedule && (
-                  <div className="space-y-2 pl-6 animate-in fade-in-50">
-                    <Label htmlFor="schedule_date">Data de Agendamento da Ocorrência *</Label>
-                    <Input id="schedule_date" type="date" {...register('schedule_date')} />
-                    {errors.schedule_date && <p className="text-sm text-red-500">{errors.schedule_date.message}</p>}
-                  </div>
-                )}
-              </div>
-            </div> */}
-
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => navigate('/ocorrencias')}>
-                  Cancelar
-                </Button>
-                <Button type="submit">
-                  {shouldSchedule ? 'Salvar e Agendar' : 'Salvar'}
-                </Button>
-              </div>
+            <div className="flex justify-end space-x-2">
+              <Button type="button" variant="outline" onClick={() => navigate('/ocorrencias')}>
+                Cancelar
+              </Button>
+              <Button type="submit">
+                {shouldSchedule ? 'Salvar e Agendar' : 'Salvar'}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
