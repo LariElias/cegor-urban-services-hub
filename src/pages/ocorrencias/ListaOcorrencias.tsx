@@ -320,8 +320,7 @@ export default function ListaOcorrencias() {
   const renderActionButtons = (ocorrencia: Ocorrencia) => {
     const buttons = [];
 
-    buttons.push(<Button key="permitir" variant="outline" size="icon" onClick={() => handleCegorApproval(ocorrencia.id)} title="Permitir Execução" className="text-green-600 hover:text-green-700"><Check className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="cancelar" variant="outline" size="icon" onClick={() => setCancelingOcorrenciaId(ocorrencia.id)} title="Cancelar" className="text-red-600 hover:text-red-700"><X className="w-4 h-4" /></Button>);
+
     buttons.push(<Button key="agendar" variant="outline" size="icon" onClick={() => setSchedulingOcorrencia(ocorrencia)} title="Agendar Ocorrência"><Calendar className="w-4 h-4" /></Button>);
     buttons.push(<Button key="vistoria" variant="outline" size="icon" asChild title="Realizar Vistoria"><Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}><Camera className="w-4 h-4" /></Link></Button>);
     buttons.push(<Button key="acompanhamento" variant="outline" size="icon" asChild title="Acompanhamento"><Link to={`/ocorrencias/${ocorrencia.id}/acompanhamento`}><FileText className="w-4 h-4" /></Link></Button>);
