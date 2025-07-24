@@ -144,6 +144,10 @@ export interface Ocorrencia {
   scheduled_date?: string;
   scheduled_time?: string;
   estimated_hours?: number;
+
+  // Vistorias
+  vistoria_previa_date?: string;
+  vistoria_pos_date?: string;
   
   // Execução
   empresa_id?: string;

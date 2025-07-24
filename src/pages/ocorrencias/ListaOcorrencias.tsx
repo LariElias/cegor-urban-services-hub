@@ -18,125 +18,135 @@ const mockOcorrencias: Ocorrencia[] = [
   {
     id: '1', protocol: 'OCR-2024-001', description: 'Limpeza de terreno baldio', service_type: 'Limpeza',
     priority: 'alta', status: 'criada', address: 'Rua das Flores, 123', public_equipment_name: 'Praça do Ferreira',
-    regional_id: '1', fiscal_id: '1', origin: 'SIGEP', role: 'Regional', subrole: 'Fiscal',
+    regional_id: '1', fiscal_id: '1', origin: 'SIGEP',
+    vistoria_previa_date: '2025-07-20T08:00:00Z',
     created_at: '2025-07-20T10:00:00Z', updated_at: '2025-07-20T10:00:00Z'
   },
   {
     id: '2', protocol: 'OCR-2024-002', description: 'Reparo em calçada', service_type: 'Manutenção',
     priority: 'media', status: 'encaminhada', address: 'Av. Beira Mar, 456', public_equipment_name: 'Areninha Campo do América',
-    regional_id: '2', fiscal_id: '2', origin: 'SPU', role: 'Empresa', subrole: 'Operador',
+    regional_id: '2', fiscal_id: '2', origin: 'SPU',
     forwarded_by: '2', forwarded_at: '2025-07-21T11:00:00Z', created_at: '2025-07-21T09:00:00Z', updated_at: '2025-07-21T11:00:00Z'
   },
   {
     id: '3', protocol: 'OCR-2024-003', description: 'Poda de árvores no parque', service_type: 'Conservação',
     priority: 'baixa', status: 'autorizada', address: 'Av. Padre Antônio Tomás, s/n', public_equipment_name: 'Parque do Cocó',
-    regional_id: '5', fiscal_id: '5', origin: 'REG2', role: 'Regional', subrole: 'Gestor',
-    approved_by_regional: '5', approved_at_regional: '2025-07-19T14:00:00Z', created_at: '2025-07-19T10:00:00Z', updated_at: '2025-07-19T14:00:00Z'
+    regional_id: '5', fiscal_id: '5', origin: 'REG2',
+    approved_by_regional: '5', approved_at_regional: '2025-07-19T14:00:00Z', vistoria_previa_date: '2025-07-19T12:00:00Z',
+    created_at: '2025-07-19T10:00:00Z', updated_at: '2025-07-19T14:00:00Z'
   },
   {
     id: '4', protocol: 'OCR-2024-004', description: 'Vazamento em poste de saúde', service_type: 'Reparo',
     priority: 'alta', status: 'agendada', address: 'Rua G, 300', public_equipment_name: 'Posto de Saúde Dr. Hélio Goes',
-    regional_id: '6', fiscal_id: '6', origin: 'SIGEP', role: 'CEGOR', subrole: 'Gestor',
-    scheduled_at: '2025-07-25T09:00:00Z', created_at: '2025-07-22T08:00:00Z', updated_at: '2025-07-22T10:00:00Z'
+    regional_id: '6', fiscal_id: '6', origin: 'SIGEP',
+    scheduled_date: '2025-07-25T09:00:00Z', vistoria_previa_date: '2025-07-22T07:00:00Z',
+    created_at: '2025-07-22T08:00:00Z', updated_at: '2025-07-22T10:00:00Z'
   },
   {
     id: '5', protocol: 'OCR-2024-005', description: 'Manutenção de brinquedos na praça', service_type: 'Manutenção',
     priority: 'media', status: 'em_execucao', address: 'Rua Paulino Nogueira, s/n', public_equipment_name: 'Praça da Gentilândia',
-    regional_id: '1', fiscal_id: '1', origin: 'REG1', role: 'Empresa', subrole: 'Operador',
+    regional_id: '1', fiscal_id: '1', origin: 'REG1',
+    scheduled_date: '2025-07-20T14:00:00Z', vistoria_previa_date: '2025-07-18T13:00:00Z',
     created_at: '2025-07-18T15:00:00Z', updated_at: '2025-07-20T13:00:00Z'
   },
   {
     id: '6', protocol: 'OCR-2024-006', description: 'Pintura de quadra', service_type: 'Pintura',
     priority: 'baixa', status: 'executada', address: 'Av. Gov. Leonel Brizola, s/n', public_equipment_name: 'Cuca Jangurussu',
-    regional_id: '4', fiscal_id: '4', origin: 'SPU', role: 'Empresa', subrole: 'Gestor',
+    regional_id: '4', fiscal_id: '4', origin: 'SPU',
+    scheduled_date: '2025-06-12T08:00:00Z', vistoria_previa_date: '2025-06-10T07:00:00Z', vistoria_pos_date: '2025-06-15T15:00:00Z',
     created_at: '2025-06-10T09:00:00Z', updated_at: '2025-06-15T16:00:00Z'
   },
   {
     id: '7', protocol: 'OCR-2024-007', description: 'Troca de lâmpada queimada', service_type: 'Iluminação',
     priority: 'alta', status: 'criada', address: 'Rua Delmiro de Farias, 1000', public_equipment_name: 'E.E.F.M. Adauto Bezerra',
-    regional_id: '3', fiscal_id: '3', origin: 'SPU', role: 'Regional', subrole: 'Fiscal',
+    regional_id: '3', fiscal_id: '3', origin: 'SPU',
     created_at: '2025-07-22T11:00:00Z', updated_at: '2025-07-22T11:00:00Z'
   },
   {
     id: '8', protocol: 'OCR-2024-008', description: 'Capinação de área externa', service_type: 'Limpeza',
     priority: 'media', status: 'cancelada', address: 'Rua Pernambuco, s/n', public_equipment_name: 'Areninha do Pici',
-    regional_id: '3', fiscal_id: '3', origin: 'REG3', role: 'CEGOR', subrole: 'Fiscal',
+    regional_id: '3', fiscal_id: '3', origin: 'REG3',
     cancel_reason: 'Serviço já executado por outra equipe.', created_at: '2025-07-15T12:00:00Z', updated_at: '2025-07-16T10:00:00Z'
   },
   {
     id: '9', protocol: 'OCR-2024-009', description: 'Conserto de portão de escola', service_type: 'Serralheria',
     priority: 'alta', status: 'agendada', address: 'Rua I, 150', public_equipment_name: 'E.M.E.I.F. Rachel de Queiroz',
-    regional_id: '4', fiscal_id: '4', origin: 'SIGEP', role: 'Regional', subrole: 'Gestor',
-    scheduled_at: '2025-07-28T14:00:00Z', created_at: '2025-07-21T16:00:00Z', updated_at: '2025-07-22T09:00:00Z'
+    regional_id: '4', fiscal_id: '4', origin: 'SIGEP',
+    scheduled_date: '2025-07-28T14:00:00Z', vistoria_previa_date: '2025-07-21T15:00:00Z',
+    created_at: '2025-07-21T16:00:00Z', updated_at: '2025-07-22T09:00:00Z'
   },
   {
     id: '10', protocol: 'OCR-2024-010', description: 'Revisão de estrutura de parquinho', service_type: 'Inspeção',
     priority: 'media', status: 'devolvida', address: 'Rua das Flores, 123', public_equipment_name: 'Praça do Ferreira',
-    regional_id: '1', fiscal_id: '1', origin: 'REG4', role: 'Empresa', subrole: 'Fiscal',
-    return_reason: 'Faltam informações sobre o material necessário.', created_at: '2025-07-20T14:00:00Z', updated_at: '2025-07-21T17:00:00Z'
+    regional_id: '1', fiscal_id: '1', origin: 'REG4',
+    cancel_reason: 'Faltam informações sobre o material necessário.', created_at: '2025-07-20T14:00:00Z', updated_at: '2025-07-21T17:00:00Z'
   },
   {
     id: '11', protocol: 'OCR-2024-011', description: 'Verificação de vazamento de esgoto', service_type: 'Inspeção',
     priority: 'alta', status: 'criada', address: 'Rua Alfa, 999', public_equipment_name: 'Centro Comunitário Alfa',
-    regional_id: '2', fiscal_id: '2', origin: 'SIGEP', role: 'CEGOR', subrole: 'Operador',
+    regional_id: '2', fiscal_id: '2', origin: 'SIGEP',
     created_at: '2025-07-20T08:00:00Z', updated_at: '2025-07-20T08:00:00Z'
   },
   {
     id: '12', protocol: 'OCR-2024-012', description: 'Reposição de bancos danificados', service_type: 'Manutenção',
     priority: 'media', status: 'criada', address: 'Rua Beta, 88', public_equipment_name: 'Praça do Sol',
-    regional_id: '2', fiscal_id: '2', origin: 'REG5', role: 'Regional', subrole: 'Fiscal',
+    regional_id: '2', fiscal_id: '2', origin: 'REG5',
     created_at: '2025-07-20T10:30:00Z', updated_at: '2025-07-20T10:30:00Z'
   },
   {
     id: '13', protocol: 'OCR-2024-013', description: 'Troca de refletores', service_type: 'Iluminação',
     priority: 'alta', status: 'executada', address: 'Rua Gama, 300', public_equipment_name: 'Campo do Gama',
-    regional_id: '6', fiscal_id: '6', origin: 'SPU', role: 'Empresa', subrole: 'Gestor',
+    regional_id: '6', fiscal_id: '6', origin: 'SPU',
+    scheduled_date: '2025-07-11T09:00:00Z', vistoria_previa_date: '2025-07-10T13:00:00Z', vistoria_pos_date: '2025-07-12T14:00:00Z',
     created_at: '2025-07-10T14:00:00Z', updated_at: '2025-07-12T15:00:00Z'
   },
   {
     id: '14', protocol: 'OCR-2024-014', description: 'Ajuste em grades de proteção', service_type: 'Serralheria',
     priority: 'baixa', status: 'em_execucao', address: 'Rua Delta, 200', public_equipment_name: 'Praça Delta',
-    regional_id: '5', fiscal_id: '5', origin: 'REG6', role: 'Regional', subrole: 'Operador',
+    regional_id: '5', fiscal_id: '5', origin: 'REG6',
+    scheduled_date: '2025-07-20T10:00:00Z', vistoria_previa_date: '2025-07-19T12:00:00Z',
     created_at: '2025-07-19T13:00:00Z', updated_at: '2025-07-20T09:00:00Z'
   },
   {
     id: '15', protocol: 'OCR-2024-015', description: 'Revisão de encanamento público', service_type: 'Manutenção',
     priority: 'alta', status: 'agendada', address: 'Rua Epsilon, 155', public_equipment_name: 'CRAS Epsilon',
-    regional_id: '6', fiscal_id: '6', origin: 'SIGEP', role: 'CEGOR', subrole: 'Gestor',
-    scheduled_at: '2025-07-25T15:00:00Z', created_at: '2025-07-22T09:00:00Z', updated_at: '2025-07-22T11:00:00Z'
+    regional_id: '6', fiscal_id: '6', origin: 'SIGEP',
+    scheduled_date: '2025-07-25T15:00:00Z', vistoria_previa_date: '2025-07-22T08:00:00Z',
+    created_at: '2025-07-22T09:00:00Z', updated_at: '2025-07-22T11:00:00Z'
   },
   {
     id: '16', protocol: 'OCR-2024-016', description: 'Inspeção elétrica', service_type: 'Inspeção',
     priority: 'media', status: 'autorizada', address: 'Rua Zeta, 444', public_equipment_name: 'Ginásio Zeta',
-    regional_id: '3', fiscal_id: '3', origin: 'REG7', role: 'Empresa', subrole: 'Fiscal',
-    approved_by_regional: '3', approved_at_regional: '2025-07-21T10:00:00Z', created_at: '2025-07-20T12:00:00Z', updated_at: '2025-07-21T10:00:00Z'
+    regional_id: '3', fiscal_id: '3', origin: 'REG7',
+    approved_by_regional: '3', approved_at_regional: '2025-07-21T10:00:00Z', vistoria_previa_date: '2025-07-20T11:00:00Z',
+    created_at: '2025-07-20T12:00:00Z', updated_at: '2025-07-21T10:00:00Z'
   },
   {
     id: '17', protocol: 'OCR-2024-017', description: 'Manutenção de refletores', service_type: 'Iluminação',
     priority: 'baixa', status: 'criada', address: 'Rua Teta, 777', public_equipment_name: 'Areninha Teta',
-    regional_id: '4', fiscal_id: '4', origin: 'SPU', role: 'CEGOR', subrole: 'Operador',
+    regional_id: '4', fiscal_id: '4', origin: 'SPU',
     created_at: '2025-07-23T08:00:00Z', updated_at: '2025-07-23T08:00:00Z'
   },
   {
     id: '18', protocol: 'OCR-2024-018', description: 'Pintura de meio-fio', service_type: 'Pintura',
     priority: 'media', status: 'executada', address: 'Rua Ômega, 333', public_equipment_name: 'Escola Ômega',
-    regional_id: '5', fiscal_id: '5', origin: 'REG8', role: 'Regional', subrole: 'Gestor',
+    regional_id: '5', fiscal_id: '5', origin: 'REG8',
+    scheduled_date: '2025-07-16T08:00:00Z', vistoria_previa_date: '2025-07-15T06:00:00Z', vistoria_pos_date: '2025-07-18T12:00:00Z',
     created_at: '2025-07-15T07:00:00Z', updated_at: '2025-07-18T13:00:00Z'
   },
   {
     id: '19', protocol: 'OCR-2024-019', description: 'Instalação de lixeiras', service_type: 'Instalação',
     priority: 'baixa', status: 'encaminhada', address: 'Rua Sigma, 222', public_equipment_name: 'Praça Sigma',
-    regional_id: '2', fiscal_id: '2', origin: 'SIGEP', role: 'Empresa', subrole: 'Gestor',
+    regional_id: '2', fiscal_id: '2', origin: 'SIGEP',
     forwarded_by: '2', forwarded_at: '2025-07-21T14:00:00Z', created_at: '2025-07-21T11:00:00Z', updated_at: '2025-07-21T14:00:00Z'
   },
   {
     id: '20', protocol: 'OCR-2024-020', description: 'Conserto em alambrado', service_type: 'Serralheria',
     priority: 'alta', status: 'criada', address: 'Rua Phi, 789', public_equipment_name: 'Campo do Centro',
-    regional_id: '1', fiscal_id: '1', origin: 'REG9', role: 'Regional', subrole: 'Fiscal',
+    regional_id: '1', fiscal_id: '1', origin: 'REG9',
     created_at: '2025-07-22T08:00:00Z', updated_at: '2025-07-22T08:00:00Z'
   },
 ];
-
 
 const mockEmpresas = [
     { id: '1', name: 'Empresa A de Serviços' },
@@ -151,35 +161,47 @@ const uniqueEquipamentos = [...new Set(mockOcorrencias.map(o => o.public_equipme
 
 // --- Componentes de Visualização ---
 
-const ListView = ({ ocorrencias, renderActionButtons, user }) => (
+const ListView = ({ ocorrencias, renderActionButtons }) => (
   <Card>
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Protocolo</TableHead>
-          <TableHead className="hidden md:table-cell">Descrição</TableHead>
+          <TableHead>Descrição</TableHead>
+          <TableHead>Equip. Público</TableHead>
           <TableHead>Prioridade</TableHead>
           <TableHead>Status</TableHead>
-          {(isRegionalGestor(user) || user?.role === 'cegor' || user?.role === 'empresa') && (
-            <TableHead>Data Agendamento</TableHead>
-          )}
+          <TableHead>Criação</TableHead>
+          <TableHead>Vistoria Prévia</TableHead>
+          <TableHead>Agendamento Exec.</TableHead>
+          <TableHead>Vistoria Pós</TableHead>
           <TableHead className="text-right">Ações</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {ocorrencias.map((ocorrencia) => (
           <TableRow key={ocorrencia.id}>
-            <TableCell className="font-medium">{ocorrencia.protocol}<p className="text-xs text-gray-500 md:hidden">{ocorrencia.description}</p></TableCell>
-            <TableCell className="hidden md:table-cell">{ocorrencia.description}</TableCell>
+            <TableCell className="font-medium">{ocorrencia.protocol}</TableCell>
+            <TableCell>{ocorrencia.description}</TableCell>
+            <TableCell>{ocorrencia.public_equipment_name}</TableCell>
             <TableCell><Badge className={getPriorityColor(ocorrencia.priority)}>{ocorrencia.priority}</Badge></TableCell>
             <TableCell><Badge className={getStatusColor(ocorrencia.status)}>{getStatusLabel(ocorrencia.status)}</Badge></TableCell>
-            {(isRegionalGestor(user) || user?.role === 'cegor' || user?.role === 'empresa') && (
-              <TableCell>
-                {ocorrencia.status === 'agendada' && ocorrencia.scheduled_at
-                  ? new Date(ocorrencia.scheduled_at).toLocaleDateString('pt-BR')
-                  : '-'}
-              </TableCell>
-            )}
+            <TableCell>{new Date(ocorrencia.created_at).toLocaleDateString('pt-BR')}</TableCell>
+            <TableCell>
+              {ocorrencia.vistoria_previa_date 
+                ? new Date(ocorrencia.vistoria_previa_date).toLocaleDateString('pt-BR')
+                : '-'}
+            </TableCell>
+            <TableCell>
+              {ocorrencia.scheduled_date 
+                ? new Date(ocorrencia.scheduled_date).toLocaleDateString('pt-BR')
+                : '-'}
+            </TableCell>
+            <TableCell>
+              {ocorrencia.vistoria_pos_date 
+                ? new Date(ocorrencia.vistoria_pos_date).toLocaleDateString('pt-BR')
+                : '-'}
+            </TableCell>
             <TableCell className="text-right"><div className="flex items-center justify-end gap-2">{renderActionButtons(ocorrencia)}</div></TableCell>
           </TableRow>
         ))}
@@ -256,7 +278,7 @@ export default function ListaOcorrencias() {
   const handleSchedule = () => {
     if (!schedulingOcorrencia || !newScheduleDate || !scheduleTime) { alert('A data e o horário do agendamento são obrigatórios.'); return; }
     console.log({ responsibleCompany, teamSize });
-    handleStatusChange(schedulingOcorrencia.id, 'agendada', { scheduled_at: new Date(newScheduleDate).toISOString() });
+    handleStatusChange(schedulingOcorrencia.id, 'agendada', { scheduled_date: new Date(newScheduleDate).toISOString() });
     setSchedulingOcorrencia(null);
     setNewScheduleDate('');
     setResponsibleCompany('');
@@ -283,7 +305,7 @@ export default function ListaOcorrencias() {
     const matchesStatus = !selectedStatus || ocorrencia.status === selectedStatus;
     const matchesPriority = !selectedPriority || ocorrencia.priority === selectedPriority;
     const matchesEquipamento = !selectedEquipamento || ocorrencia.public_equipment_name === selectedEquipamento;
-    const matchesDate = !scheduledDateFilter || (ocorrencia.scheduled_at && ocorrencia.scheduled_at.startsWith(scheduledDateFilter));
+    const matchesDate = !scheduledDateFilter || (ocorrencia.scheduled_date && ocorrencia.scheduled_date.startsWith(scheduledDateFilter));
     
     return matchesSearch && matchesStatus && matchesPriority && matchesEquipamento && matchesDate;
   });
@@ -347,7 +369,7 @@ export default function ListaOcorrencias() {
             <GridView ocorrencias={filteredOcorrencias} renderActionButtons={renderActionButtons} />
           ) : (
             <div className="space-y-4">
-              <ListView ocorrencias={currentListItems} renderActionButtons={renderActionButtons} user={user} />
+              <ListView ocorrencias={currentListItems} renderActionButtons={renderActionButtons} />
               {totalPages > 1 && (
                 <Pagination>
                   <PaginationContent>
