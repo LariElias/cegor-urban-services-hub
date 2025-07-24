@@ -46,7 +46,6 @@ const menuItems = [
       { title: 'Bairros', url: '/cadastros/bairros', icon: MapPin, role: ['cegor'], subrole: ['gestor']},
       { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin, role: ['cegor'],subrole: ['gestor'] },
       { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield, role: ['cegor'], subrole: ['gestor'] },
-      { title: 'ZGL', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'],subrole: ['gestor'] },
       { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building, role: ['cegor'],subrole: ['gestor'] },
       { title: 'Empresas', url: '/cadastros/empresas', icon: Building, role: ['cegor'],subrole: ['gestor'] },
     ]
@@ -86,6 +85,7 @@ const menuItems = [
       { title: 'Histórico', url: '/relatorios/historico', icon: History, role: ['cegor', 'regional', 'empresa'] },
       { title: 'Relatório Regional', url: '/relatorios/regional', icon: BarChart3, role: ['regional'] },
       { title: 'Serviços Programados', url: '/relatorios/programados', icon: Calendar, role: ['empresa'] },
+      { title: 'Mapa', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'],subrole: ['gestor'] },
       { title: 'Exportar CSV', url: '/relatorios/csv', icon: FileText, role: ['cegor'], subrole:['gestor', 'fiscal'] },
     ]
   },
@@ -174,7 +174,7 @@ export function AppSidebar() {
           )
         ))}
 
-        <div className="mt-auto p-4 border-t border-white/20">
+        {/* <div className="mt-auto p-4 border-t border-white/20">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
               <span className="text-sm font-bold text-white">
@@ -197,7 +197,7 @@ export function AppSidebar() {
               <LogOut className="w-5 h-5 text-white" />
             </button>
           </div>
-        </div>
+        </div> */}
       </SidebarContent>
     </Sidebar>
   );
