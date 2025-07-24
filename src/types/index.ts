@@ -106,6 +106,7 @@ export interface Ocorrencia {
   protocol: string;
   description: string;
   service_type: string;
+  public_equipment_name: string;
   priority: 'baixa' | 'media' | 'alta';
   status: 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida' | 'executada';
   
