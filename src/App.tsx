@@ -25,7 +25,7 @@ import DemandasEmpresa from "./pages/ocorrencias/DemandasEmpresa";
 import Agendamento from "./pages/ocorrencias/Agendamento";
 import DetalhamentoExecucao from "./pages/ocorrencias/DetalhamentoExecucao";
 import VistoriaPrevia from "./pages/ocorrencias/VistoriaPrevia";
-import VistoriaFinal from "./pages/ocorrencias/VistoriaFInal";
+import VistoriaFinal from "./pages/ocorrencias/VistoriaFinal";
 import AcompanhamentoDiario from "./pages/ocorrencias/AcompanhamentoDiario";
 
 // Importar páginas de relatórios
