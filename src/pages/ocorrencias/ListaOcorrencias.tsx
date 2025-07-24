@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Eye, Play, Send, CheckCircle, XCircle, Camera, FileText, Search, Check, X, Building, LayoutGrid, List, Calendar } from 'lucide-react';
+import { Plus, Search, LayoutGrid, List, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,136 +7,147 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useAuth } from '@/context/AuthContext';
-import { Ocorrencia, isRegionalGestor, isRegionalOperador, isRegionalFiscal } from '@/types';
+import { Ocorrencia, getPermittedActions } from '@/types';
+import { getActionButton } from '@/utils/actionButtons';
 import { Link } from 'react-router-dom';
 
-// Mock data com status 'executada' para teste do fiscal
+// Mock data atualizado com public_equipment_name
 const mockOcorrencias: Ocorrencia[] = [
   {
     id: '1', protocol: 'OCR-2024-001', description: 'Limpeza de terreno baldio', service_type: 'Limpeza',
     priority: 'alta', status: 'criada', address: 'Rua das Flores, 123', public_equipment_name: 'Praça do Ferreira',
-    regional_id: '1', fiscal_id: '1', origin: 'SIGEP', role: 'Regional', subrole: 'Fiscal',
+    regional_id: '1', fiscal_id: '1', origin: 'SIGEP',
+    vistoria_previa_date: '2025-07-20T08:00:00Z',
     created_at: '2025-07-20T10:00:00Z', updated_at: '2025-07-20T10:00:00Z'
   },
   {
     id: '2', protocol: 'OCR-2024-002', description: 'Reparo em calçada', service_type: 'Manutenção',
     priority: 'media', status: 'encaminhada', address: 'Av. Beira Mar, 456', public_equipment_name: 'Areninha Campo do América',
-    regional_id: '2', fiscal_id: '2', origin: 'SPU', role: 'Empresa', subrole: 'Operador',
+    regional_id: '2', fiscal_id: '2', origin: 'SPU',
     forwarded_by: '2', forwarded_at: '2025-07-21T11:00:00Z', created_at: '2025-07-21T09:00:00Z', updated_at: '2025-07-21T11:00:00Z'
   },
   {
     id: '3', protocol: 'OCR-2024-003', description: 'Poda de árvores no parque', service_type: 'Conservação',
     priority: 'baixa', status: 'autorizada', address: 'Av. Padre Antônio Tomás, s/n', public_equipment_name: 'Parque do Cocó',
-    regional_id: '5', fiscal_id: '5', origin: 'REG2', role: 'Regional', subrole: 'Gestor',
-    approved_by_regional: '5', approved_at_regional: '2025-07-19T14:00:00Z', created_at: '2025-07-19T10:00:00Z', updated_at: '2025-07-19T14:00:00Z'
+    regional_id: '5', fiscal_id: '5', origin: 'REG2',
+    approved_by_regional: '5', approved_at_regional: '2025-07-19T14:00:00Z', vistoria_previa_date: '2025-07-19T12:00:00Z',
+    created_at: '2025-07-19T10:00:00Z', updated_at: '2025-07-19T14:00:00Z'
   },
   {
     id: '4', protocol: 'OCR-2024-004', description: 'Vazamento em poste de saúde', service_type: 'Reparo',
     priority: 'alta', status: 'agendada', address: 'Rua G, 300', public_equipment_name: 'Posto de Saúde Dr. Hélio Goes',
-    regional_id: '6', fiscal_id: '6', origin: 'SIGEP', role: 'CEGOR', subrole: 'Gestor',
-    scheduled_at: '2025-07-25T09:00:00Z', created_at: '2025-07-22T08:00:00Z', updated_at: '2025-07-22T10:00:00Z'
+    regional_id: '6', fiscal_id: '6', origin: 'SIGEP',
+    scheduled_date: '2025-07-25T09:00:00Z', vistoria_previa_date: '2025-07-22T07:00:00Z',
+    created_at: '2025-07-22T08:00:00Z', updated_at: '2025-07-22T10:00:00Z'
   },
   {
     id: '5', protocol: 'OCR-2024-005', description: 'Manutenção de brinquedos na praça', service_type: 'Manutenção',
     priority: 'media', status: 'em_execucao', address: 'Rua Paulino Nogueira, s/n', public_equipment_name: 'Praça da Gentilândia',
-    regional_id: '1', fiscal_id: '1', origin: 'REG1', role: 'Empresa', subrole: 'Operador',
+    regional_id: '1', fiscal_id: '1', origin: 'REG1',
+    scheduled_date: '2025-07-20T14:00:00Z', vistoria_previa_date: '2025-07-18T13:00:00Z',
     created_at: '2025-07-18T15:00:00Z', updated_at: '2025-07-20T13:00:00Z'
   },
   {
     id: '6', protocol: 'OCR-2024-006', description: 'Pintura de quadra', service_type: 'Pintura',
     priority: 'baixa', status: 'executada', address: 'Av. Gov. Leonel Brizola, s/n', public_equipment_name: 'Cuca Jangurussu',
-    regional_id: '4', fiscal_id: '4', origin: 'SPU', role: 'Empresa', subrole: 'Gestor',
+    regional_id: '4', fiscal_id: '4', origin: 'SPU',
+    scheduled_date: '2025-06-12T08:00:00Z', vistoria_previa_date: '2025-06-10T07:00:00Z', vistoria_pos_date: '2025-06-15T15:00:00Z',
     created_at: '2025-06-10T09:00:00Z', updated_at: '2025-06-15T16:00:00Z'
   },
   {
     id: '7', protocol: 'OCR-2024-007', description: 'Troca de lâmpada queimada', service_type: 'Iluminação',
     priority: 'alta', status: 'criada', address: 'Rua Delmiro de Farias, 1000', public_equipment_name: 'E.E.F.M. Adauto Bezerra',
-    regional_id: '3', fiscal_id: '3', origin: 'SPU', role: 'Regional', subrole: 'Fiscal',
+    regional_id: '3', fiscal_id: '3', origin: 'SPU',
     created_at: '2025-07-22T11:00:00Z', updated_at: '2025-07-22T11:00:00Z'
   },
   {
     id: '8', protocol: 'OCR-2024-008', description: 'Capinação de área externa', service_type: 'Limpeza',
     priority: 'media', status: 'cancelada', address: 'Rua Pernambuco, s/n', public_equipment_name: 'Areninha do Pici',
-    regional_id: '3', fiscal_id: '3', origin: 'REG3', role: 'CEGOR', subrole: 'Fiscal',
+    regional_id: '3', fiscal_id: '3', origin: 'REG3',
     cancel_reason: 'Serviço já executado por outra equipe.', created_at: '2025-07-15T12:00:00Z', updated_at: '2025-07-16T10:00:00Z'
   },
   {
     id: '9', protocol: 'OCR-2024-009', description: 'Conserto de portão de escola', service_type: 'Serralheria',
     priority: 'alta', status: 'agendada', address: 'Rua I, 150', public_equipment_name: 'E.M.E.I.F. Rachel de Queiroz',
-    regional_id: '4', fiscal_id: '4', origin: 'SIGEP', role: 'Regional', subrole: 'Gestor',
-    scheduled_at: '2025-07-28T14:00:00Z', created_at: '2025-07-21T16:00:00Z', updated_at: '2025-07-22T09:00:00Z'
+    regional_id: '4', fiscal_id: '4', origin: 'SIGEP',
+    scheduled_date: '2025-07-28T14:00:00Z', vistoria_previa_date: '2025-07-21T15:00:00Z',
+    created_at: '2025-07-21T16:00:00Z', updated_at: '2025-07-22T09:00:00Z'
   },
   {
     id: '10', protocol: 'OCR-2024-010', description: 'Revisão de estrutura de parquinho', service_type: 'Inspeção',
     priority: 'media', status: 'devolvida', address: 'Rua das Flores, 123', public_equipment_name: 'Praça do Ferreira',
-    regional_id: '1', fiscal_id: '1', origin: 'REG4', role: 'Empresa', subrole: 'Fiscal',
-    return_reason: 'Faltam informações sobre o material necessário.', created_at: '2025-07-20T14:00:00Z', updated_at: '2025-07-21T17:00:00Z'
+    regional_id: '1', fiscal_id: '1', origin: 'REG4',
+    cancel_reason: 'Faltam informações sobre o material necessário.', created_at: '2025-07-20T14:00:00Z', updated_at: '2025-07-21T17:00:00Z'
   },
   {
     id: '11', protocol: 'OCR-2024-011', description: 'Verificação de vazamento de esgoto', service_type: 'Inspeção',
     priority: 'alta', status: 'criada', address: 'Rua Alfa, 999', public_equipment_name: 'Centro Comunitário Alfa',
-    regional_id: '2', fiscal_id: '2', origin: 'SIGEP', role: 'CEGOR', subrole: 'Operador',
+    regional_id: '2', fiscal_id: '2', origin: 'SIGEP',
     created_at: '2025-07-20T08:00:00Z', updated_at: '2025-07-20T08:00:00Z'
   },
   {
     id: '12', protocol: 'OCR-2024-012', description: 'Reposição de bancos danificados', service_type: 'Manutenção',
     priority: 'media', status: 'criada', address: 'Rua Beta, 88', public_equipment_name: 'Praça do Sol',
-    regional_id: '2', fiscal_id: '2', origin: 'REG5', role: 'Regional', subrole: 'Fiscal',
+    regional_id: '2', fiscal_id: '2', origin: 'REG5',
     created_at: '2025-07-20T10:30:00Z', updated_at: '2025-07-20T10:30:00Z'
   },
   {
     id: '13', protocol: 'OCR-2024-013', description: 'Troca de refletores', service_type: 'Iluminação',
     priority: 'alta', status: 'executada', address: 'Rua Gama, 300', public_equipment_name: 'Campo do Gama',
-    regional_id: '6', fiscal_id: '6', origin: 'SPU', role: 'Empresa', subrole: 'Gestor',
+    regional_id: '6', fiscal_id: '6', origin: 'SPU',
+    scheduled_date: '2025-07-11T09:00:00Z', vistoria_previa_date: '2025-07-10T13:00:00Z', vistoria_pos_date: '2025-07-12T14:00:00Z',
     created_at: '2025-07-10T14:00:00Z', updated_at: '2025-07-12T15:00:00Z'
   },
   {
     id: '14', protocol: 'OCR-2024-014', description: 'Ajuste em grades de proteção', service_type: 'Serralheria',
     priority: 'baixa', status: 'em_execucao', address: 'Rua Delta, 200', public_equipment_name: 'Praça Delta',
-    regional_id: '5', fiscal_id: '5', origin: 'REG6', role: 'Regional', subrole: 'Operador',
+    regional_id: '5', fiscal_id: '5', origin: 'REG6',
+    scheduled_date: '2025-07-20T10:00:00Z', vistoria_previa_date: '2025-07-19T12:00:00Z',
     created_at: '2025-07-19T13:00:00Z', updated_at: '2025-07-20T09:00:00Z'
   },
   {
     id: '15', protocol: 'OCR-2024-015', description: 'Revisão de encanamento público', service_type: 'Manutenção',
     priority: 'alta', status: 'agendada', address: 'Rua Epsilon, 155', public_equipment_name: 'CRAS Epsilon',
-    regional_id: '6', fiscal_id: '6', origin: 'SIGEP', role: 'CEGOR', subrole: 'Gestor',
-    scheduled_at: '2025-07-25T15:00:00Z', created_at: '2025-07-22T09:00:00Z', updated_at: '2025-07-22T11:00:00Z'
+    regional_id: '6', fiscal_id: '6', origin: 'SIGEP',
+    scheduled_date: '2025-07-25T15:00:00Z', vistoria_previa_date: '2025-07-22T08:00:00Z',
+    created_at: '2025-07-22T09:00:00Z', updated_at: '2025-07-22T11:00:00Z'
   },
   {
     id: '16', protocol: 'OCR-2024-016', description: 'Inspeção elétrica', service_type: 'Inspeção',
     priority: 'media', status: 'autorizada', address: 'Rua Zeta, 444', public_equipment_name: 'Ginásio Zeta',
-    regional_id: '3', fiscal_id: '3', origin: 'REG7', role: 'Empresa', subrole: 'Fiscal',
-    approved_by_regional: '3', approved_at_regional: '2025-07-21T10:00:00Z', created_at: '2025-07-20T12:00:00Z', updated_at: '2025-07-21T10:00:00Z'
+    regional_id: '3', fiscal_id: '3', origin: 'REG7',
+    approved_by_regional: '3', approved_at_regional: '2025-07-21T10:00:00Z', vistoria_previa_date: '2025-07-20T11:00:00Z',
+    created_at: '2025-07-20T12:00:00Z', updated_at: '2025-07-21T10:00:00Z'
   },
   {
     id: '17', protocol: 'OCR-2024-017', description: 'Manutenção de refletores', service_type: 'Iluminação',
     priority: 'baixa', status: 'criada', address: 'Rua Teta, 777', public_equipment_name: 'Areninha Teta',
-    regional_id: '4', fiscal_id: '4', origin: 'SPU', role: 'CEGOR', subrole: 'Operador',
+    regional_id: '4', fiscal_id: '4', origin: 'SPU',
     created_at: '2025-07-23T08:00:00Z', updated_at: '2025-07-23T08:00:00Z'
   },
   {
     id: '18', protocol: 'OCR-2024-018', description: 'Pintura de meio-fio', service_type: 'Pintura',
     priority: 'media', status: 'executada', address: 'Rua Ômega, 333', public_equipment_name: 'Escola Ômega',
-    regional_id: '5', fiscal_id: '5', origin: 'REG8', role: 'Regional', subrole: 'Gestor',
+    regional_id: '5', fiscal_id: '5', origin: 'REG8',
+    scheduled_date: '2025-07-16T08:00:00Z', vistoria_previa_date: '2025-07-15T06:00:00Z', vistoria_pos_date: '2025-07-18T12:00:00Z',
     created_at: '2025-07-15T07:00:00Z', updated_at: '2025-07-18T13:00:00Z'
   },
   {
     id: '19', protocol: 'OCR-2024-019', description: 'Instalação de lixeiras', service_type: 'Instalação',
     priority: 'baixa', status: 'encaminhada', address: 'Rua Sigma, 222', public_equipment_name: 'Praça Sigma',
-    regional_id: '2', fiscal_id: '2', origin: 'SIGEP', role: 'Empresa', subrole: 'Gestor',
+    regional_id: '2', fiscal_id: '2', origin: 'SIGEP',
     forwarded_by: '2', forwarded_at: '2025-07-21T14:00:00Z', created_at: '2025-07-21T11:00:00Z', updated_at: '2025-07-21T14:00:00Z'
   },
   {
     id: '20', protocol: 'OCR-2024-020', description: 'Conserto em alambrado', service_type: 'Serralheria',
     priority: 'alta', status: 'criada', address: 'Rua Phi, 789', public_equipment_name: 'Campo do Centro',
-    regional_id: '1', fiscal_id: '1', origin: 'REG9', role: 'Regional', subrole: 'Fiscal',
+    regional_id: '1', fiscal_id: '1', origin: 'REG9',
     created_at: '2025-07-22T08:00:00Z', updated_at: '2025-07-22T08:00:00Z'
   },
 ];
-
 
 const mockEmpresas = [
     { id: '1', name: 'Empresa A de Serviços' },
@@ -151,36 +162,52 @@ const uniqueEquipamentos = [...new Set(mockOcorrencias.map(o => o.public_equipme
 
 // --- Componentes de Visualização ---
 
-const ListView = ({ ocorrencias, renderActionButtons, user }) => (
+const ListView = ({ ocorrencias, renderActionButtons }) => (
   <Card>
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Protocolo</TableHead>
-          <TableHead className="hidden md:table-cell">Descrição</TableHead>
+          <TableHead>Descrição</TableHead>
+          <TableHead>Equip. Público</TableHead>
           <TableHead>Prioridade</TableHead>
           <TableHead>Status</TableHead>
-          {(isRegionalGestor(user) || user?.role === 'cegor' || user?.role === 'empresa') && (
-            <TableHead>Data Agendamento</TableHead>
-          )}
+          <TableHead>Criação</TableHead>
+          <TableHead>Vistoria Prévia</TableHead>
+          <TableHead>Agendamento Exec.</TableHead>
+          <TableHead>Vistoria Pós</TableHead>
           <TableHead className="text-right">Ações</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {ocorrencias.map((ocorrencia) => (
           <TableRow key={ocorrencia.id}>
-            <TableCell className="font-medium">{ocorrencia.protocol}<p className="text-xs text-gray-500 md:hidden">{ocorrencia.description}</p></TableCell>
-            <TableCell className="hidden md:table-cell">{ocorrencia.description}</TableCell>
+            <TableCell className="font-medium">{ocorrencia.protocol}</TableCell>
+            <TableCell>{ocorrencia.description}</TableCell>
+            <TableCell>{ocorrencia.public_equipment_name}</TableCell>
             <TableCell><Badge className={getPriorityColor(ocorrencia.priority)}>{ocorrencia.priority}</Badge></TableCell>
             <TableCell><Badge className={getStatusColor(ocorrencia.status)}>{getStatusLabel(ocorrencia.status)}</Badge></TableCell>
-            {(isRegionalGestor(user) || user?.role === 'cegor' || user?.role === 'empresa') && (
-              <TableCell>
-                {ocorrencia.status === 'agendada' && ocorrencia.scheduled_at
-                  ? new Date(ocorrencia.scheduled_at).toLocaleDateString('pt-BR')
-                  : '-'}
-              </TableCell>
-            )}
-            <TableCell className="text-right"><div className="flex items-center justify-end gap-2">{renderActionButtons(ocorrencia)}</div></TableCell>
+            <TableCell>{new Date(ocorrencia.created_at).toLocaleDateString('pt-BR')}</TableCell>
+            <TableCell>
+              {ocorrencia.vistoria_previa_date 
+                ? new Date(ocorrencia.vistoria_previa_date).toLocaleDateString('pt-BR')
+                : '-'}
+            </TableCell>
+            <TableCell>
+              {ocorrencia.scheduled_date 
+                ? new Date(ocorrencia.scheduled_date).toLocaleDateString('pt-BR')
+                : '-'}
+            </TableCell>
+            <TableCell>
+              {ocorrencia.vistoria_pos_date 
+                ? new Date(ocorrencia.vistoria_pos_date).toLocaleDateString('pt-BR')
+                : '-'}
+            </TableCell>
+            <TableCell className="text-right">
+              <div className="flex items-center justify-end gap-2">
+                {renderActionButtons(ocorrencia)}
+              </div>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -207,6 +234,18 @@ const GridView = ({ ocorrencias, renderActionButtons }) => (
                         <span className="text-sm font-medium">Status:</span>
                         <Badge className={getStatusColor(ocorrencia.status)}>{getStatusLabel(ocorrencia.status)}</Badge>
                     </div>
+                    <div className="space-y-2 text-xs text-gray-500">
+                        <p><strong>Criação:</strong> {new Date(ocorrencia.created_at).toLocaleDateString('pt-BR')}</p>
+                        {ocorrencia.vistoria_previa_date && (
+                            <p><strong>Vistoria Prévia:</strong> {new Date(ocorrencia.vistoria_previa_date).toLocaleDateString('pt-BR')}</p>
+                        )}
+                        {ocorrencia.scheduled_date && (
+                            <p><strong>Agendamento:</strong> {new Date(ocorrencia.scheduled_date).toLocaleDateString('pt-BR')}</p>
+                        )}
+                        {ocorrencia.vistoria_pos_date && (
+                            <p><strong>Vistoria Pós:</strong> {new Date(ocorrencia.vistoria_pos_date).toLocaleDateString('pt-BR')}</p>
+                        )}
+                    </div>
                 </CardContent>
                 <div className="flex items-center justify-end gap-2 p-4 pt-2 border-t mt-auto">
                     {renderActionButtons(ocorrencia)}
@@ -216,16 +255,17 @@ const GridView = ({ ocorrencias, renderActionButtons }) => (
     </div>
 );
 
-
 export default function ListaOcorrencias() {
   const { user } = useAuth();
   const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>(mockOcorrencias);
+  
   // Estados para filtros
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedPriority, setSelectedPriority] = useState('');
   const [selectedEquipamento, setSelectedEquipamento] = useState('');
   const [scheduledDateFilter, setScheduledDateFilter] = useState('');
+  
   // Estados para UI e Dialogs
   const [viewMode, setViewMode] = useState('list');
   const [currentPage, setCurrentPage] = useState(1);
@@ -242,30 +282,37 @@ export default function ListaOcorrencias() {
   const handleStatusChange = (id: string, newStatus: Ocorrencia['status'], additionalData?: any) => {
     setOcorrencias(ocorrencias.map(o => o.id === id ? { ...o, status: newStatus, updated_at: new Date().toISOString(), ...additionalData } : o));
   };
-  const handleRegionalApproval = (id: string) => handleStatusChange(id, 'autorizada', { approved_by_regional: user?.id, approved_at_regional: new Date().toISOString() });
-  const handleForwardToCegor = (id: string) => handleStatusChange(id, 'encaminhada', { forwarded_by: user?.id, forwarded_at: new Date().toISOString() });
-  const handleCegorApproval = (id: string) => handleStatusChange(id, 'autorizada', { approved_by: user?.name, approved_at: new Date().toISOString() });
-  
-  const handleCancellation = () => {
-    if (!cancelingOcorrenciaId || !cancelReason.trim()) { alert('Motivo do cancelamento é obrigatório'); return; }
-    handleStatusChange(cancelingOcorrenciaId, 'cancelada', { cancel_reason: cancelReason });
-    setCancelReason('');
-    setCancelingOcorrenciaId(null);
+
+  const handleAction = (action: string, ocorrenciaId: string) => {
+    switch (action) {
+      case 'permitir_execucao':
+        handleStatusChange(ocorrenciaId, 'autorizada', { approved_by_regional: user?.id, approved_at_regional: new Date().toISOString() });
+        break;
+      case 'encaminhar':
+        handleStatusChange(ocorrenciaId, 'encaminhada', { forwarded_by: user?.id, forwarded_at: new Date().toISOString() });
+        break;
+      case 'agendar_ocorrencia':
+        const ocorrencia = ocorrencias.find(o => o.id === ocorrenciaId);
+        if (ocorrencia) {
+          setSchedulingOcorrencia(ocorrencia);
+        }
+        break;
+      default:
+        console.log(`Ação ${action} para ocorrência ${ocorrenciaId}`);
+    }
   };
 
   const handleSchedule = () => {
-    if (!schedulingOcorrencia || !newScheduleDate || !scheduleTime) { alert('A data e o horário do agendamento são obrigatórios.'); return; }
-    console.log({ responsibleCompany, teamSize });
-    handleStatusChange(schedulingOcorrencia.id, 'agendada', { scheduled_at: new Date(newScheduleDate).toISOString() });
+    if (!schedulingOcorrencia || !newScheduleDate || !scheduleTime) { 
+      alert('A data e o horário do agendamento são obrigatórios.'); 
+      return; 
+    }
+    handleStatusChange(schedulingOcorrencia.id, 'agendada', { scheduled_date: new Date(newScheduleDate).toISOString() });
     setSchedulingOcorrencia(null);
     setNewScheduleDate('');
     setResponsibleCompany('');
     setTeamSize('');
     setScheduleTime('');
-  };
-
-  const handleFiscalApproval = (id: string) => {
-    handleStatusChange(id, 'concluida', { fiscal_approved_by: user?.id, fiscal_approved_at: new Date().toISOString() });
   };
 
   // --- Lógica de Filtragem ---
@@ -283,7 +330,7 @@ export default function ListaOcorrencias() {
     const matchesStatus = !selectedStatus || ocorrencia.status === selectedStatus;
     const matchesPriority = !selectedPriority || ocorrencia.priority === selectedPriority;
     const matchesEquipamento = !selectedEquipamento || ocorrencia.public_equipment_name === selectedEquipamento;
-    const matchesDate = !scheduledDateFilter || (ocorrencia.scheduled_at && ocorrencia.scheduled_at.startsWith(scheduledDateFilter));
+    const matchesDate = !scheduledDateFilter || (ocorrencia.scheduled_date && ocorrencia.scheduled_date.startsWith(scheduledDateFilter));
     
     return matchesSearch && matchesStatus && matchesPriority && matchesEquipamento && matchesDate;
   });
@@ -294,41 +341,48 @@ export default function ListaOcorrencias() {
   const currentListItems = filteredOcorrencias.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredOcorrencias.length / itemsPerPage);
 
-  // --- Renderização de Botões ---
+  // --- Renderização de Botões baseada em Permissões ---
   const renderActionButtons = (ocorrencia: Ocorrencia) => {
-    const buttons = [];
+    if (!user) return [];
 
-    buttons.push(<Button key="permitir" variant="outline" size="icon" onClick={() => handleCegorApproval(ocorrencia.id)} title="Permitir Execução" className="text-green-600 hover:text-green-700"><Check className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="cancelar" variant="outline" size="icon" onClick={() => setCancelingOcorrenciaId(ocorrencia.id)} title="Cancelar" className="text-red-600 hover:text-red-700"><X className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="agendar" variant="outline" size="icon" onClick={() => setSchedulingOcorrencia(ocorrencia)} title="Agendar Ocorrência"><Calendar className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="vistoria" variant="outline" size="icon" asChild title="Realizar Vistoria"><Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}><Camera className="w-4 h-4" /></Link></Button>);
-    buttons.push(<Button key="acompanhamento" variant="outline" size="icon" asChild title="Acompanhamento"><Link to={`/ocorrencias/${ocorrencia.id}/acompanhamento`}><FileText className="w-4 h-4" /></Link></Button>);
-    buttons.push(<Button key="executar-regional" variant="outline" size="icon" onClick={() => handleRegionalApproval(ocorrencia.id)} title="Executar na Regional" className="text-green-600 hover:text-green-700"><Building className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="encaminhar" variant="outline" size="icon" onClick={() => handleForwardToCegor(ocorrencia.id)} title="Encaminhar para CEGOR" className="text-blue-600 hover:text-blue-700"><Send className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="executar" variant="outline" size="icon" onClick={() => handleStatusChange(ocorrencia.id, 'em_execucao')} title="Iniciar execução"><Play className="w-4 h-4" /></Button>);
-    buttons.push(<Button key="detalhar" variant="outline" size="icon" asChild title="Detalhar Execução"><Link to={`/ocorrencias/${ocorrencia.id}/detalhamento`}><Edit className="w-4 h-4" /></Link></Button>);
-    buttons.push(<Button key="aprovar-fiscal" variant="outline" size="icon" asChild title="Concluir Ocorrência (Fiscal)" className="text-green-600 hover:text-green-700"><Link to={`/ocorrencias/${ocorrencia.id}/vistoria_final`}><CheckCircle className="w-4 h-4" /></Link></Button>);
-    buttons.push(<Button key="visualizar" variant="outline" size="icon" asChild title="Visualizar"><Link to={`/ocorrencias/${ocorrencia.id}`}><Eye className="w-4 h-4" /></Link></Button>);
+    const permittedActions = getPermittedActions(user.role, user.subrole);
     
-    return buttons;
+    return permittedActions.map(action => 
+      getActionButton(action, ocorrencia.id, (id) => handleAction(action, id))
+    ).filter(Boolean);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Ocorrências</h1>
-        {(isRegionalOperador(user) || isRegionalGestor(user)) && (
-          <Button asChild><Link to="/ocorrencias/nova"><Plus className="w-4 h-4 mr-2" />Nova Ocorrência</Link></Button>
-        )}
+        <Button asChild>
+          <Link to="/ocorrencias/nova">
+            <Plus className="w-4 h-4 mr-2" />Nova Ocorrência
+          </Link>
+        </Button>
       </div>
 
       <Card>
         <CardHeader><CardTitle className="flex items-center gap-2"><Search className="w-4 h-4" /> Filtros</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <Input placeholder="Buscar protocolo ou descrição..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="lg:col-span-2" />
-          <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm"><option value="">Todos os Status</option>{['criada', 'encaminhada', 'autorizada', 'agendada', 'em_execucao', 'executada', 'concluida', 'cancelada', 'devolvida'].map(s => <option key={s} value={s}>{getStatusLabel(s)}</option>)}</select>
-          <select value={selectedPriority} onChange={(e) => setSelectedPriority(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm"><option value="">Todas as Prioridades</option><option value="baixa">Baixa</option><option value="media">Média</option><option value="alta">Alta</option></select>
-          <select value={selectedEquipamento} onChange={(e) => setSelectedEquipamento(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm"><option value="">Todos Equipamentos</option>{uniqueEquipamentos.map(e => <option key={e} value={e}>{e}</option>)}</select>
+          <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm">
+            <option value="">Todos os Status</option>
+            {['criada', 'encaminhada', 'autorizada', 'agendada', 'em_execucao', 'executada', 'concluida', 'cancelada', 'devolvida'].map(s => 
+              <option key={s} value={s}>{getStatusLabel(s)}</option>
+            )}
+          </select>
+          <select value={selectedPriority} onChange={(e) => setSelectedPriority(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm">
+            <option value="">Todas as Prioridades</option>
+            <option value="baixa">Baixa</option>
+            <option value="media">Média</option>
+            <option value="alta">Alta</option>
+          </select>
+          <select value={selectedEquipamento} onChange={(e) => setSelectedEquipamento(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm">
+            <option value="">Todos Equipamentos</option>
+            {uniqueEquipamentos.map(e => <option key={e} value={e}>{e}</option>)}
+          </select>
           <Input type="date" value={scheduledDateFilter} onChange={(e) => setScheduledDateFilter(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm" />
         </CardContent>
       </Card>
@@ -336,8 +390,12 @@ export default function ListaOcorrencias() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">{filteredOcorrencias.length} ocorrências encontradas</p>
         <div className="flex items-center justify-end gap-2 p-1 bg-gray-100 rounded-lg">
-          <Button variant={viewMode === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('grid')}><LayoutGrid className="w-4 h-4" /></Button>
-          <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('list')}><List className="w-4 h-4" /></Button>
+          <Button variant={viewMode === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('grid')}>
+            <LayoutGrid className="w-4 h-4" />
+          </Button>
+          <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('list')}>
+            <List className="w-4 h-4" />
+          </Button>
         </div>
       </div>
       
@@ -347,39 +405,47 @@ export default function ListaOcorrencias() {
             <GridView ocorrencias={filteredOcorrencias} renderActionButtons={renderActionButtons} />
           ) : (
             <div className="space-y-4">
-              <ListView ocorrencias={currentListItems} renderActionButtons={renderActionButtons} user={user} />
+              <ListView ocorrencias={currentListItems} renderActionButtons={renderActionButtons} />
               {totalPages > 1 && (
                 <Pagination>
                   <PaginationContent>
-                    <PaginationItem><PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.max(p - 1, 1)); }} className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined} /></PaginationItem>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        href="#" 
+                        onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.max(p - 1, 1)); }} 
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined} 
+                      />
+                    </PaginationItem>
                     {[...Array(totalPages).keys()].map(num => (
-                      <PaginationItem key={num + 1}><PaginationLink href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(num + 1); }} isActive={currentPage === num + 1}>{num + 1}</PaginationLink></PaginationItem>
+                      <PaginationItem key={num + 1}>
+                        <PaginationLink 
+                          href="#" 
+                          onClick={(e) => { e.preventDefault(); setCurrentPage(num + 1); }} 
+                          isActive={currentPage === num + 1}
+                        >
+                          {num + 1}
+                        </PaginationLink>
+                      </PaginationItem>
                     ))}
-                    <PaginationItem><PaginationNext href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.min(p + 1, totalPages)); }} className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined} /></PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext 
+                        href="#" 
+                        onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.min(p + 1, totalPages)); }} 
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined} 
+                      />
+                    </PaginationItem>
                   </PaginationContent>
                 </Pagination>
               )}
             </div>
           )
         ) : (
-          <div className="text-center py-16 bg-gray-50 rounded-lg"><p className="text-gray-500">Nenhuma ocorrência encontrada.</p></div>
+          <div className="text-center py-16 bg-gray-50 rounded-lg">
+            <p className="text-gray-500">Nenhuma ocorrência encontrada.</p>
+          </div>
         )}
       </div>
 
-      <Dialog open={!!cancelingOcorrenciaId} onOpenChange={(isOpen) => !isOpen && setCancelingOcorrenciaId(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Cancelar Ocorrência</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <p>Deseja cancelar a ocorrência {ocorrencias.find(o => o.id === cancelingOcorrenciaId)?.protocol}?</p>
-            <Textarea value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} placeholder="Informe o motivo do cancelamento *" rows={3} />
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setCancelingOcorrenciaId(null)}>Voltar</Button>
-              <Button variant="destructive" onClick={handleCancellation}>Confirmar Cancelamento</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
       <Dialog open={!!schedulingOcorrencia} onOpenChange={(isOpen) => !isOpen && setSchedulingOcorrencia(null)}>
         <DialogContent className="sm:max-w-[600px]">
             <DialogHeader><DialogTitle>Agendamento da Ocorrência</DialogTitle></DialogHeader>
@@ -428,7 +494,6 @@ export default function ListaOcorrencias() {
             </div>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }
