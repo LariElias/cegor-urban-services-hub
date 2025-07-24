@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { isRegionalGestor, isRegionalOperador, isRegionalFiscal, isCegorGestor, isCegorOperador } from '@/types';
+import logoPmf from '@/assets/images/logo-pmf-2025.png';
 
 const menuItems = [
   {
@@ -108,22 +109,24 @@ export function AppSidebar() {
   };
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/90';
+    isActive ? 'bg-white/20 text-gray-700 font-medium' : 'hover:bg-white/10 text-white/90';
 
   const isCollapsed = state === 'collapsed';
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
-      <SidebarContent className="bg-[#0B5CF0] text-white">
+      <SidebarContent className="bg-gray-200 text-white">
         <div className="p-4 border-b border-white/20">
           <NavLink to="/" className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
             </div>
             {!isCollapsed && (
               <div>
-                <h1 className="text-lg font-bold text-white">CEGOR</h1>
-                <p className="text-sm text-white/70">Sistema de Ocorrências</p>
+                  <img 
+                    src={logoPmf}
+                    alt="Logo pmf" 
+                    className="h-10 w-auto logoSide" 
+                  />
               </div>
             )}
           </NavLink>
@@ -145,7 +148,7 @@ export function AppSidebar() {
         {menuItems.map((group) => (
           hasPermission(group.role, group.subrole) && (
             <SidebarGroup key={group.title}>
-              <SidebarGroupLabel className="text-white/70 px-4">
+              <SidebarGroupLabel className="text-gray-500 px-4">
                 {!isCollapsed && group.title}
               </SidebarGroupLabel>
               <SidebarGroupContent>

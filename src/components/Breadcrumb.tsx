@@ -2,10 +2,12 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 export function Breadcrumb() {
   const location = useLocation();
   const pathSegments = location.pathname.split('/').filter(Boolean);
+  const { user } = useAuth();
 
   const getBreadcrumbName = (segment: string, index: number) => {
     const names: Record<string, string> = {
@@ -36,13 +38,13 @@ export function Breadcrumb() {
   };
 
   return (
-    <nav className="flex items-center space-x-2 text-sm text-gray-600">
+    <nav className="flex items-center space-x-2 text-sm text-gray-600 justify-between">
       <Link 
         to="/" 
         className="flex items-center hover:text-[#0B5CF0] transition-colors p-1 rounded-md hover:bg-gray-100"
       >
         <Home className="w-4 h-4" />
-        <span className="ml-1">Dashboard</span>
+        <span className="ml-1">Dashboard teste</span>
       </Link>
       
       {pathSegments.map((segment, index) => (

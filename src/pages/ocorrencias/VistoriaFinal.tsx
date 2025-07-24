@@ -34,7 +34,7 @@ const vistoriaSchema = z.object({
 
 type VistoriaFormData = z.infer<typeof vistoriaSchema>;
 
-export default function VistoriaPrevia() {
+export default function VistoriaFinal() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();

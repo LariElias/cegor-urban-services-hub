@@ -107,7 +107,7 @@ export interface Ocorrencia {
   description: string;
   service_type: string;
   priority: 'baixa' | 'media' | 'alta';
-  status: 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
+  status: 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida' | 'executada';
   
   // Campos atualizados RF010
   occurrence_date?: string;

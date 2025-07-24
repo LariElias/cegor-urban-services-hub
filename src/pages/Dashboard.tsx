@@ -117,13 +117,6 @@ export default function Dashboard() {
               Exportar CSV
             </Button>
           )}
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Bem-vindo,</p>
-            <p className="font-medium text-gray-900">{user?.name}</p>
-            <p className="text-xs text-gray-500 capitalize">
-              {user?.role} {user?.subrole && `- ${user.subrole}`}
-            </p>
-          </div>
         </div>
       </div>
 

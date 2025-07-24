@@ -128,3 +128,10 @@ All colors MUST be HSL.
     @apply bg-green-100 text-green-800;
   }
 }
+
+html {
+  filter: grayscale(100%) !important;
+}
+.logoSide {
+  filter: grayscale(10%) !important;
+}

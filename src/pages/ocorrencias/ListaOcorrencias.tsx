@@ -1,424 +1,243 @@
-
 import React, { useState } from 'react';
-import { Plus, Edit, Eye, Play, Send, CheckCircle, XCircle, Camera, FileText, Search, Check, X, Building } from 'lucide-react';
+import { Plus, Edit, Eye, Play, Send, CheckCircle, XCircle, Camera, FileText, Search, Check, X, Building, LayoutGrid, List, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useAuth } from '@/context/AuthContext';
 import { Ocorrencia, isRegionalGestor, isRegionalOperador, isRegionalFiscal } from '@/types';
 import { Link } from 'react-router-dom';
 
+// Mock data com status 'executada' para teste do fiscal
+const mockOcorrencias: Ocorrencia[] = [
+  { id: '1', protocol: 'OCR-2024-001', description: 'Limpeza de terreno baldio', service_type: 'Limpeza', priority: 'alta', status: 'criada', address: 'Rua das Flores, 123', public_equipment_name: 'Praça do Ferreira', regional_id: '1', fiscal_id: '1', origin: 'SISGEP', created_at: '2025-07-20T10:00:00Z', updated_at: '2025-07-20T10:00:00Z' },
+  { id: '2', protocol: 'OCR-2024-002', description: 'Reparo em calçada', service_type: 'Manutenção', priority: 'media', status: 'encaminhada', address: 'Av. Beira Mar, 456', public_equipment_name: 'Areninha Campo do América', regional_id: '2', fiscal_id: '2', forwarded_by: '2', forwarded_at: '2025-07-21T11:00:00Z', created_at: '2025-07-21T09:00:00Z', updated_at: '2025-07-21T11:00:00Z' },
+  { id: '3', protocol: 'OCR-2024-003', description: 'Poda de árvores no parque', service_type: 'Conservação', priority: 'baixa', status: 'autorizada', address: 'Av. Padre Antônio Tomás, s/n', public_equipment_name: 'Parque do Cocó', regional_id: '5', fiscal_id: '5', approved_by_regional: '5', approved_at_regional: '2025-07-19T14:00:00Z', created_at: '2025-07-19T10:00:00Z', updated_at: '2025-07-19T14:00:00Z' },
+  { id: '4', protocol: 'OCR-2024-004', description: 'Vazamento em poste de saúde', service_type: 'Reparo', priority: 'alta', status: 'agendada', address: 'Rua G, 300', public_equipment_name: 'Posto de Saúde Dr. Hélio Goes', regional_id: '6', fiscal_id: '6', scheduled_at: '2025-07-25T09:00:00Z', created_at: '2025-07-22T08:00:00Z', updated_at: '2025-07-22T10:00:00Z' },
+  { id: '5', protocol: 'OCR-2024-005', description: 'Manutenção de brinquedos na praça', service_type: 'Manutenção', priority: 'media', status: 'em_execucao', address: 'Rua Paulino Nogueira, s/n', public_equipment_name: 'Praça da Gentilândia', regional_id: '1', fiscal_id: '1', created_at: '2025-07-18T15:00:00Z', updated_at: '2025-07-20T13:00:00Z' },
+  { id: '6', protocol: 'OCR-2024-006', description: 'Pintura de quadra', service_type: 'Pintura', priority: 'baixa', status: 'executada', address: 'Av. Gov. Leonel Brizola, s/n', public_equipment_name: 'Cuca Jangurussu', regional_id: '4', fiscal_id: '4', created_at: '2025-06-10T09:00:00Z', updated_at: '2025-06-15T16:00:00Z' },
+  { id: '7', protocol: 'OCR-2024-007', description: 'Troca de lâmpada queimada', service_type: 'Iluminação', priority: 'alta', status: 'criada', address: 'Rua Delmiro de Farias, 1000', public_equipment_name: 'E.E.F.M. Adauto Bezerra', regional_id: '3', fiscal_id: '3', origin: 'SPU', created_at: '2025-07-22T11:00:00Z', updated_at: '2025-07-22T11:00:00Z' },
+  { id: '8', protocol: 'OCR-2024-008', description: 'Capinação de área externa', service_type: 'Limpeza', priority: 'media', status: 'cancelada', address: 'Rua Pernambuco, s/n', public_equipment_name: 'Areninha do Pici', regional_id: '3', fiscal_id: '3', cancel_reason: 'Serviço já executado por outra equipe.', created_at: '2025-07-15T12:00:00Z', updated_at: '2025-07-16T10:00:00Z' },
+  { id: '9', protocol: 'OCR-2024-009', description: 'Conserto de portão de escola', service_type: 'Serralheria', priority: 'alta', status: 'agendada', address: 'Rua I, 150', public_equipment_name: 'E.M.E.I.F. Rachel de Queiroz', regional_id: '4', fiscal_id: '4', scheduled_at: '2025-07-28T14:00:00Z', created_at: '2025-07-21T16:00:00Z', updated_at: '2025-07-22T09:00:00Z' },
+  { id: '10', protocol: 'OCR-2024-010', description: 'Revisão de estrutura de parquinho', service_type: 'Inspeção', priority: 'media', status: 'devolvida', address: 'Rua das Flores, 123', public_equipment_name: 'Praça do Ferreira', regional_id: '1', fiscal_id: '1', return_reason: 'Faltam informações sobre o material necessário.', created_at: '2025-07-20T14:00:00Z', updated_at: '2025-07-21T17:00:00Z' },
+];
+
+const mockEmpresas = [
+    { id: '1', name: 'Empresa A de Serviços' },
+    { id: '2', name: 'Empresa B de Manutenção' },
+    { id: '3', name: 'Empresa C de Limpeza' },
+];
+
+const getStatusColor = (status: string) => ({'criada': 'bg-gray-100 text-gray-800','encaminhada': 'bg-blue-100 text-blue-800','autorizada': 'bg-teal-100 text-teal-800','cancelada': 'bg-red-100 text-red-800','devolvida': 'bg-orange-100 text-orange-800','em_analise': 'bg-yellow-100 text-yellow-800','agendada': 'bg-purple-100 text-purple-800','em_execucao': 'bg-cyan-100 text-cyan-800','executada': 'bg-green-100 text-green-800', 'concluida': 'bg-emerald-100 text-emerald-800'}[status] || 'bg-gray-100 text-gray-800');
+const getStatusLabel = (status: string) => ({'criada': 'Criada','encaminhada': 'Encaminhada','autorizada': 'Autorizada','cancelada': 'Cancelada','devolvida': 'Devolvida','em_analise': 'Em Análise','agendada': 'Agendada','em_execucao': 'Em Execução','executada': 'Executada', 'concluida': 'Concluída'}[status] || status);
+const getPriorityColor = (priority: string) => ({'baixa': 'bg-green-100 text-green-800','media': 'bg-yellow-100 text-yellow-800','alta': 'bg-red-100 text-red-800'}[priority] || 'bg-gray-100 text-gray-800');
+const uniqueEquipamentos = [...new Set(mockOcorrencias.map(o => o.public_equipment_name).filter(Boolean))];
+
+// --- Componentes de Visualização ---
+
+const ListView = ({ ocorrencias, renderActionButtons, user }) => (
+  <Card>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Protocolo</TableHead>
+          <TableHead className="hidden md:table-cell">Descrição</TableHead>
+          <TableHead>Prioridade</TableHead>
+          <TableHead>Status</TableHead>
+          {(isRegionalGestor(user) || user?.role === 'cegor' || user?.role === 'empresa') && (
+            <TableHead>Data Agendamento</TableHead>
+          )}
+          <TableHead className="text-right">Ações</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {ocorrencias.map((ocorrencia) => (
+          <TableRow key={ocorrencia.id}>
+            <TableCell className="font-medium">{ocorrencia.protocol}<p className="text-xs text-gray-500 md:hidden">{ocorrencia.description}</p></TableCell>
+            <TableCell className="hidden md:table-cell">{ocorrencia.description}</TableCell>
+            <TableCell><Badge className={getPriorityColor(ocorrencia.priority)}>{ocorrencia.priority}</Badge></TableCell>
+            <TableCell><Badge className={getStatusColor(ocorrencia.status)}>{getStatusLabel(ocorrencia.status)}</Badge></TableCell>
+            {(isRegionalGestor(user) || user?.role === 'cegor' || user?.role === 'empresa') && (
+              <TableCell>
+                {ocorrencia.status === 'agendada' && ocorrencia.scheduled_at
+                  ? new Date(ocorrencia.scheduled_at).toLocaleDateString('pt-BR')
+                  : '-'}
+              </TableCell>
+            )}
+            <TableCell className="text-right"><div className="flex items-center justify-end gap-2">{renderActionButtons(ocorrencia)}</div></TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </Card>
+);
+
+const GridView = ({ ocorrencias, renderActionButtons }) => (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {ocorrencias.map((ocorrencia) => (
+            <Card key={ocorrencia.id} className="flex flex-col">
+                <CardHeader>
+                    <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{ocorrencia.protocol}</CardTitle>
+                        <Badge className={getPriorityColor(ocorrencia.priority)}>{ocorrencia.priority}</Badge>
+                    </div>
+                    <p className="text-sm text-gray-500">{ocorrencia.service_type}</p>
+                </CardHeader>
+                <CardContent className="flex-grow space-y-3">
+                    <p className="text-sm text-gray-600">{ocorrencia.description}</p>
+                    <p className="text-sm text-gray-600"><strong>Equipamento:</strong> {ocorrencia.public_equipment_name}</p>
+                    <p className="text-sm text-gray-600"><strong>Endereço:</strong> {ocorrencia.address}</p>
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">Status:</span>
+                        <Badge className={getStatusColor(ocorrencia.status)}>{getStatusLabel(ocorrencia.status)}</Badge>
+                    </div>
+                </CardContent>
+                <div className="flex items-center justify-end gap-2 p-4 pt-2 border-t mt-auto">
+                    {renderActionButtons(ocorrencia)}
+                </div>
+            </Card>
+        ))}
+    </div>
+);
+
+
 export default function ListaOcorrencias() {
   const { user } = useAuth();
+  const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>(mockOcorrencias);
+  // Estados para filtros
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedPriority, setSelectedPriority] = useState('');
+  const [selectedEquipamento, setSelectedEquipamento] = useState('');
+  const [scheduledDateFilter, setScheduledDateFilter] = useState('');
+  // Estados para UI e Dialogs
+  const [viewMode, setViewMode] = useState('list');
+  const [currentPage, setCurrentPage] = useState(1);
   const [cancelReason, setCancelReason] = useState('');
-  const [selectedOcorrencia, setSelectedOcorrencia] = useState<string | null>(null);
+  const [schedulingOcorrencia, setSchedulingOcorrencia] = useState<Ocorrencia | null>(null);
+  const [newScheduleDate, setNewScheduleDate] = useState('');
+  const [responsibleCompany, setResponsibleCompany] = useState('');
+  const [teamSize, setTeamSize] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('');
+  const [cancelingOcorrenciaId, setCancelingOcorrenciaId] = useState<string | null>(null);
+  const itemsPerPage = 5;
 
-  // Mock data - em produção viria da API
-  const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>([
-    {
-      id: '1',
-      protocol: 'OCR-2024-001',
-      description: 'Limpeza de terreno baldio',
-      service_type: 'Limpeza',
-      priority: 'alta',
-      status: 'criada',
-      address: 'Rua das Flores, 123',
-      regional_id: '1',
-      fiscal_id: '1',
-      origin: 'SISGEP',
-      origin_number: 'SGP-2024-001',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      protocol: 'OCR-2024-002',
-      description: 'Reparo em calçada',
-      service_type: 'Manutenção',
-      priority: 'media',
-      status: 'encaminhada',
-      address: 'Av. Brasil, 456',
-      regional_id: '1',
-      fiscal_id: '1',
-      forwarded_by: '2',
-      forwarded_at: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    {
-      id: '3',
-      protocol: 'OCR-2024-003',
-      description: 'Poda de árvores',
-      service_type: 'Conservação',
-      priority: 'baixa',
-      status: 'autorizada',
-      address: 'Praça Central, s/n',
-      regional_id: '1',
-      fiscal_id: '1',
-      approved_by_regional: '2',
-      approved_at_regional: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-  ]);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'criada': return 'bg-gray-100 text-gray-800';
-      case 'encaminhada': return 'bg-blue-100 text-blue-800';
-      case 'autorizada': return 'bg-purple-100 text-purple-800';
-      case 'cancelada': return 'bg-red-100 text-red-800';
-      case 'devolvida': return 'bg-orange-100 text-orange-800';
-      case 'em_analise': return 'bg-yellow-100 text-yellow-800';
-      case 'agendada': return 'bg-purple-100 text-purple-800';
-      case 'em_execucao': return 'bg-blue-100 text-blue-800';
-      case 'concluida': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'criada': return 'Criada';
-      case 'encaminhada': return 'Encaminhada';
-      case 'autorizada': return 'Autorizada';
-      case 'cancelada': return 'Cancelada';
-      case 'devolvida': return 'Devolvida';
-      case 'em_analise': return 'Em Análise';
-      case 'agendada': return 'Agendada';
-      case 'em_execucao': return 'Em Execução';
-      case 'concluida': return 'Concluída';
-      default: return status;
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'baixa': return 'bg-green-100 text-green-800';
-      case 'media': return 'bg-yellow-100 text-yellow-800';
-      case 'alta': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
+  // --- Lógica de Ações e Status ---
   const handleStatusChange = (id: string, newStatus: Ocorrencia['status'], additionalData?: any) => {
-    setOcorrencias(ocorrencias.map(o => 
-      o.id === id 
-        ? { 
-            ...o, 
-            status: newStatus, 
-            updated_at: new Date().toISOString(),
-            ...additionalData
-          }
-        : o
-    ));
+    setOcorrencias(ocorrencias.map(o => o.id === id ? { ...o, status: newStatus, updated_at: new Date().toISOString(), ...additionalData } : o));
   };
-
-  const handleRegionalApproval = (id: string) => {
-    handleStatusChange(id, 'autorizada', {
-      approved_by_regional: user?.id,
-      approved_at_regional: new Date().toISOString()
-    });
-  };
-
-  const handleForwardToCegor = (id: string) => {
-    handleStatusChange(id, 'encaminhada', {
-      forwarded_by: user?.id,
-      forwarded_at: new Date().toISOString()
-    });
-  };
-
-  const handleCegorApproval = (id: string) => {
-    handleStatusChange(id, 'autorizada', {
-      approved_by: user?.name,
-      approved_at: new Date().toISOString()
-    });
-  };
-
-  const handleCancellation = (id: string) => {
-    if (!cancelReason.trim()) {
-      alert('Motivo do cancelamento é obrigatório');
-      return;
-    }
-    
-    handleStatusChange(id, 'cancelada', {
-      cancel_reason: cancelReason
-    });
-    
+  const handleRegionalApproval = (id: string) => handleStatusChange(id, 'autorizada', { approved_by_regional: user?.id, approved_at_regional: new Date().toISOString() });
+  const handleForwardToCegor = (id: string) => handleStatusChange(id, 'encaminhada', { forwarded_by: user?.id, forwarded_at: new Date().toISOString() });
+  const handleCegorApproval = (id: string) => handleStatusChange(id, 'autorizada', { approved_by: user?.name, approved_at: new Date().toISOString() });
+  
+  const handleCancellation = () => {
+    if (!cancelingOcorrenciaId || !cancelReason.trim()) { alert('Motivo do cancelamento é obrigatório'); return; }
+    handleStatusChange(cancelingOcorrenciaId, 'cancelada', { cancel_reason: cancelReason });
     setCancelReason('');
-    setSelectedOcorrencia(null);
+    setCancelingOcorrenciaId(null);
   };
 
+  const handleSchedule = () => {
+    if (!schedulingOcorrencia || !newScheduleDate || !scheduleTime) { alert('A data e o horário do agendamento são obrigatórios.'); return; }
+    console.log({ responsibleCompany, teamSize });
+    handleStatusChange(schedulingOcorrencia.id, 'agendada', { scheduled_at: new Date(newScheduleDate).toISOString() });
+    setSchedulingOcorrencia(null);
+    setNewScheduleDate('');
+    setResponsibleCompany('');
+    setTeamSize('');
+    setScheduleTime('');
+  };
+
+  const handleFiscalApproval = (id: string) => {
+    handleStatusChange(id, 'concluida', { fiscal_approved_by: user?.id, fiscal_approved_at: new Date().toISOString() });
+  };
+
+  // --- Lógica de Filtragem ---
   const filteredOcorrencias = ocorrencias.filter(ocorrencia => {
-    const matchesSearch = ocorrencia.protocol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ocorrencia.description.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Filtrar por permissões
-    if (user?.role === 'regional') {
-      const regionalFilter = ocorrencia.regional_id === user.regional_id;
-      
-      if (isRegionalOperador(user)) {
-        // Operador vê apenas suas próprias ocorrências ou do SISGEP/SPU
-        return matchesSearch && regionalFilter && (
-          ocorrencia.origin === 'SISGEP' || 
-          ocorrencia.origin === 'SPU' || 
-          ocorrencia.fiscal_id === user.id
-        );
-      }
-      
-      return matchesSearch && regionalFilter;
+    // Filtro geral por regional
+    if (user?.role === 'regional' && ocorrencia.regional_id !== user.regional_id) {
+        return false;
     }
-    
-    if (user?.role === 'empresa') {
-      // Empresa só vê ocorrências autorizadas, agendadas ou em execução
-      return matchesSearch && ['autorizada', 'agendada', 'em_execucao'].includes(ocorrencia.status);
+    // Filtro específico de status para empresa
+    if (user?.role === 'empresa' && !['autorizada', 'agendada', 'em_execucao', 'executada'].includes(ocorrencia.status)) {
+        return false;
     }
+
+    const matchesSearch = ocorrencia.protocol.toLowerCase().includes(searchTerm.toLowerCase()) || ocorrencia.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = !selectedStatus || ocorrencia.status === selectedStatus;
+    const matchesPriority = !selectedPriority || ocorrencia.priority === selectedPriority;
+    const matchesEquipamento = !selectedEquipamento || ocorrencia.public_equipment_name === selectedEquipamento;
+    const matchesDate = !scheduledDateFilter || (ocorrencia.scheduled_at && ocorrencia.scheduled_at.startsWith(scheduledDateFilter));
     
-    return matchesSearch;
+    return matchesSearch && matchesStatus && matchesPriority && matchesEquipamento && matchesDate;
   });
 
+  // --- Lógica de Paginação ---
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentListItems = filteredOcorrencias.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredOcorrencias.length / itemsPerPage);
+
+  // --- Renderização de Botões ---
   const renderActionButtons = (ocorrencia: Ocorrencia) => {
     const buttons = [];
 
-    // Botões para CEGOR
+    // CEGOR
     if (user?.role === 'cegor') {
       if (ocorrencia.status === 'encaminhada') {
-        buttons.push(
-          <Button
-            key="permitir"
-            variant="outline"
-            size="sm"
-            onClick={() => handleCegorApproval(ocorrencia.id)}
-            title="Permitir Execução"
-            className="text-green-600 hover:text-green-700"
-          >
-            <Check className="w-4 h-4" />
-          </Button>
-        );
-        buttons.push(
-          <Dialog key="cancelar">
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedOcorrencia(ocorrencia.id)}
-                title="Cancelar"
-                className="text-red-600 hover:text-red-700"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Cancelar Ocorrência</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <p>Deseja cancelar a ocorrência {ocorrencia.protocol}?</p>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Motivo do cancelamento *
-                  </label>
-                  <Textarea
-                    value={cancelReason}
-                    onChange={(e) => setCancelReason(e.target.value)}
-                    placeholder="Informe o motivo do cancelamento"
-                    rows={3}
-                  />
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setCancelReason('');
-                      setSelectedOcorrencia(null);
-                    }}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleCancellation(ocorrencia.id)}
-                  >
-                    Confirmar Cancelamento
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        );
+        buttons.push(<Button key="permitir" variant="outline" size="icon" onClick={() => handleCegorApproval(ocorrencia.id)} title="Permitir Execução" className="text-green-600 hover:text-green-700"><Check className="w-4 h-4" /></Button>);
+        buttons.push(<Button key="cancelar" variant="outline" size="icon" onClick={() => setCancelingOcorrenciaId(ocorrencia.id)} title="Cancelar" className="text-red-600 hover:text-red-700"><X className="w-4 h-4" /></Button>);
       }
-
       if (ocorrencia.status === 'autorizada') {
-        buttons.push(
-          <Button
-            key="agendar"
-            variant="outline"
-            size="sm"
-            asChild
-          >
-            <Link to={`/ocorrencias/${ocorrencia.id}/agendamento`}>
-              <CheckCircle className="w-4 h-4" />
-            </Link>
-          </Button>
-        );
+        buttons.push(<Button key="agendar" variant="outline" size="icon" onClick={() => setSchedulingOcorrencia(ocorrencia)} title="Agendar Ocorrência"><Calendar className="w-4 h-4" /></Button>);
       }
-
       if (ocorrencia.status === 'criada') {
-        buttons.push(
-          <Button
-            key="vistoria"
-            variant="outline"
-            size="sm"
-            asChild
-          >
-            <Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}>
-              <Camera className="w-4 h-4" />
-            </Link>
-          </Button>
-        );
+        buttons.push(<Button key="vistoria" variant="outline" size="icon" asChild title="Realizar Vistoria"><Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}><Camera className="w-4 h-4" /></Link></Button>);
+      }
+      if (ocorrencia.status === 'em_execucao' || ocorrencia.status === 'executada') {
+        buttons.push(<Button key="acompanhamento" variant="outline" size="icon" asChild title="Acompanhamento"><Link to={`/ocorrencias/${ocorrencia.id}/acompanhamento`}><FileText className="w-4 h-4" /></Link></Button>);
       }
     }
 
-    // Botões para Regional Gestor
+    // Regional Gestor
     if (isRegionalGestor(user)) {
       if (ocorrencia.status === 'criada') {
-        buttons.push(
-          <Button
-            key="executar-regional"
-            variant="outline"
-            size="sm"
-            onClick={() => handleRegionalApproval(ocorrencia.id)}
-            title="Executar na Regional"
-            className="text-green-600 hover:text-green-700"
-          >
-            <Building className="w-4 h-4" />
-          </Button>
-        );
-        buttons.push(
-          <Button
-            key="encaminhar"
-            variant="outline"
-            size="sm"
-            onClick={() => handleForwardToCegor(ocorrencia.id)}
-            title="Encaminhar para CEGOR"
-            className="text-blue-600 hover:text-blue-700"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
-        );
+        buttons.push(<Button key="executar-regional" variant="outline" size="icon" onClick={() => handleRegionalApproval(ocorrencia.id)} title="Executar na Regional" className="text-green-600 hover:text-green-700"><Building className="w-4 h-4" /></Button>);
+        buttons.push(<Button key="encaminhar" variant="outline" size="icon" onClick={() => handleForwardToCegor(ocorrencia.id)} title="Encaminhar para CEGOR" className="text-blue-600 hover:text-blue-700"><Send className="w-4 h-4" /></Button>);
       }
-      
       if (ocorrencia.status === 'autorizada') {
-        buttons.push(
-          <Button
-            key="agendar"
-            variant="outline"
-            size="sm"
-            asChild
-          >
-            <Link to={`/ocorrencias/${ocorrencia.id}/agendamento`}>
-              <CheckCircle className="w-4 h-4" />
-            </Link>
-          </Button>
-        );
+        buttons.push(<Button key="agendar" variant="outline" size="icon" onClick={() => setSchedulingOcorrencia(ocorrencia)} title="Agendar Ocorrência"><Calendar className="w-4 h-4" /></Button>);
       }
-
       if (ocorrencia.status === 'agendada') {
-        buttons.push(
-          <Button
-            key="executar"
-            variant="outline"
-            size="sm"
-            onClick={() => handleStatusChange(ocorrencia.id, 'em_execucao')}
-            title="Iniciar execução"
-          >
-            <Play className="w-4 h-4" />
-          </Button>
-        );
+        buttons.push(<Button key="executar" variant="outline" size="icon" onClick={() => handleStatusChange(ocorrencia.id, 'em_execucao')} title="Iniciar execução"><Play className="w-4 h-4" /></Button>);
       }
-
-      if (ocorrencia.status === 'em_execucao') {
-        buttons.push(
-          <Button
-            key="detalhar"
-            variant="outline"
-            size="sm"
-            asChild
-          >
-            <Link to={`/ocorrencias/${ocorrencia.id}/detalhamento`}>
-              <Edit className="w-4 h-4" />
-            </Link>
-          </Button>
-        );
+      if (ocorrencia.status === 'em_execucao' || ocorrencia.status === 'executada') {
+        buttons.push(<Button key="detalhar" variant="outline" size="icon" asChild title="Detalhar Execução"><Link to={`/ocorrencias/${ocorrencia.id}/detalhamento`}><Edit className="w-4 h-4" /></Link></Button>);
+        buttons.push(<Button key="acompanhamento" variant="outline" size="icon" asChild title="Acompanhamento"><Link to={`/ocorrencias/${ocorrencia.id}/acompanhamento`}><FileText className="w-4 h-4" /></Link></Button>);
       }
     }
 
-    // Botões para Regional Fiscal
-    if (isRegionalFiscal(user) && ocorrencia.status === 'criada') {
-      buttons.push(
-        <Button
-          key="vistoria"
-          variant="outline"
-          size="sm"
-          asChild
-        >
-          <Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}>
-            <Camera className="w-4 h-4" />
-          </Link>
-        </Button>
-      );
+    // Regional Fiscal
+    if (isRegionalFiscal(user)) {
+        if (ocorrencia.status === 'criada') {
+            buttons.push(<Button key="vistoria" variant="outline" size="icon" asChild title="Realizar Vistoria"><Link to={`/ocorrencias/${ocorrencia.id}/vistoria`}><Camera className="w-4 h-4" /></Link></Button>);
+        }
+        if (ocorrencia.status === 'executada') {
+            buttons.push(<Button key="aprovar-fiscal" variant="outline" size="icon" asChild title="Concluir Ocorrência (Fiscal)" className="text-green-600 hover:text-green-700"><Link to={`/ocorrencias/${ocorrencia.id}/vistoria_final`}><CheckCircle className="w-4 h-4" /></Link></Button>);
+        }
     }
 
-    // Botões para Empresa
-    if (user?.role === 'empresa') {
-      if (ocorrencia.status === 'em_execucao') {
-        buttons.push(
-          <Button
-            key="acompanhamento"
-            variant="outline"
-            size="sm"
-            asChild
-          >
-            <Link to={`/ocorrencias/${ocorrencia.id}/acompanhamento`}>
-              <FileText className="w-4 h-4" />
-            </Link>
-          </Button>
-        );
-      }
+    // Empresa
+    if (user?.role === 'empresa' && ocorrencia.status === 'em_execucao') {
+      buttons.push(<Button key="acompanhamento" variant="outline" size="icon" asChild title="Acompanhamento"><Link to={`/ocorrencias/${ocorrencia.id}/acompanhamento`}><FileText className="w-4 h-4" /></Link></Button>);
     }
 
-    // Botão de visualizar sempre presente
-    buttons.push(
-      <Button
-        key="visualizar"
-        variant="outline"
-        size="sm"
-        asChild
-      >
-        <Link to={`/ocorrencias/${ocorrencia.id}`}>
-          <Eye className="w-4 h-4" />
-        </Link>
-      </Button>
-    );
-
+    buttons.push(<Button key="visualizar" variant="outline" size="icon" asChild title="Visualizar"><Link to={`/ocorrencias/${ocorrencia.id}`}><Eye className="w-4 h-4" /></Link></Button>);
     return buttons;
   };
 
@@ -426,80 +245,118 @@ export default function ListaOcorrencias() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Ocorrências</h1>
-        {(user?.role === 'regional' && (isRegionalOperador(user) || isRegionalGestor(user))) && (
-          <Button asChild className="flex items-center gap-2">
-            <Link to="/ocorrencias/nova">
-              <Plus className="w-4 h-4" />
-              Nova Ocorrência
-            </Link>
-          </Button>
+        {(isRegionalOperador(user) || isRegionalGestor(user)) && (
+          <Button asChild><Link to="/ocorrencias/nova"><Plus className="w-4 h-4 mr-2" />Nova Ocorrência</Link></Button>
         )}
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Lista de Ocorrências</CardTitle>
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Buscar ocorrências..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Protocolo</TableHead>
-                <TableHead>Descrição</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Prioridade</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Origem</TableHead>
-                <TableHead>Endereço</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredOcorrencias.map((ocorrencia) => (
-                <TableRow key={ocorrencia.id}>
-                  <TableCell className="font-medium">{ocorrencia.protocol}</TableCell>
-                  <TableCell>{ocorrencia.description}</TableCell>
-                  <TableCell>{ocorrencia.service_type}</TableCell>
-                  <TableCell>
-                    <Badge className={getPriorityColor(ocorrencia.priority)}>
-                      {ocorrencia.priority}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(ocorrencia.status)}>
-                      {getStatusLabel(ocorrencia.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {ocorrencia.origin ? (
-                      <Badge variant="outline">{ocorrencia.origin}</Badge>
-                    ) : (
-                      <span className="text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell>{ocorrencia.address}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {renderActionButtons(ocorrencia)}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <CardHeader><CardTitle className="flex items-center gap-2"><Search className="w-4 h-4" /> Filtros</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <Input placeholder="Buscar protocolo ou descrição..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="lg:col-span-2" />
+          <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm"><option value="">Todos os Status</option>{['criada', 'encaminhada', 'autorizada', 'agendada', 'em_execucao', 'executada', 'concluida', 'cancelada', 'devolvida'].map(s => <option key={s} value={s}>{getStatusLabel(s)}</option>)}</select>
+          <select value={selectedPriority} onChange={(e) => setSelectedPriority(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm"><option value="">Todas as Prioridades</option><option value="baixa">Baixa</option><option value="media">Média</option><option value="alta">Alta</option></select>
+          <select value={selectedEquipamento} onChange={(e) => setSelectedEquipamento(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm"><option value="">Todos Equipamentos</option>{uniqueEquipamentos.map(e => <option key={e} value={e}>{e}</option>)}</select>
+          <Input type="date" value={scheduledDateFilter} onChange={(e) => setScheduledDateFilter(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm" />
         </CardContent>
       </Card>
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-600">{filteredOcorrencias.length} ocorrências encontradas</p>
+        <div className="flex items-center justify-end gap-2 p-1 bg-gray-100 rounded-lg">
+          <Button variant={viewMode === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('grid')}><LayoutGrid className="h-5 w-5" /></Button>
+          <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('list')}><List className="h-5 w-5" /></Button>
+        </div>
+      </div>
+      
+      <div>
+        {filteredOcorrencias.length > 0 ? (
+          viewMode === 'grid' ? (
+            <GridView ocorrencias={filteredOcorrencias} renderActionButtons={renderActionButtons} />
+          ) : (
+            <div className="space-y-4">
+              <ListView ocorrencias={currentListItems} renderActionButtons={renderActionButtons} user={user} />
+              {totalPages > 1 && (
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem><PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.max(p - 1, 1)); }} className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined} /></PaginationItem>
+                    {[...Array(totalPages).keys()].map(num => (
+                      <PaginationItem key={num + 1}><PaginationLink href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(num + 1); }} isActive={currentPage === num + 1}>{num + 1}</PaginationLink></PaginationItem>
+                    ))}
+                    <PaginationItem><PaginationNext href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.min(p + 1, totalPages)); }} className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined} /></PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </div>
+          )
+        ) : (
+          <div className="text-center py-16 bg-gray-50 rounded-lg"><p className="text-gray-500">Nenhuma ocorrência encontrada.</p></div>
+        )}
+      </div>
+
+      <Dialog open={!!cancelingOcorrenciaId} onOpenChange={(isOpen) => !isOpen && setCancelingOcorrenciaId(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Cancelar Ocorrência</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <p>Deseja cancelar a ocorrência {ocorrencias.find(o => o.id === cancelingOcorrenciaId)?.protocol}?</p>
+            <Textarea value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} placeholder="Informe o motivo do cancelamento *" rows={3} />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setCancelingOcorrenciaId(null)}>Voltar</Button>
+              <Button variant="destructive" onClick={handleCancellation}>Confirmar Cancelamento</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={!!schedulingOcorrencia} onOpenChange={(isOpen) => !isOpen && setSchedulingOcorrencia(null)}>
+        <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader><DialogTitle>Agendamento da Ocorrência</DialogTitle></DialogHeader>
+            <div className="space-y-4 py-4">
+                <p className="text-sm text-gray-600">Agendar execução para a ocorrência <strong>{schedulingOcorrencia?.protocol}</strong>.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                    <div className="space-y-2">
+                        <Label>Tipo de Ocorrência:</Label>
+                        <Input value={schedulingOcorrencia?.service_type || ''} disabled className="bg-gray-100" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="responsible-company">Empresa Responsável:</Label>
+                        <select id="responsible-company" value={responsibleCompany} onChange={(e) => setResponsibleCompany(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                            <option value="">Selecione uma empresa</option>
+                            {mockEmpresas.map(empresa => (
+                                <option key={empresa.id} value={empresa.id}>{empresa.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="team-size">Quantidade de Pessoas na Equipe:</Label>
+                        <Input id="team-size" type="number" value={teamSize} onChange={(e) => setTeamSize(e.target.value)} />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                        <Label>Descrição:</Label>
+                        <Textarea value={schedulingOcorrencia?.description || ''} disabled rows={2} className="bg-gray-100" />
+                    </div>
+                    <hr className="md:col-span-2 my-2"/>
+                    <div className="space-y-2">
+                        <Label htmlFor="schedule-date">Data disponível:</Label>
+                        <Input id="schedule-date" type="date" value={newScheduleDate} onChange={(e) => setNewScheduleDate(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="schedule-time">Horários disponíveis:</Label>
+                        <select id="schedule-time" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                            <option value="">Selecione um horário</option>
+                            <option value="07h-12h">07h - 12h</option>
+                            <option value="13h-17h">13h - 17h</option>
+                        </select>
+                    </div>
+                </div>
+                <div className="flex justify-end gap-2 pt-4">
+                    <Button variant="outline" onClick={() => setSchedulingOcorrencia(null)}>Cancelar</Button>
+                    <Button onClick={handleSchedule} className="bg-blue-600 hover:bg-blue-700">Confirmar Agendamento</Button>
+                </div>
+            </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
