@@ -96,7 +96,7 @@ export default function VistoriaFinal() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Voltar
         </Button>
-        <h1 className="text-3xl font-bold">Vistoria Prévia</h1>
+        <h1 className="text-3xl font-bold">Vistoria Final</h1>
       </div>
 
       <Card>
