@@ -3,89 +3,108 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, Upload, X, Camera, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/AuthContext';
 
-// Schema de validação atualizado com os novos campos e lógica condicional
-const vistoriaSchema = z.object({
-  photos: z.array(z.string()).min(1, 'Pelo menos uma foto é obrigatória'),
-  responsible: z.string().min(1, 'Responsável é obrigatório'),
+// Schema de validação para os novos campos
+const vistoriaFinalSchema = z.object({
+  real_start_date: z.string().min(1, 'Data de início é obrigatória'),
+  real_end_date: z.string().min(1, 'Data de fim é obrigatória'),
+  real_start_shift: z.string().min(1, 'Turno de início é obrigatório'),
+  total_time_spent: z.string().min(1, 'Tempo total é obrigatório'),
+  selected_team: z.string().min(1, 'A seleção da equipe é obrigatória'),
+  inspection_responsible: z.string(),
   inspection_date: z.string().min(1, 'Data da vistoria é obrigatória'),
-  activity: z.string().min(1, 'Atividade é obrigatória'),
-  ponto_inicial: z.string().optional(),
-  ponto_final: z.string().optional(),
-  cannot_execute: z.boolean().default(false),
-  cannot_execute_reason: z.string().optional(),
-}).superRefine((data, ctx) => {
-  if (data.cannot_execute && !data.cannot_execute_reason?.trim()) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'O motivo é obrigatório.',
-      path: ['cannot_execute_reason'],
-    });
-  }
+  reproval_reason: z.string().optional(),
 });
 
-type VistoriaFormData = z.infer<typeof vistoriaSchema>;
+type VistoriaFinalFormData = z.infer<typeof vistoriaFinalSchema>;
 
 export default function VistoriaFinal() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const [photos, setPhotos] = useState<string[]>([]);
+  
+  const [isApproveOpen, setIsApproveOpen] = useState(false);
+  const [isReproveOpen, setIsReproveOpen] = useState(false);
+  const [formData, setFormData] = useState<VistoriaFinalFormData | null>(null);
 
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
+    watch,
+    trigger, // Adicionado para validação manual
+    getValues, // Adicionado para pegar os valores do formulário
     formState: { errors },
-  } = useForm<VistoriaFormData>({
-    resolver: zodResolver(vistoriaSchema),
+  } = useForm<VistoriaFinalFormData>({
+    resolver: zodResolver(vistoriaFinalSchema),
     defaultValues: {
-      cannot_execute: false,
-      responsible: user?.name || '',
+      inspection_responsible: user?.name || 'Demostenes Araujo Ferreira',
     }
   });
 
-  const cannotExecute = watch('cannot_execute');
+  const reprovalReason = watch('reproval_reason');
 
-  // Seta o nome do usuário no campo responsável quando o componente monta
+  // Mock data
+  const teams = [
+    { id: '1', name: 'Equipe Alpha' },
+    { id: '2', name: 'Equipe Bravo' },
+    { id: '3', name: 'Equipe Charlie' },
+  ];
+
+  const teamInfo = {
+    funcionarios: ['Antonio Joao', 'Maria Ana', 'Carlos Joao', 'Antonio Joao'],
+    datas: ['13/10/2024', '09/10/2024', '12/09/2024', '31/10/2024'],
+    turnos: ['Manhã', 'Tarde', 'Noite', 'Tarde'],
+  };
+
   useEffect(() => {
     if (user?.name) {
-      setValue('responsible', user.name);
+      setValue('inspection_responsible', user.name);
     }
   }, [user, setValue]);
 
-  // Mock data
-  const activities = [
-    { id: '1', name: 'Varrição de via pública' },
-    { id: '2', name: 'Capina e poda de vegetação' },
-    { id: '3', name: 'Corte de árvore' },
-  ];
-
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    const newPhotos = files.map(file => URL.createObjectURL(file));
-    const updatedPhotos = [...photos, ...newPhotos];
-    setPhotos(updatedPhotos);
-    setValue('photos', updatedPhotos, { shouldValidate: true });
+  const handleOpenApproveModal = async () => {
+    const isValid = await trigger(); // Valida o formulário
+    if (isValid) {
+      setFormData(getValues()); // Pega os dados válidos
+      setIsApproveOpen(true); // Abre o modal
+    }
   };
 
-  const removePhoto = (index: number) => {
-    const updatedPhotos = photos.filter((_, i) => i !== index);
-    setPhotos(updatedPhotos);
-    setValue('photos', updatedPhotos, { shouldValidate: true });
+  const handleOpenReproveModal = async () => {
+    const isValid = await trigger();
+    if (isValid) {
+      setFormData(getValues());
+      setIsReproveOpen(true);
+    }
   };
 
-  const onSubmit = (data: VistoriaFormData) => {
-    console.log('Vistoria salva:', data);
+  const handleConfirmApproval = () => {
+    if (!formData) return;
+    console.log('Vistoria Aprovada:', formData);
+    // Lógica para submeter os dados da vistoria final como APROVADA
+    setIsApproveOpen(false);
+    navigate('/ocorrencias');
+  };
+
+  const handleConfirmReproval = () => {
+    if (!formData) return;
+    if (!reprovalReason || !reprovalReason.trim()) {
+        alert("O motivo da reprovação é obrigatório.");
+        return;
+    }
+    const finalData = { ...formData, reproval_reason: reprovalReason };
+    console.log('Vistoria Reprovada:', finalData);
+    // Lógica para submeter os dados da vistoria final como REPROVADA
+    setIsReproveOpen(false);
     navigate('/ocorrencias');
   };
 
@@ -100,101 +119,137 @@ export default function VistoriaFinal() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Camera className="w-5 h-5" />
-            Registro de Vistoria
+        <CardHeader className="rounded-t-lg">
+          <CardTitle className="">
+            Vistoria final
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="photos">Fotos da Vistoria *</Label>
-              <div className="flex items-center gap-2">
-                <Input type="file" multiple accept="image/*" onChange={handlePhotoUpload} className="hidden" id="photo-upload" />
-                <Button type="button" variant="outline" onClick={() => document.getElementById('photo-upload')?.click()}>
-                  <Upload className="w-4 h-4 mr-2" /> Adicionar Fotos
-                </Button>
-              </div>
-              {errors.photos && <p className="text-sm text-red-500">{errors.photos.message}</p>}
-              {photos.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-                  {photos.map((photo, index) => (
-                    <div key={index} className="relative">
-                      <img src={photo} alt={`Foto ${index + 1}`} className="w-full h-20 object-cover rounded" />
-                      <Button type="button" variant="destructive" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0" onClick={() => removePhoto(index)}><X className="w-3 h-3" /></Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-              {/* <div className="space-y-2">
-                <Label htmlFor="responsible">Responsável pela Vistoria *</Label>
-                <Input id="responsible" {...register('responsible')} readOnly className="bg-gray-100"/>
-                {errors.responsible && <p className="text-sm text-red-500">{errors.responsible.message}</p>}
-              </div> */}
+          <div className="space-y-6 pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="inspection_date">Data da Vistoria *</Label>
-                <Input id="inspection_date" type="date" {...register('inspection_date')} />
-                {errors.inspection_date && <p className="text-sm text-red-500">{errors.inspection_date.message}</p>}
+                <Label htmlFor="real_start_date">Data real do início</Label>
+                <Input id="real_start_date" type="date" {...register('real_start_date')} />
+                {errors.real_start_date && <p className="text-sm text-red-500">{errors.real_start_date.message}</p>}
               </div>
-
-
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="activity">Atividade *</Label>
-                <select id="activity" {...register('activity')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                  <option value="">Selecione a atividade</option>
-                  {activities.map(activity => <option key={activity.id} value={activity.id}>{activity.name}</option>)}
+              <div className="space-y-2">
+                <Label htmlFor="real_end_date">Data real do Fim</Label>
+                <Input id="real_end_date" type="date" {...register('real_end_date')} />
+                {errors.real_end_date && <p className="text-sm text-red-500">{errors.real_end_date.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="real_start_shift">Turno Real Início</Label>
+                <select id="real_start_shift" {...register('real_start_shift')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                    <option value="">Selecione o turno</option>
+                    <option value="Diurno">Diurno</option>
+                    <option value="Noturno">Noturno</option>
                 </select>
-                {errors.activity && <p className="text-sm text-red-500">{errors.activity.message}</p>}
+                {errors.real_start_shift && <p className="text-sm text-red-500">{errors.real_start_shift.message}</p>}
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="ponto_inicial">Ponto Inicial</Label>
-                <Input id="ponto_inicial" {...register('ponto_inicial')} placeholder="Ex: Esquina da Rua A com Av. B" />
-                {errors.ponto_inicial && <p className="text-sm text-red-500">{errors.ponto_inicial.message}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="ponto_final">Ponto Final</Label>
-                <Input id="ponto_final" {...register('ponto_final')} placeholder="Ex: Em frente ao número 123" />
-                {errors.ponto_final && <p className="text-sm text-red-500">{errors.ponto_final.message}</p>}
+                <Label htmlFor="total_time_spent">Tempo Real total gasto (em horas)</Label>
+                <Input id="total_time_spent" type="number" {...register('total_time_spent')} placeholder="Ex: 8" />
+                {errors.total_time_spent && <p className="text-sm text-red-500">{errors.total_time_spent.message}</p>}
               </div>
             </div>
 
-            {/* --- CHECKBOX E TEXTAREA CONDICIONAL --- */}
-            <div className="space-y-4 pt-4 border-t">
-                <div className="flex items-center space-x-2">
-                    <Checkbox id="cannot_execute" checked={cannotExecute} onCheckedChange={(checked) => setValue('cannot_execute', checked as boolean)} />
-                    <Label htmlFor="cannot_execute" className="flex items-center gap-2 cursor-pointer text-red-600 font-medium">
-                        <AlertCircle className="w-4 h-4" />
-                        Não é possível realizar a ocorrência
-                    </Label>
-                </div>
-
-                {cannotExecute && (
-                    <div className="space-y-2 pl-6 animate-in fade-in-50">
-                        <Label htmlFor="cannot_execute_reason">Descreva o motivo *</Label>
-                        <Textarea id="cannot_execute_reason" {...register('cannot_execute_reason')} placeholder="Explique por que a ocorrência não pode ser realizada..." rows={3} />
-                        {errors.cannot_execute_reason && <p className="text-sm text-red-500">{errors.cannot_execute_reason.message}</p>}
+            <hr className="my-4" />
+            
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Informações da equipe</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="selected_team">Equipe selecionada</Label>
+                        <select id="selected_team" {...register('selected_team')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                            <option value="">Selecione a equipe</option>
+                            {teams.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}
+                        </select>
+                        {errors.selected_team && <p className="text-sm text-red-500">{errors.selected_team.message}</p>}
                     </div>
-                )}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                    <div>
+                        <Label className="font-semibold">Funcionários:</Label>
+                        {teamInfo.funcionarios.map((func, index) => <p key={index} className="bg-yellow-100 p-2 rounded mt-1">{func}</p>)}
+                    </div>
+                    <div>
+                        <Label className="font-semibold">Data:</Label>
+                        {teamInfo.datas.map((data, index) => <p key={index} className="bg-yellow-100 p-2 rounded mt-1">{data}</p>)}
+                    </div>
+                    <div>
+                        <Label className="font-semibold">Turno da falta:</Label>
+                        {teamInfo.turnos.map((turno, index) => <p key={index} className="bg-yellow-100 p-2 rounded mt-1">{turno}</p>)}
+                    </div>
+                </div>
             </div>
 
-            <div className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={() => navigate('/ocorrencias')}>
-                Cancelar
+            <hr className="my-4" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                    <Label htmlFor="total_hours_calculated">Cálculo do total de horas da ocorrência</Label>
+                    <Input id="total_hours_calculated" value="12 horas" disabled className="bg-gray-100" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="inspection_responsible">Responsável Vistoria (ZGL vistoria):</Label>
+                    <Input id="inspection_responsible" {...register('inspection_responsible')} disabled className="bg-gray-100" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="inspection_date">Data da vistoria:</Label>
+                    <Input id="inspection_date" type="date" {...register('inspection_date')} />
+                    {errors.inspection_date && <p className="text-sm text-red-500">{errors.inspection_date.message}</p>}
+                </div>
+            </div>
+
+            <div className="flex justify-start space-x-2 pt-4">
+              <Button type="button" onClick={handleOpenApproveModal} className="bg-green-600 hover:bg-green-700">
+                Aprovar Vistoria
               </Button>
-              <Button type="submit">
-                Salvar Vistoria
+              <Button type="button" variant="destructive" onClick={handleOpenReproveModal}>
+                Reprovar Vistoria
               </Button>
             </div>
-          </form>
+          </div>
         </CardContent>
       </Card>
+
+      {/* Dialog de Aprovação */}
+      <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Aprovar Vistoria</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p>Você confirma a vistoria e a ocorrência aprovada?</p>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsApproveOpen(false)}>Voltar</Button>
+            <Button onClick={handleConfirmApproval} className="bg-green-600 hover:bg-green-700">Confirmar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialog de Reprovação */}
+      <Dialog open={isReproveOpen} onOpenChange={setIsReproveOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reprovar Vistoria</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <Label htmlFor="reproval_reason">Descreva um resumo do por que da sua desaprovação</Label>
+            <Textarea 
+              id="reproval_reason" 
+              {...register('reproval_reason')}
+              placeholder="Descreva o motivo aqui..."
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsReproveOpen(false)}>Voltar</Button>
+            <Button variant="destructive" onClick={handleConfirmReproval}>Reprovar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
