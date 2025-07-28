@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -170,20 +169,26 @@ export interface BusinessRule {
   description: string;
 }
 
-// Interfaces para formulários - corrigidas
+// Interfaces para formulários - corrigidas para aceitar ambos os padrões
 export interface EquipamentoFormProps {
   equipamento?: any;
-  onClose: () => void;
+  onClose?: () => void;
+  onSave?: (data: any) => void;
+  onCancel?: () => void;
 }
 
 export interface FiscalFormProps {
   fiscal?: any;
-  onClose: () => void;
+  onClose?: () => void;
+  onSave?: (data: any) => void;
+  onCancel?: () => void;
 }
 
 export interface TerritorioFormProps {
   territorio?: any;
-  onClose: () => void;
+  onClose?: () => void;
+  onSave?: (data: any) => void;
+  onCancel?: () => void;
 }
 
 export type OccurrenceStatus = 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';

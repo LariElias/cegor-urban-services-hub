@@ -9,10 +9,12 @@ import { useToast } from '@/hooks/use-toast';
 
 interface EquipamentoFormProps {
   equipamento?: any;
-  onClose: () => void;
+  onClose?: () => void;
+  onSave?: (data: any) => void;
+  onCancel?: () => void;
 }
 
-export const EquipamentoForm = ({ equipamento, onClose }: EquipamentoFormProps) => {
+export const EquipamentoForm = ({ equipamento, onClose, onSave, onCancel }: EquipamentoFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -49,7 +51,20 @@ export const EquipamentoForm = ({ equipamento, onClose }: EquipamentoFormProps) 
       description: `Equipamento ${equipamento ? 'atualizado' : 'criado'} com sucesso!`,
     });
     
-    onClose();
+    // Call the appropriate callback
+    if (onSave) {
+      onSave(formData);
+    } else if (onClose) {
+      onClose();
+    }
+  };
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else if (onClose) {
+      onClose();
+    }
   };
 
   return (
@@ -183,7 +198,7 @@ export const EquipamentoForm = ({ equipamento, onClose }: EquipamentoFormProps) 
       </div>
 
       <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={onClose}>
+        <Button type="button" variant="outline" onClick={handleCancel}>
           Cancelar
         </Button>
         <Button type="submit">

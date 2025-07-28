@@ -8,10 +8,12 @@ import { useToast } from '@/hooks/use-toast';
 
 interface FiscalFormProps {
   fiscal?: any;
-  onClose: () => void;
+  onClose?: () => void;
+  onSave?: (data: any) => void;
+  onCancel?: () => void;
 }
 
-export const FiscalForm = ({ fiscal, onClose }: FiscalFormProps) => {
+export const FiscalForm = ({ fiscal, onClose, onSave, onCancel }: FiscalFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -55,7 +57,20 @@ export const FiscalForm = ({ fiscal, onClose }: FiscalFormProps) => {
       description: `Fiscal ${fiscal ? 'atualizado' : 'criado'} com sucesso!`,
     });
     
-    onClose();
+    // Call the appropriate callback
+    if (onSave) {
+      onSave(formData);
+    } else if (onClose) {
+      onClose();
+    }
+  };
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else if (onClose) {
+      onClose();
+    }
   };
 
   const formatCPF = (value: string) => {
@@ -142,7 +157,7 @@ export const FiscalForm = ({ fiscal, onClose }: FiscalFormProps) => {
       </div>
 
       <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={onClose}>
+        <Button type="button" variant="outline" onClick={handleCancel}>
           Cancelar
         </Button>
         <Button type="submit">

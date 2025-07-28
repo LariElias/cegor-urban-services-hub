@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Printer, CheckCircle, MapPin, Calendar, User, FileText, Camera, AlertCircle } from 'lucide-react';
@@ -15,68 +14,276 @@ import { Ocorrencia, getPermittedActions } from '@/types';
 import TimelineItem from '@/components/ocorrencias/TimelineItem';
 import GalleryItem from '@/components/ocorrencias/GalleryItem';
 
-// Mock data expandido
-const mockOcorrencia: Ocorrencia = {
-  id: '2',
-  protocol: 'OCR-2024-002',
-  description: 'Reparo necessário na calçada em frente ao equipamento público devido a danos causados por raízes de árvores',
-  service_type: 'Manutenção',
-  public_equipment_name: 'Escola Municipal João Silva',
-  priority: 'media',
-  status: 'agendada',
-  
-  // Dados básicos
-  occurrence_date: '2024-01-15',
-  occurrence_type: 'Preventiva',
-  origin: 'SIGEP',
-  origin_number: '2024-001234',
-  
-  // Localização
-  address: 'Rua das Palmeiras, 456',
-  latitude: -3.7319,
-  longitude: -38.5267,
-  
-  // Responsabilidades
-  regional_id: '2',
-  regional: { 
-    id: '2', 
-    name: 'Regional Centro', 
-    code: 'RC', 
-    address: 'Av. Central, 100', 
-    phone: '(85) 3456-7890', 
-    responsible: 'Maria Santos', 
-    created_at: '2024-01-01T00:00:00Z', 
-    updated_at: '2024-01-01T00:00:00Z' 
+// Mock data expandido com múltiplas ocorrências
+const mockOcorrencias: Record<string, Ocorrencia> = {
+  '1': {
+    id: '1',
+    protocol: 'OCR-2024-001',
+    description: 'Limpeza de praça pública necessária devido ao acúmulo de lixo e entulho',
+    service_type: 'Limpeza',
+    public_equipment_name: 'Praça da Liberdade',
+    priority: 'alta',
+    status: 'criada',
+    
+    occurrence_date: '2024-01-14',
+    occurrence_type: 'Corretiva',
+    origin: 'Ouvidoria',
+    origin_number: '2024-001233',
+    
+    address: 'Praça da Liberdade, s/n',
+    latitude: -19.9317,
+    longitude: -43.9378,
+    
+    regional_id: '1',
+    regional: { 
+      id: '1', 
+      name: 'Regional Centro-Sul', 
+      code: 'RCS', 
+      address: 'Av. Afonso Pena, 1000', 
+      phone: '(31) 3234-5678', 
+      responsible: 'Carlos Silva', 
+      created_at: '2024-01-01T00:00:00Z', 
+      updated_at: '2024-01-01T00:00:00Z' 
+    },
+    fiscal_id: '1',
+    fiscal: { 
+      id: '1', 
+      name: 'Maria Santos', 
+      cpf: '123.456.789-00', 
+      phone: '(31) 99999-1234', 
+      email: 'maria.santos@prefeitura.gov.br', 
+      regional_id: '1',
+      created_at: '2024-01-01T00:00:00Z', 
+      updated_at: '2024-01-01T00:00:00Z' 
+    },
+    
+    created_at: '2024-01-14T08:30:00Z',
+    updated_at: '2024-01-14T08:30:00Z'
   },
-  fiscal_id: '2',
-  fiscal: { 
-    id: '2', 
-    name: 'João Oliveira', 
-    cpf: '987.654.321-00', 
-    phone: '(85) 9876-5432', 
-    email: 'joao.oliveira@prefeitura.gov.br', 
+  '2': {
+    id: '2',
+    protocol: 'OCR-2024-002',
+    description: 'Reparo necessário na calçada em frente ao equipamento público devido a danos causados por raízes de árvores',
+    service_type: 'Manutenção',
+    public_equipment_name: 'Escola Municipal João Silva',
+    priority: 'media',
+    status: 'agendada',
+    
+    occurrence_date: '2024-01-15',
+    occurrence_type: 'Preventiva',
+    origin: 'SIGEP',
+    origin_number: '2024-001234',
+    
+    address: 'Rua das Palmeiras, 456',
+    latitude: -3.7319,
+    longitude: -38.5267,
+    
     regional_id: '2',
-    created_at: '2024-01-01T00:00:00Z', 
-    updated_at: '2024-01-01T00:00:00Z' 
+    regional: { 
+      id: '2', 
+      name: 'Regional Centro', 
+      code: 'RC', 
+      address: 'Av. Central, 100', 
+      phone: '(85) 3456-7890', 
+      responsible: 'Maria Santos', 
+      created_at: '2024-01-01T00:00:00Z', 
+      updated_at: '2024-01-01T00:00:00Z' 
+    },
+    fiscal_id: '2',
+    fiscal: { 
+      id: '2', 
+      name: 'João Oliveira', 
+      cpf: '987.654.321-00', 
+      phone: '(85) 9876-5432', 
+      email: 'joao.oliveira@prefeitura.gov.br', 
+      regional_id: '2',
+      created_at: '2024-01-01T00:00:00Z', 
+      updated_at: '2024-01-01T00:00:00Z' 
+    },
+    
+    scheduled_date: '2024-01-20T08:00:00Z',
+    scheduled_time: '08:00',
+    estimated_hours: 4,
+    
+    vistoria_previa_date: '2024-01-18T10:00:00Z',
+    
+    forwarded_by: '2',
+    forwarded_at: '2024-01-16T14:00:00Z',
+    approved_by_regional: '2',
+    approved_at_regional: '2024-01-17T09:00:00Z',
+    
+    created_at: '2024-01-15T10:30:00Z',
+    updated_at: '2024-01-18T10:00:00Z'
   },
-  
-  // Agendamento
-  scheduled_date: '2024-01-20T08:00:00Z',
-  scheduled_time: '08:00',
-  estimated_hours: 4,
-  
-  // Vistorias
-  vistoria_previa_date: '2024-01-18T10:00:00Z',
-  
-  // Aprovações
-  forwarded_by: '2',
-  forwarded_at: '2024-01-16T14:00:00Z',
-  approved_by_regional: '2',
-  approved_at_regional: '2024-01-17T09:00:00Z',
-  
-  // Timestamps
-  created_at: '2024-01-15T10:30:00Z',
-  updated_at: '2024-01-18T10:00:00Z'
+  '3': {
+    id: '3',
+    protocol: 'OCR-2024-003',
+    description: 'Substituição de lâmpadas queimadas na iluminação pública',
+    service_type: 'Elétrica',
+    public_equipment_name: 'Avenida Paulista',
+    priority: 'baixa',
+    status: 'em_execucao',
+    
+    occurrence_date: '2024-01-16',
+    occurrence_type: 'Corretiva',
+    origin: 'Solicitação Interna',
+    origin_number: '2024-001235',
+    
+    address: 'Avenida Paulista, 1000',
+    latitude: -23.5613,
+    longitude: -46.6565,
+    
+    regional_id: '1',
+    regional: { 
+      id: '1', 
+      name: 'Regional Centro-Sul', 
+      code: 'RCS', 
+      address: 'Av. Afonso Pena, 1000', 
+      phone: '(31) 3234-5678', 
+      responsible: 'Carlos Silva', 
+      created_at: '2024-01-01T00:00:00Z', 
+      updated_at: '2024-01-01T00:00:00Z' 
+    },
+    fiscal_id: '1',
+    fiscal: { 
+      id: '1', 
+      name: 'Maria Santos', 
+      cpf: '123.456.789-00', 
+      phone: '(31) 99999-1234', 
+      email: 'maria.santos@prefeitura.gov.br', 
+      regional_id: '1',
+      created_at: '2024-01-01T00:00:00Z', 
+      updated_at: '2024-01-01T00:00:00Z' 
+    },
+    
+    scheduled_date: '2024-01-19T14:00:00Z',
+    scheduled_time: '14:00',
+    estimated_hours: 2,
+    started_at: '2024-01-19T14:00:00Z',
+    
+    empresa_id: '1',
+    empresa: {
+      id: '1',
+      name: 'Empresa Elétrica LTDA',
+      cnpj: '12.345.678/0001-90',
+      phone: '(31) 3333-4444',
+      email: 'contato@eletrica.com',
+      address: 'Rua da Energia, 100',
+      responsible: 'Pedro Eletrícista',
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z'
+    },
+    
+    created_at: '2024-01-16T09:15:00Z',
+    updated_at: '2024-01-19T14:00:00Z'
+  },
+  '4': {
+    id: '4',
+    protocol: 'OCR-2024-004',
+    description: 'Poda de árvores que estão obstruindo a sinalização de trânsito',
+    service_type: 'Jardinagem',
+    public_equipment_name: 'Cruzamento Rua A com Rua B',
+    priority: 'alta',
+    status: 'concluida',
+    
+    occurrence_date: '2024-01-10',
+    occurrence_type: 'Preventiva',
+    origin: 'BHTRANS',
+    origin_number: '2024-001236',
+    
+    address: 'Cruzamento Rua A com Rua B',
+    latitude: -19.9167,
+    longitude: -43.9345,
+    
+    regional_id: '2',
+    regional: { 
+      id: '2', 
+      name: 'Regional Centro', 
+      code: 'RC', 
+      address: 'Av. Central, 100', 
+      phone: '(85) 3456-7890', 
+      responsible: 'Maria Santos', 
+      created_at: '2024-01-01T00:00:00Z', 
+      updated_at: '2024-01-01T00:00:00Z' 
+    },
+    fiscal_id: '2',
+    fiscal: { 
+      id: '2', 
+      name: 'João Oliveira', 
+      cpf: '987.654.321-00', 
+      phone: '(85) 9876-5432', 
+      email: 'joao.oliveira@prefeitura.gov.br', 
+      regional_id: '2',
+      created_at: '2024-01-01T00:00:00Z', 
+      updated_at: '2024-01-01T00:00:00Z' 
+    },
+    
+    scheduled_date: '2024-01-12T08:00:00Z',
+    scheduled_time: '08:00',
+    estimated_hours: 3,
+    started_at: '2024-01-12T08:00:00Z',
+    completed_at: '2024-01-12T11:00:00Z',
+    actual_hours: 3,
+    
+    vistoria_previa_date: '2024-01-11T10:00:00Z',
+    vistoria_pos_date: '2024-01-12T11:30:00Z',
+    
+    forwarded_by: '2',
+    forwarded_at: '2024-01-10T15:00:00Z',
+    approved_by_regional: '2',
+    approved_at_regional: '2024-01-11T08:00:00Z',
+    
+    execution_notes: 'Poda realizada com sucesso. Sinalização liberada.',
+    
+    created_at: '2024-01-10T14:20:00Z',
+    updated_at: '2024-01-12T11:30:00Z'
+  },
+  '5': {
+    id: '5',
+    protocol: 'OCR-2024-005',
+    description: 'Reparo em equipamento de playground danificado',
+    service_type: 'Manutenção',
+    public_equipment_name: 'Parque Municipal',
+    priority: 'media',
+    status: 'cancelada',
+    
+    occurrence_date: '2024-01-17',
+    occurrence_type: 'Corretiva',
+    origin: 'Ouvidoria',
+    origin_number: '2024-001237',
+    
+    address: 'Parque Municipal, s/n',
+    latitude: -19.9240,
+    longitude: -43.9370,
+    
+    regional_id: '1',
+    regional: { 
+      id: '1', 
+      name: 'Regional Centro-Sul', 
+      code: 'RCS', 
+      address: 'Av. Afonso Pena, 1000', 
+      phone: '(31) 3234-5678', 
+      responsible: 'Carlos Silva', 
+      created_at: '2024-01-01T00:00:00Z', 
+      updated_at: '2024-01-01T00:00:00Z' 
+    },
+    fiscal_id: '1',
+    fiscal: { 
+      id: '1', 
+      name: 'Maria Santos', 
+      cpf: '123.456.789-00', 
+      phone: '(31) 99999-1234', 
+      email: 'maria.santos@prefeitura.gov.br', 
+      regional_id: '1',
+      created_at: '2024-01-01T00:00:00Z', 
+      updated_at: '2024-01-01T00:00:00Z' 
+    },
+    
+    cancel_reason: 'Equipamento foi substituído por novo modelo, não necessitando reparo.',
+    
+    created_at: '2024-01-17T11:45:00Z',
+    updated_at: '2024-01-18T09:15:00Z'
+  }
 };
 
 const mockAttachments = [
@@ -133,8 +340,8 @@ export default function VisualizarOcorrencia() {
         // Simular delay da API
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        if (id === '2') {
-          setOcorrencia(mockOcorrencia);
+        if (id && mockOcorrencias[id]) {
+          setOcorrencia(mockOcorrencias[id]);
         } else {
           // Ocorrência não encontrada
           setOcorrencia(null);
@@ -205,6 +412,15 @@ export default function VisualizarOcorrencia() {
         date: ocorrencia.started_at,
         title: 'Início da Execução',
         description: 'Execução iniciada',
+        status: 'completed' as const
+      });
+    }
+
+    if (ocorrencia.vistoria_pos_date) {
+      events.push({
+        date: ocorrencia.vistoria_pos_date,
+        title: 'Vistoria Pós-Execução',
+        description: 'Vistoria pós-execução realizada',
         status: 'completed' as const
       });
     }
@@ -381,9 +597,9 @@ export default function VisualizarOcorrencia() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Território</Label>
+                      <Label>Bairro</Label>
                       <Input 
-                        value={ocorrencia.territorio?.name || 'Não informado'} 
+                        value={ocorrencia.equipamento?.bairro?.name || 'Não informado'} 
                         disabled 
                         className="bg-gray-50"
                       />

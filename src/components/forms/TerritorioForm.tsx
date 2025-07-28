@@ -9,10 +9,12 @@ import { useToast } from '@/hooks/use-toast';
 
 interface TerritorioFormProps {
   territorio?: any;
-  onClose: () => void;
+  onClose?: () => void;
+  onSave?: (data: any) => void;
+  onCancel?: () => void;
 }
 
-export const TerritorioForm = ({ territorio, onClose }: TerritorioFormProps) => {
+export const TerritorioForm = ({ territorio, onClose, onSave, onCancel }: TerritorioFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -44,7 +46,20 @@ export const TerritorioForm = ({ territorio, onClose }: TerritorioFormProps) => 
       description: `Território ${territorio ? 'atualizado' : 'criado'} com sucesso!`,
     });
     
-    onClose();
+    // Call the appropriate callback
+    if (onSave) {
+      onSave(formData);
+    } else if (onClose) {
+      onClose();
+    }
+  };
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else if (onClose) {
+      onClose();
+    }
   };
 
   return (
@@ -122,7 +137,7 @@ export const TerritorioForm = ({ territorio, onClose }: TerritorioFormProps) => 
       </div>
 
       <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={onClose}>
+        <Button type="button" variant="outline" onClick={handleCancel}>
           Cancelar
         </Button>
         <Button type="submit">
