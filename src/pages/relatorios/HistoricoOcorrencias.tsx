@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { History, Search, Filter, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,55 +38,50 @@ export default function HistoricoOcorrencias() {
   });
 
   // Mock data - em produção viria da API
-  const mockOcorrencias: Ocorrencia[] = [
+  const [ocorrencias] = useState<Ocorrencia[]>([
     {
       id: '1',
       protocol: 'OCR-2024-001',
-      description: 'Limpeza de bueiro obstruído',
+      description: 'Limpeza de terreno baldio',
       service_type: 'Limpeza',
-      public_equipment_name: 'Bueiro Principal - Rua A',
       priority: 'alta',
       status: 'concluida',
-      address: 'Rua Principal, 123',
+      address: 'Rua das Flores, 123',
       regional_id: '1',
       fiscal_id: '1',
-      completed_at: '2024-01-15T14:30:00Z',
+      completed_at: '2024-01-15T10:30:00Z',
       created_at: '2024-01-10T08:00:00Z',
-      updated_at: '2024-01-15T14:30:00Z'
+      updated_at: '2024-01-15T10:30:00Z',
     },
     {
       id: '2',
       protocol: 'OCR-2024-002',
-      description: 'Reparo de luminária',
-      service_type: 'Elétrica',
-      public_equipment_name: 'Poste 456 - Av. Central',
+      description: 'Reparo em calçada',
+      service_type: 'Manutenção',
       priority: 'media',
       status: 'cancelada',
-      address: 'Avenida Central, 456',
-      regional_id: '1',
-      fiscal_id: '2',
-      cancel_reason: 'Equipamento danificado além do reparo',
-      created_at: '2024-01-12T09:15:00Z',
-      updated_at: '2024-01-13T16:45:00Z'
+      address: 'Av. Brasil, 456',
+      regional_id: '2',
+      fiscal_id: '1',
+      cancel_reason: 'Orçamento indisponível',
+      created_at: '2024-01-12T09:00:00Z',
+      updated_at: '2024-01-14T16:00:00Z',
     },
     {
       id: '3',
       protocol: 'OCR-2024-003',
-      description: 'Manutenção de praça',
-      service_type: 'Paisagismo',
-      public_equipment_name: 'Praça da Liberdade',
+      description: 'Poda de árvores',
+      service_type: 'Conservação',
       priority: 'baixa',
       status: 'concluida',
-      address: 'Praça da Liberdade, s/n',
-      regional_id: '2',
-      fiscal_id: '3',
-      completed_at: '2024-01-20T17:00:00Z',
-      created_at: '2024-01-08T10:30:00Z',
-      updated_at: '2024-01-20T17:00:00Z'
-    }
-  ];
-
-  const [ocorrencias] = useState<Ocorrencia[]>(mockOcorrencias);
+      address: 'Praça Central, s/n',
+      regional_id: '1',
+      fiscal_id: '1',
+      completed_at: '2024-01-20T14:00:00Z',
+      created_at: '2024-01-15T11:00:00Z',
+      updated_at: '2024-01-20T14:00:00Z',
+    },
+  ]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
