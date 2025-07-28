@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -174,18 +175,21 @@ export interface EquipamentoFormProps {
   equipamento?: any;
   onSave: (data: any) => void;
   onCancel: () => void;
+  onClose: () => void;
 }
 
 export interface FiscalFormProps {
   fiscal?: any;
   onSave: (data: any) => void;
   onCancel: () => void;
+  onClose: () => void;
 }
 
 export interface TerritorioFormProps {
   territorio?: any;
   onSave: (data: any) => void;
   onCancel: () => void;
+  onClose: () => void;
 }
 
 export type OccurrenceStatus = 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
@@ -207,12 +211,12 @@ export const getPermittedActions = (role: string, subrole?: string): string[] =>
     cegor: {
       gestor: ['visualizar', 'andamento_vistoria'],
       fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento', 'permitir_execucao'],
-      operador: ['agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao', 'visualizar']
+      operador: ['visualizar', 'agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao']
     },
     regional: {
       gestor: ['visualizar', 'acompanhamento'],
       fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento', 'permitir_execucao', 'encaminhar'],
-      operador: ['agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao', 'visualizar', 'encaminhar']
+      operador: ['visualizar', 'agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao', 'encaminhar']
     },
     empresa: {
       gestor: ['visualizar', 'acompanhamento'],
