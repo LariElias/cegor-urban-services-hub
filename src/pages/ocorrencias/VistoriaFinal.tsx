@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/AuthContext';
 
-// Schema de validação para os novos campos
+// ALTERADO: Adicionado campo de foto
 const vistoriaFinalSchema = z.object({
   real_start_date: z.string().min(1, 'Data de início é obrigatória'),
   real_end_date: z.string().min(1, 'Data de fim é obrigatória'),
@@ -22,6 +22,8 @@ const vistoriaFinalSchema = z.object({
   inspection_responsible: z.string(),
   inspection_date: z.string().min(1, 'Data da vistoria é obrigatória'),
   reproval_reason: z.string().optional(),
+  // NOVO: Schema para o campo de foto
+  final_photo: z.instanceof(FileList).optional(), // Opcional por enquanto
 });
 
 type VistoriaFinalFormData = z.infer<typeof vistoriaFinalSchema>;
@@ -34,14 +36,16 @@ export default function VistoriaFinal() {
   const [isApproveOpen, setIsApproveOpen] = useState(false);
   const [isReproveOpen, setIsReproveOpen] = useState(false);
   const [formData, setFormData] = useState<VistoriaFinalFormData | null>(null);
+  // NOVO: Estado para pré-visualização da foto
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    trigger, // Adicionado para validação manual
-    getValues, // Adicionado para pegar os valores do formulário
+    trigger,
+    getValues,
     formState: { errors },
   } = useForm<VistoriaFinalFormData>({
     resolver: zodResolver(vistoriaFinalSchema),
@@ -51,6 +55,22 @@ export default function VistoriaFinal() {
   });
 
   const reprovalReason = watch('reproval_reason');
+  // NOVO: Observar o campo da foto para atualizar a pré-visualização
+  const photoFile = watch('final_photo');
+
+  useEffect(() => {
+    if (photoFile && photoFile.length > 0) {
+      const file = photoFile[0];
+      const previewUrl = URL.createObjectURL(file);
+      setPhotoPreview(previewUrl);
+
+      // Limpa a URL da memória quando o componente for desmontado
+      return () => URL.revokeObjectURL(previewUrl);
+    } else {
+      setPhotoPreview(null);
+    }
+  }, [photoFile]);
+
 
   // Mock data
   const teams = [
@@ -72,10 +92,10 @@ export default function VistoriaFinal() {
   }, [user, setValue]);
 
   const handleOpenApproveModal = async () => {
-    const isValid = await trigger(); // Valida o formulário
+    const isValid = await trigger();
     if (isValid) {
-      setFormData(getValues()); // Pega os dados válidos
-      setIsApproveOpen(true); // Abre o modal
+      setFormData(getValues());
+      setIsApproveOpen(true);
     }
   };
 
@@ -89,8 +109,8 @@ export default function VistoriaFinal() {
 
   const handleConfirmApproval = () => {
     if (!formData) return;
+    // Agora `formData` incluirá `final_photo` que é um FileList
     console.log('Vistoria Aprovada:', formData);
-    // Lógica para submeter os dados da vistoria final como APROVADA
     setIsApproveOpen(false);
     navigate('/ocorrencias');
   };
@@ -103,7 +123,6 @@ export default function VistoriaFinal() {
     }
     const finalData = { ...formData, reproval_reason: reprovalReason };
     console.log('Vistoria Reprovada:', finalData);
-    // Lógica para submeter os dados da vistoria final como REPROVADA
     setIsReproveOpen(false);
     navigate('/ocorrencias');
   };
@@ -120,12 +139,12 @@ export default function VistoriaFinal() {
 
       <Card>
         <CardHeader className="rounded-t-lg">
-          <CardTitle className="">
-            Vistoria final
-          </CardTitle>
+          <CardTitle>Vistoria final</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-6 pt-6">
+            {/* ... (código dos outros campos do formulário permanece o mesmo) ... */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="real_start_date">Data real do início</Label>
@@ -201,6 +220,32 @@ export default function VistoriaFinal() {
                 </div>
             </div>
 
+            {/* NOVO: Campo de Upload de Foto */}
+            <hr className="my-4" />
+            <div className="space-y-4">
+              <Label htmlFor="final_photo" className="text-lg font-semibold">Foto Final da Ocorrência</Label>
+              <div className="flex items-center gap-4">
+                <Label htmlFor="final_photo" className="flex items-center gap-2 cursor-pointer rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
+                  <Camera className="w-4 h-4" />
+                  Selecionar Foto
+                </Label>
+                <Input 
+                  id="final_photo" 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  {...register('final_photo')} 
+                />
+                {photoPreview && (
+                  <div className="w-32 h-32 border rounded-md overflow-hidden">
+                    <img src={photoPreview} alt="Pré-visualização" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
+              {errors.final_photo && <p className="text-sm text-red-500">{errors.final_photo.message}</p>}
+            </div>
+
+
             <div className="flex justify-start space-x-2 pt-4">
               <Button type="button" onClick={handleOpenApproveModal} className="bg-green-600 hover:bg-green-700">
                 Aprovar Vistoria
@@ -212,8 +257,7 @@ export default function VistoriaFinal() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Dialog de Aprovação */}
+      
       <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
         <DialogContent>
           <DialogHeader>
@@ -229,7 +273,6 @@ export default function VistoriaFinal() {
         </DialogContent>
       </Dialog>
       
-      {/* Dialog de Reprovação */}
       <Dialog open={isReproveOpen} onOpenChange={setIsReproveOpen}>
         <DialogContent>
           <DialogHeader>
