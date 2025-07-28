@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -204,15 +203,15 @@ export const isCegorFiscal = (user: User | null) => user?.role === 'cegor' && us
 
 // Função para obter permissões de botões baseado no role e subrole
 export const getPermittedActions = (role: string, subrole?: string): string[] => {
-  const permissions: Record<string, Record<string, string[]>> = {
+  const permissions: Record<string, Record<string[]>> = {
     cegor: {
       gestor: ['visualizar', 'andamento_vistoria'],
-      fiscal: ['visualizar','realizar_vistoria', 'acompanhamento', 'permitir_execucao'],
+      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento', 'permitir_execucao'],
       operador: ['agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao', 'visualizar']
     },
     regional: {
       gestor: ['visualizar', 'acompanhamento'],
-      fiscal: ['visualizar','realizar_vistoria', 'acompanhamento', 'permitir_execucao', 'encaminhar'],
+      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento', 'permitir_execucao', 'encaminhar'],
       operador: ['agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao', 'visualizar', 'encaminhar']
     },
     empresa: {

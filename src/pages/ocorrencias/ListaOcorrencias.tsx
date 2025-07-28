@@ -13,6 +13,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Ocorrencia, getPermittedActions } from '@/types';
 import { getActionButton } from '@/utils/actionButtons';
 import { Link } from 'react-router-dom';
+import OcorrenciaViewer from '@/components/ocorrencias/OcorrenciaViewer';
 
 // Mock data atualizado com public_equipment_name
 const mockOcorrencias: Ocorrencia[] = [
@@ -276,6 +277,7 @@ export default function ListaOcorrencias() {
   const [teamSize, setTeamSize] = useState('');
   const [scheduleTime, setScheduleTime] = useState('');
   const [cancelingOcorrenciaId, setCancelingOcorrenciaId] = useState<string | null>(null);
+  const [viewingOcorrencia, setViewingOcorrencia] = useState<Ocorrencia | null>(null);
   const itemsPerPage = 5;
 
   // --- Lógica de Ações e Status ---
@@ -285,6 +287,12 @@ export default function ListaOcorrencias() {
 
   const handleAction = (action: string, ocorrenciaId: string) => {
     switch (action) {
+      case 'visualizar':
+        const ocorrencia = ocorrencias.find(o => o.id === ocorrenciaId);
+        if (ocorrencia) {
+          setViewingOcorrencia(ocorrencia);
+        }
+        break;
       case 'permitir_execucao':
         handleStatusChange(ocorrenciaId, 'autorizada', { approved_by_regional: user?.id, approved_at_regional: new Date().toISOString() });
         break;
@@ -292,9 +300,9 @@ export default function ListaOcorrencias() {
         handleStatusChange(ocorrenciaId, 'encaminhada', { forwarded_by: user?.id, forwarded_at: new Date().toISOString() });
         break;
       case 'agendar_ocorrencia':
-        const ocorrencia = ocorrencias.find(o => o.id === ocorrenciaId);
-        if (ocorrencia) {
-          setSchedulingOcorrencia(ocorrencia);
+        const ocorrenciaToSchedule = ocorrencias.find(o => o.id === ocorrenciaId);
+        if (ocorrenciaToSchedule) {
+          setSchedulingOcorrencia(ocorrenciaToSchedule);
         }
         break;
       default:
@@ -494,6 +502,14 @@ export default function ListaOcorrencias() {
             </div>
         </DialogContent>
       </Dialog>
+
+      {viewingOcorrencia && (
+        <OcorrenciaViewer
+          ocorrencia={viewingOcorrencia}
+          isOpen={!!viewingOcorrencia}
+          onClose={() => setViewingOcorrencia(null)}
+        />
+      )}
     </div>
   );
 }
