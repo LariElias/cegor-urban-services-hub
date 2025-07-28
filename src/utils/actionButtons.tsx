@@ -16,7 +16,7 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
     case 'visualizar':
       return (
         <Button {...buttonProps} asChild title="Visualizar">
-          <Link to={`/ocorrencias/${ocorrenciaId}`}>
+          <Link to={`/ocorrencias/${ocorrenciaId}/visualizar`}>
             <Eye className="w-4 h-4" />
           </Link>
         </Button>
