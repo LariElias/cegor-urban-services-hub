@@ -58,7 +58,7 @@ const App = () => (
             
             {/* Rotas de ocorrências - todas usando Layout */}
             <Route path="/ocorrencias" element={<Layout><ListaOcorrencias /></Layout>} />
-            <Route path="/ocorrencias/nova" element={<Layout><NovaOcorrencia /></Layout>} />
+            <Route path="/ocorrencias/nova" element={<Layout><VisualizarOcorrencia /></Layout>} />
             <Route path="/ocorrencias/aprovadas" element={<Layout><OcorrenciasAprovadas /></Layout>} />
             <Route path="/ocorrencias/demandas" element={<Layout><DemandasEmpresa /></Layout>} />
             <Route path="/empresas/:id/demandas" element={<Layout><DemandasEmpresa /></Layout>} />
