@@ -39,15 +39,14 @@ const menuItems = [
   {
     title: 'Cadastros',
     icon: Settings,
-    role: ['cegor'],
-    subrole: ['gestor'],
+    role: ['adm'],
     items: [
-      { title: 'Regionais', url: '/cadastros/regionais', icon: Building, role: ['cegor'],subrole: ['gestor'] },
-      { title: 'Bairros', url: '/cadastros/bairros', icon: MapPin, role: ['cegor'], subrole: ['gestor']},
-      { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin, role: ['cegor'],subrole: ['gestor'] },
-      { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield, role: ['cegor'], subrole: ['gestor'] },
-      { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building, role: ['cegor'],subrole: ['gestor'] },
-      { title: 'Empresas', url: '/cadastros/empresas', icon: Building, role: ['cegor'],subrole: ['gestor'] },
+      { title: 'Regionais', url: '/cadastros/regionais', icon: Building},
+      { title: 'Bairros', url: '/cadastros/bairros', icon: MapPin},
+      { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin},
+      { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield },
+      { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building},
+      { title: 'Empresas', url: '/cadastros/empresas', icon: Building,},
     ]
   },
   // {
@@ -67,10 +66,12 @@ const menuItems = [
     role: ['cegor', 'regional', 'empresa'],
     subrole: ['gestor', 'fiscal', 'operador', 'supervisor'],
     items: [
-      { title: 'Lista de Ocorrências', url: '/ocorrencias', icon: FileText },
-      { title: 'Nova Ocorrência', url: '/ocorrencias/nova', icon: AlertCircle, role: ['regional'], subrole: ['operador', 'gestor'] },
-      { title: 'Ocorrências Aprovadas', url: '/ocorrencias/aprovadas', icon: CheckCircle, role: ['cegor'] },
+      { title: 'Lista', url: '/ocorrencias', icon: FileText },
+      { title: 'Novo registro', url: '/ocorrencias/nova', icon: AlertCircle, role: ['regional'], subrole: ['operador'] },
+      // { title: 'Aprovadas', url: '/ocorrencias/aprovadas', icon: CheckCircle, role: ['cegor'] },
       // { title: 'Demandas da Empresa', url: '/ocorrencias/demandas', icon: Briefcase, role: ['empresa'] },
+      { title: 'Mapa', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'],subrole: ['gestor'] },
+
     ]
   },
   {
@@ -80,19 +81,18 @@ const menuItems = [
     subrole: ['gestor', 'fiscal', 'operador', 'supervisor'],
     items: [
       { title: 'Dashboard Geral', url: '/relatorios/dashboard', icon: Activity, role: ['cegor'], subrole: ['gestor']},
-      { title: 'Tempo de Execução', url: '/relatorios/tempo', icon: Clock, role: ['cegor', 'regional'], subrole: ['gestor'] },
+      // { title: 'Tempo de Execução', url: '/relatorios/tempo', icon: Clock, role: ['cegor', 'regional'], subrole: ['gestor'] },
       // { title: 'Mapa de Ocorrências', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'] },
       { title: 'Histórico', url: '/relatorios/historico', icon: History, role: ['cegor', 'regional', 'empresa'] },
       { title: 'Relatório Regional', url: '/relatorios/regional', icon: BarChart3, role: ['regional'] },
       { title: 'Serviços Programados', url: '/relatorios/programados', icon: Calendar, role: ['empresa'] },
-      { title: 'Mapa', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'],subrole: ['gestor'] },
       { title: 'Exportar CSV', url: '/relatorios/csv', icon: FileText, role: ['cegor'], subrole:['gestor', 'fiscal'] },
     ]
   },
   {
     title: 'Conta',
     icon: Users,
-    role: ['cegor', 'regional', 'empresa'],
+    role: ['cegor', 'regional', 'empresa', 'adm'],
     items: [  // alterar a rota de conta -> entender depois o que precisa aparecer
       { title: 'Configurações', url: '/relatorios/dashboard', icon: Settings},
       

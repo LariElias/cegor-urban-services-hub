@@ -2,7 +2,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'cegor' | 'regional' | 'empresa';
+  role: 'cegor' | 'regional' | 'empresa' | 'adm';
   subrole?: 'gestor' | 'operador' | 'fiscal' | 'supervisor'; // null para empresas
   regional_id?: string;
   created_at: string;
@@ -205,7 +205,7 @@ export interface TerritorioFormProps {
 
 export type OccurrenceStatus = 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
 export type Priority = 'baixa' | 'media' | 'alta';
-export type UserRole = 'cegor' | 'regional' | 'empresa';
+export type UserRole = 'cegor' | 'regional' | 'empresa' | 'adm';
 export type UserSubrole = 'gestor' | 'operador' | 'fiscal' | 'supervisor';
 
 // Funções auxiliares para verificar permissões - com null checks
@@ -219,22 +219,24 @@ export const isCegorFiscal = (user: User | null) => user?.role === 'cegor' && us
 
 export const isEmpresaSupervisor = (user: User | null) => user?.role === 'empresa' && user?.subrole === 'supervisor';
 
+export const isSuperAdm = (user: User | null) => user?.role === 'adm' ;
+
 // Função para obter permissões de botões baseado no role e subrole
 export const getPermittedActions = (role: string, subrole?: string): string[] => {
   const permissions: Record<string, Record<string, string[]>> = {
     cegor: {
       gestor: ['visualizar', 'andamento_vistoria'],
-      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento', 'permitir_execucao'],
-      operador: ['agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao', 'visualizar']
+      fiscal: ['visualizar', 'encerrar_ocorrencia','acompanhamento', 'permitir_execucao' ],  // " permitir execução"
+      operador: ['agendar_ocorrencia', 'acompanhamento', 'visualizar']
     },
     regional: {
       gestor: ['visualizar', 'acompanhamento'],
-      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento', 'permitir_execucao', 'encaminhar'],
-      operador: ['agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao', 'visualizar', 'encaminhar']
+      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento','detalhar_execucao', 'encerrar_ocorrencia'], // "permitir execução" deve ser colocado no modal
+      operador: ['acompanhamento' , 'visualizar']
     },
     empresa: {
-      supervisor: ['visualizar', 'acompanhamento' ,  'realizar_vistoria_supervisor', 'encerrar_ocorrencia']
-    }
+      supervisor: ['visualizar', 'acompanhamento' ,  'realizar_vistoria_supervisor', ]
+    }  
   };
 
   if (!subrole || !permissions[role] || !permissions[role][subrole]) {
