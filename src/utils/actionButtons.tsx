@@ -102,6 +102,15 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
         </Button>
       );
 
+    case 'realizar_vistoria_supervisor':
+      return (
+        <Button {...buttonProps} asChild title="Realizar Vistoria">
+          <Link to={`/ocorrencias/${ocorrenciaId}/vistoria_supervisor`}>
+            <Camera  className="w-4 h-4" />
+          </Link>
+        </Button>
+      );
+
     default:
       return null;
   }

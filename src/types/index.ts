@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: 'cegor' | 'regional' | 'empresa';
-  subrole?: 'gestor' | 'operador' | 'fiscal'; // null para empresas
+  subrole?: 'gestor' | 'operador' | 'fiscal' | 'supervisor'; // null para empresas
   regional_id?: string;
   created_at: string;
   updated_at: string;
@@ -51,6 +51,18 @@ export interface Fiscal {
   created_at: string;
   updated_at: string;
 }
+
+// export interface Supervisor {
+//   id: string;
+//   name: string;
+//   cpf: string;
+//   phone: string;
+//   email: string;
+//   regional_id: string;
+//   regional?: Regional;
+//   created_at: string;
+//   updated_at: string;
+// }
 
 export interface ZGL {
   id: string;
@@ -194,15 +206,18 @@ export interface TerritorioFormProps {
 export type OccurrenceStatus = 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
 export type Priority = 'baixa' | 'media' | 'alta';
 export type UserRole = 'cegor' | 'regional' | 'empresa';
-export type UserSubrole = 'gestor' | 'operador' | 'fiscal';
+export type UserSubrole = 'gestor' | 'operador' | 'fiscal' | 'supervisor';
 
 // Funções auxiliares para verificar permissões - com null checks
 export const isRegionalGestor = (user: User | null) => user?.role === 'regional' && user?.subrole === 'gestor';
 export const isRegionalOperador = (user: User | null) => user?.role === 'regional' && user?.subrole === 'operador';
 export const isRegionalFiscal = (user: User | null) => user?.role === 'regional' && user?.subrole === 'fiscal';
+
 export const isCegorGestor = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'gestor';
 export const isCegorOperador = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'operador';
 export const isCegorFiscal = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'fiscal';
+
+export const isEmpresaSupervisor = (user: User | null) => user?.role === 'empresa' && user?.subrole === 'supervisor';
 
 // Função para obter permissões de botões baseado no role e subrole
 export const getPermittedActions = (role: string, subrole?: string): string[] => {
@@ -218,9 +233,7 @@ export const getPermittedActions = (role: string, subrole?: string): string[] =>
       operador: ['agendar_ocorrencia', 'acompanhamento', 'detalhar_execucao', 'visualizar', 'encaminhar']
     },
     empresa: {
-      gestor: ['visualizar', 'acompanhamento'],
-      fiscal: ['visualizar', 'encerrar_ocorrencia', 'acompanhamento', 'realizar_vistoria'],
-      operador: ['visualizar', 'acompanhamento']
+      supervisor: ['visualizar', 'acompanhamento' ,  'realizar_vistoria_supervisor', 'encerrar_ocorrencia']
     }
   };
 
