@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { MapPin, Filter, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,74 +16,58 @@ import { useAuth } from '@/context/AuthContext';
 import { Ocorrencia } from '@/types';
 import { Link } from 'react-router-dom';
 
+// Importações necessárias para o react-leaflet
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css'; // ESSENCIAL: Importa o CSS do Leaflet
+
+// Interface estendida para garantir que 'bairro' e 'regional_name' existam nos nossos dados de mock.
+// Em um projeto real, esses campos viriam da sua API e estariam no tipo 'Ocorrencia'.
+interface OcorrenciaComBairro extends Ocorrencia {
+  bairro: string;
+  regional_name: string;
+}
+
 export default function MapaOcorrencias() {
   const { user } = useAuth();
   const [filters, setFilters] = useState({
     status: '',
-    tipo: '',
-    regional: '',
     prioridade: '',
-    dataInicio: '',
-    dataFim: '',
+    regional: '',
+    bairro: '',
   });
 
-  // Mock data - em produção viria da API
-  const ocorrencias: Ocorrencia[] = [
-    {
-      id: '1',
-      protocol: 'OCR-2024-001',
-      description: 'Limpeza de terreno baldio',
-      service_type: 'Limpeza',
-      public_equipment_name: 'Terreno Rua das Flores',
-      priority: 'alta',
-      status: 'encaminhada',
-      address: 'Rua das Flores, 123',
-      latitude: -3.732,
-      longitude: -38.527,
-      regional_id: '1',
-      fiscal_id: '1',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      protocol: 'OCR-2024-002',
-      description: 'Reparo em calçada',
-      service_type: 'Manutenção',
-      public_equipment_name: 'Calçada Av. Brasil',
-      priority: 'media',
-      status: 'autorizada',
-      address: 'Av. Brasil, 456',
-      latitude: -3.735,
-      longitude: -38.525,
-      regional_id: '1',
-      fiscal_id: '1',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    {
-      id: '3',
-      protocol: 'OCR-2024-003',
-      description: 'Poda de árvores',
-      service_type: 'Conservação',
-      public_equipment_name: 'Praça Central',
-      priority: 'baixa',
-      status: 'em_execucao',
-      address: 'Praça Central, s/n',
-      latitude: -3.730,
-      longitude: -38.530,
-      regional_id: '1',
-      fiscal_id: '1',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
+  // ATUALIZAÇÃO 1: Mock data reduzido para 8 ocorrências com dados variados.
+  const ocorrencias: OcorrenciaComBairro[] = [
+    { id: '1', protocol: 'OCR-2024-001', description: 'Limpeza de terreno baldio', service_type: 'Limpeza', public_equipment_name: 'Terreno Rua das Flores', priority: 'alta', status: 'encaminhada', address: 'Rua das Flores, 123', latitude: -3.732, longitude: -38.527, regional_id: '1', fiscal_id: '1', created_at: '2025-07-29T10:00:00Z', updated_at: '2025-07-29T10:00:00Z', bairro: 'Centro', regional_name: 'Regional Centro' },
+    { id: '2', protocol: 'OCR-2024-002', description: 'Reparo em calçada', service_type: 'Manutenção', public_equipment_name: 'Calçada Av. Brasil', priority: 'media', status: 'autorizada', address: 'Av. Brasil, 456', latitude: -3.735, longitude: -38.525, regional_id: '2', fiscal_id: '1', created_at: '2025-07-28T11:00:00Z', updated_at: '2025-07-28T11:00:00Z', bairro: 'Meireles', regional_name: 'Regional II' },
+    { id: '3', protocol: 'OCR-2024-003', description: 'Poda de árvores', service_type: 'Conservação', public_equipment_name: 'Praça Central', priority: 'baixa', status: 'em_execucao', address: 'Praça Central, s/n', latitude: -3.730, longitude: -38.530, regional_id: '1', fiscal_id: '1', created_at: '2025-07-27T14:00:00Z', updated_at: '2025-07-27T14:00:00Z', bairro: 'Centro', regional_name: 'Regional Centro' },
+    { id: '4', protocol: 'OCR-2024-004', description: 'Poste com luz queimada', service_type: 'Iluminação', public_equipment_name: 'Poste 34A', priority: 'alta', status: 'concluida', address: 'Rua dos Tabajaras, 500', latitude: -3.720, longitude: -38.515, regional_id: '2', fiscal_id: '2', created_at: '2025-07-26T09:00:00Z', updated_at: '2025-07-26T09:00:00Z', bairro: 'Praia de Iracema', regional_name: 'Regional II' },
+    { id: '5', protocol: 'OCR-2024-005', description: 'Buraco na via', service_type: 'Manutenção', public_equipment_name: 'Asfalto Av. Leste-Oeste', priority: 'media', status: 'encaminhada', address: 'Av. Leste-Oeste, 1020', latitude: -3.715, longitude: -38.540, regional_id: '3', fiscal_id: '3', created_at: '2025-07-25T16:00:00Z', updated_at: '2025-07-25T16:00:00Z', bairro: 'Barra do Ceará', regional_name: 'Regional I' },
+    { id: '6', protocol: 'OCR-2024-006', description: 'Coleta de lixo acumulado', service_type: 'Limpeza', public_equipment_name: 'Esquina da Rua X com Y', priority: 'alta', status: 'em_execucao', address: 'Rua X, 10', latitude: -3.765, longitude: -38.575, regional_id: '4', fiscal_id: '4', created_at: '2025-07-24T08:00:00Z', updated_at: '2025-07-24T08:00:00Z', bairro: 'Antônio Bezerra', regional_name: 'Regional III' },
+    { id: '7', protocol: 'OCR-2024-007', description: 'Sinalização de trânsito apagada', service_type: 'Trânsito', public_equipment_name: 'Semáforo Av. da Universidade', priority: 'media', status: 'autorizada', address: 'Av. da Universidade, 2200', latitude: -3.742, longitude: -38.536, regional_id: '5', fiscal_id: '5', created_at: '2025-07-23T13:00:00Z', updated_at: '2025-07-23T13:00:00Z', bairro: 'Benfica', regional_name: 'Regional IV' },
+    { id: '8', protocol: 'OCR-2024-008', description: 'Vazamento de água', service_type: 'Saneamento', public_equipment_name: 'Rua Padre Cícero', priority: 'alta', status: 'encaminhada', address: 'Rua Padre Cícero, 88', latitude: -3.790, longitude: -38.558, regional_id: '6', fiscal_id: '6', created_at: '2025-07-22T18:00:00Z', updated_at: '2025-07-22T18:00:00Z', bairro: 'Messejana', regional_name: 'Regional VI' },
   ];
+
+  // ATUALIZAÇÃO 2: Lógica de filtragem revisada
+  const filteredOcorrencias = useMemo(() => {
+    return ocorrencias.filter(ocorrencia => {
+      const statusMatch = !filters.status || filters.status === 'todos' || ocorrencia.status === filters.status;
+      const prioridadeMatch = !filters.prioridade || filters.prioridade === 'todas' || ocorrencia.priority === filters.prioridade;
+      const regionalMatch = !filters.regional || filters.regional === 'todas' || ocorrencia.regional_name === filters.regional;
+      const bairroMatch = !filters.bairro || filters.bairro === 'todos' || ocorrencia.bairro === filters.bairro;
+      return statusMatch && prioridadeMatch && regionalMatch && bairroMatch;
+    });
+  }, [ocorrencias, filters]);
+  
+  // Gera listas únicas para os seletores de filtro
+  const regionais = useMemo(() => [...new Set(ocorrencias.map(o => o.regional_name))].sort(), [ocorrencias]);
+  const bairros = useMemo(() => [...new Set(ocorrencias.map(o => o.bairro))].sort(), [ocorrencias]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'encaminhada': return 'bg-red-500';
-      case 'autorizada':
-      case 'agendada': return 'bg-orange-500';
+      case 'autorizada': case 'agendada': return 'bg-orange-500';
       case 'em_execucao': return 'bg-blue-500';
       case 'concluida': return 'bg-green-500';
       default: return 'bg-gray-500';
@@ -92,18 +75,22 @@ export default function MapaOcorrencias() {
   };
 
   const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'criada': return 'Criada';
-      case 'encaminhada': return 'Encaminhada';
-      case 'autorizada': return 'Autorizada';
-      case 'cancelada': return 'Cancelada';
-      case 'devolvida': return 'Devolvida';
-      case 'em_analise': return 'Em Análise';
-      case 'agendada': return 'Agendada';
-      case 'em_execucao': return 'Em Execução';
-      case 'concluida': return 'Concluída';
-      default: return status;
-    }
+    const labels: { [key: string]: string } = {
+      criada: 'Criada', encaminhada: 'Encaminhada', autorizada: 'Autorizada',
+      cancelada: 'Cancelada', devolvida: 'Devolvida', em_analise: 'Em Análise',
+      agendada: 'Agendada', em_execucao: 'Em Execução', concluida: 'Concluída'
+    };
+    return labels[status] || status;
+  };
+
+  const createCustomIcon = (status: string) => {
+    const colorClass = getStatusColor(status);
+    return L.divIcon({
+      html: `<span class="flex h-4 w-4 rounded-full ${colorClass} border-2 border-white shadow-md"></span>`,
+      className: 'bg-transparent border-0',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+    });
   };
 
   if (user?.role !== 'cegor') {
@@ -122,7 +109,7 @@ export default function MapaOcorrencias() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Painel de Filtros */}
+        {/* ATUALIZAÇÃO 3: Painel de Filtros completo e funcional */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -133,10 +120,8 @@ export default function MapaOcorrencias() {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select value={filters.status} onValueChange={(value) => setFilters({...filters, status: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
+              <Select value={filters.status} onValueChange={(value) => setFilters(prev => ({...prev, status: value === 'todos' ? '' : value}))}>
+                <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos</SelectItem>
                   <SelectItem value="encaminhada">Encaminhada</SelectItem>
@@ -149,26 +134,9 @@ export default function MapaOcorrencias() {
             </div>
 
             <div>
-              <Label htmlFor="tipo">Tipo de Ocorrência</Label>
-              <Select value={filters.tipo} onValueChange={(value) => setFilters({...filters, tipo: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="Limpeza">Limpeza</SelectItem>
-                  <SelectItem value="Manutenção">Manutenção</SelectItem>
-                  <SelectItem value="Conservação">Conservação</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
               <Label htmlFor="prioridade">Prioridade</Label>
-              <Select value={filters.prioridade} onValueChange={(value) => setFilters({...filters, prioridade: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas" />
-                </SelectTrigger>
+              <Select value={filters.prioridade} onValueChange={(value) => setFilters(prev => ({...prev, prioridade: value === 'todas' ? '' : value}))}>
+                <SelectTrigger><SelectValue placeholder="Todas" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todas">Todas</SelectItem>
                   <SelectItem value="baixa">Baixa</SelectItem>
@@ -179,113 +147,110 @@ export default function MapaOcorrencias() {
             </div>
 
             <div>
-              <Label htmlFor="dataInicio">Data Início</Label>
-              <Input
-                id="dataInicio"
-                type="date"
-                value={filters.dataInicio}
-                onChange={(e) => setFilters({...filters, dataInicio: e.target.value})}
-              />
+              <Label htmlFor="regional">Regional</Label>
+              <Select value={filters.regional} onValueChange={(value) => setFilters(prev => ({...prev, regional: value === 'todas' ? '' : value}))}>
+                <SelectTrigger><SelectValue placeholder="Todas" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todas">Todas</SelectItem>
+                  {regionais.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
-              <Label htmlFor="dataFim">Data Fim</Label>
-              <Input
-                id="dataFim"
-                type="date"
-                value={filters.dataFim}
-                onChange={(e) => setFilters({...filters, dataFim: e.target.value})}
-              />
+              <Label htmlFor="bairro">Bairro</Label>
+              <Select value={filters.bairro} onValueChange={(value) => setFilters(prev => ({...prev, bairro: value === 'todos' ? '' : value}))}>
+                <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  {bairros.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
 
             <Button className="w-full" onClick={() => setFilters({
-              status: '', tipo: '', regional: '', prioridade: '', dataInicio: '', dataFim: ''
+              status: '', prioridade: '', regional: '', bairro: ''
             })}>
               Limpar Filtros
             </Button>
           </CardContent>
         </Card>
 
-        {/* Área do Mapa */}
         <div className="lg:col-span-3">
           <Card>
             <CardHeader>
-              <CardTitle>Mapa - Fortaleza/CE</CardTitle>
+              <CardTitle>Mapa - Fortaleza/CE ({filteredOcorrencias.length} ocorrências)</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Simulação do mapa - em produção seria um componente Leaflet */}
-              <div className="relative w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-600">Mapa será implementado com mapas.fortaleza.ce.gov.br</p>
-                    <p className="text-sm text-gray-500">Centro: Fortaleza (-3.732, -38.527)</p>
-                  </div>
-                </div>
-
-                {/* Simulação de marcadores */}
-                {ocorrencias.map((ocorrencia, index) => (
-                  <div
-                    key={ocorrencia.id}
-                    className={`absolute w-4 h-4 rounded-full ${getStatusColor(ocorrencia.status)} cursor-pointer`}
-                    style={{
-                      left: `${50 + index * 10}%`,
-                      top: `${40 + index * 5}%`,
-                    }}
-                    title={`${ocorrencia.protocol} - ${getStatusLabel(ocorrencia.status)}`}
+              <div className="h-96 w-full rounded-lg overflow-hidden z-0">
+                <MapContainer center={[-3.732, -38.527]} zoom={12} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                ))}
+                  
+                  {filteredOcorrencias.map((ocorrencia) => (
+                    <Marker 
+                      key={ocorrencia.id} 
+                      position={[ocorrencia.latitude, ocorrencia.longitude]}
+                      icon={createCustomIcon(ocorrencia.status)}
+                    >
+                      <Popup>
+                        <div className="space-y-2">
+                          <p className="font-bold">{ocorrencia.protocol}</p>
+                          <p className="text-sm">{ocorrencia.description}</p>
+                          <Badge variant="secondary">{getStatusLabel(ocorrencia.status)}</Badge>
+                          <p className="text-xs text-muted-foreground">{ocorrencia.address}</p>
+                          <Button size="sm" className="w-full mt-2" asChild>
+                            <Link to={`/ocorrencias/${ocorrencia.id}`}>
+                              Ver Detalhes
+                            </Link>
+                          </Button>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  ))}
+                </MapContainer>
               </div>
-
-              {/* Legenda */}
               <div className="mt-4 flex flex-wrap gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span className="text-sm">Encaminhada</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                  <span className="text-sm">Autorizada/Agendada</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm">Em Execução</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-sm">Concluída</span>
-                </div>
+                 <div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-500 rounded-full"></div><span className="text-sm">Encaminhada</span></div>
+                 <div className="flex items-center gap-2"><div className="w-3 h-3 bg-orange-500 rounded-full"></div><span className="text-sm">Autorizada/Agendada</span></div>
+                 <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div><span className="text-sm">Em Execução</span></div>
+                 <div className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded-full"></div><span className="text-sm">Concluída</span></div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Lista de Ocorrências no Mapa */}
           <Card className="mt-6">
             <CardHeader>
               <CardTitle>Ocorrências Visualizadas</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {ocorrencias.map((ocorrencia) => (
-                  <div key={ocorrencia.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${getStatusColor(ocorrencia.status)}`}></div>
-                      <div>
-                        <p className="font-medium">{ocorrencia.protocol}</p>
-                        <p className="text-sm text-muted-foreground">{ocorrencia.description}</p>
-                        <Badge variant="secondary" className="text-xs mt-1">
-                          {getStatusLabel(ocorrencia.status)}
-                        </Badge>
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {filteredOcorrencias.length > 0 ? (
+                  filteredOcorrencias.map((ocorrencia) => (
+                    <div key={ocorrencia.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${getStatusColor(ocorrencia.status)}`}></div>
+                        <div>
+                          <p className="font-medium">{ocorrencia.protocol}</p>
+                          <p className="text-sm text-muted-foreground">{ocorrencia.description}</p>
+                          <Badge variant="secondary" className="text-xs mt-1">
+                            {getStatusLabel(ocorrencia.status)}
+                          </Badge>
+                        </div>
                       </div>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/ocorrencias/${ocorrencia.id}`}>
+                          <Eye className="w-4 h-4 mr-1" />
+                          Abrir
+                        </Link>
+                      </Button>
                     </div>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to={`/ocorrencias/${ocorrencia.id}`}>
-                        <Eye className="w-4 h-4 mr-1" />
-                        Abrir
-                      </Link>
-                    </Button>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">Nenhuma ocorrência encontrada para os filtros selecionados.</p>
+                )}
               </div>
             </CardContent>
           </Card>
