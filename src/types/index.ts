@@ -2,7 +2,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'cegor' | 'regional' | 'empresa';
+  role: 'cegor' | 'regional' | 'empresa' | 'adm';
   subrole?: 'gestor' | 'operador' | 'fiscal' | 'supervisor'; // null para empresas
   regional_id?: string;
   created_at: string;
@@ -205,7 +205,7 @@ export interface TerritorioFormProps {
 
 export type OccurrenceStatus = 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
 export type Priority = 'baixa' | 'media' | 'alta';
-export type UserRole = 'cegor' | 'regional' | 'empresa';
+export type UserRole = 'cegor' | 'regional' | 'empresa' | 'adm';
 export type UserSubrole = 'gestor' | 'operador' | 'fiscal' | 'supervisor';
 
 // Funções auxiliares para verificar permissões - com null checks
@@ -218,6 +218,8 @@ export const isCegorOperador = (user: User | null) => user?.role === 'cegor' && 
 export const isCegorFiscal = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'fiscal';
 
 export const isEmpresaSupervisor = (user: User | null) => user?.role === 'empresa' && user?.subrole === 'supervisor';
+
+export const isSuperAdm = (user: User | null) => user?.role === 'adm' ;
 
 // Função para obter permissões de botões baseado no role e subrole
 export const getPermittedActions = (role: string, subrole?: string): string[] => {
