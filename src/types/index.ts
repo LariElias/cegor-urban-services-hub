@@ -132,11 +132,13 @@ export interface Ocorrencia {
   latitude?: number;
   longitude?: number;
   equipamento_id?: string;
+  bairro?: string;
   equipamento?: EquipamentoPublico;
   
   // Responsabilidades
   regional_id: string;
   regional?: Regional;
+  regionalAn?: string;
   fiscal_id: string;
   fiscal?: Fiscal;
   
@@ -231,7 +233,7 @@ export const getPermittedActions = (role: string, subrole?: string): string[] =>
     },
     regional: {
       gestor: ['visualizar', 'acompanhamento'],
-      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento','detalhar_execucao', 'encerrar_ocorrencia'], // "permitir execução" deve ser colocado no modal
+      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento', 'encerrar_ocorrencia'], // "permitir execução" deve ser colocado no modal
       operador: ['acompanhamento' , 'visualizar']
     },
     empresa: {

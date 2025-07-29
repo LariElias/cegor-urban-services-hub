@@ -15,139 +15,115 @@ import { getActionButton } from '@/utils/actionButtons';
 import { Link } from 'react-router-dom';
 import OcorrenciaViewer from '@/components/ocorrencias/OcorrenciaViewer';
 
+const regionalMap: { [key: string]: string } = {
+  '1': 'Regional 1',
+  '2': 'Regional 2',
+  '3': 'Regional 3',
+  '4': 'Regional 4',
+  '5': 'Regional 5',
+  '6': 'Regional 6',
+  '7': 'Regional 7',
+  '8': 'Regional 8',
+  '9': 'Regional 9',
+  '10': 'Regional 10',
+  '11': 'Regional 11',
+  '12': 'Regional 12',
+};
+
 // Mock data atualizado com public_equipment_name
 const mockOcorrencias: Ocorrencia[] = [
-  {
-    id: '1', protocol: 'OCR-2024-001', description: 'Limpeza de terreno baldio', service_type: 'Limpeza',
-    priority: 'alta', status: 'criada', address: 'Rua das Flores, 123', public_equipment_name: 'Praça do Ferreira',
-    regional_id: '1', fiscal_id: '1', origin: 'SIGEP',
-    vistoria_previa_date: '2025-07-20T08:00:00Z',
-    created_at: '2025-07-20T10:00:00Z', updated_at: '2025-07-20T10:00:00Z'
-  },
-  {
-    id: '2', protocol: 'OCR-2024-002', description: 'Reparo em calçada', service_type: 'Manutenção',
-    priority: 'media', status: 'encaminhada', address: 'Av. Beira Mar, 456', public_equipment_name: 'Areninha Campo do América',
-    regional_id: '2', fiscal_id: '2', origin: 'SPU',
-    forwarded_by: '2', forwarded_at: '2025-07-21T11:00:00Z', created_at: '2025-07-21T09:00:00Z', updated_at: '2025-07-21T11:00:00Z'
-  },
-  {
-    id: '3', protocol: 'OCR-2024-003', description: 'Poda de árvores no parque', service_type: 'Conservação',
-    priority: 'baixa', status: 'autorizada', address: 'Av. Padre Antônio Tomás, s/n', public_equipment_name: 'Parque do Cocó',
-    regional_id: '5', fiscal_id: '5', origin: 'REG2',
-    approved_by_regional: '5', approved_at_regional: '2025-07-19T14:00:00Z', vistoria_previa_date: '2025-07-19T12:00:00Z',
-    created_at: '2025-07-19T10:00:00Z', updated_at: '2025-07-19T14:00:00Z'
-  },
-  {
-    id: '4', protocol: 'OCR-2024-004', description: 'Vazamento em poste de saúde', service_type: 'Reparo',
-    priority: 'alta', status: 'agendada', address: 'Rua G, 300', public_equipment_name: 'Posto de Saúde Dr. Hélio Goes',
-    regional_id: '6', fiscal_id: '6', origin: 'SIGEP',
-    scheduled_date: '2025-07-25T09:00:00Z', vistoria_previa_date: '2025-07-22T07:00:00Z',
-    created_at: '2025-07-22T08:00:00Z', updated_at: '2025-07-22T10:00:00Z'
-  },
-  {
-    id: '5', protocol: 'OCR-2024-005', description: 'Manutenção de brinquedos na praça', service_type: 'Manutenção',
-    priority: 'media', status: 'em_execucao', address: 'Rua Paulino Nogueira, s/n', public_equipment_name: 'Praça da Gentilândia',
-    regional_id: '1', fiscal_id: '1', origin: 'REG1',
-    scheduled_date: '2025-07-20T14:00:00Z', vistoria_previa_date: '2025-07-18T13:00:00Z',
-    created_at: '2025-07-18T15:00:00Z', updated_at: '2025-07-20T13:00:00Z'
-  },
-  {
-    id: '6', protocol: 'OCR-2024-006', description: 'Pintura de quadra', service_type: 'Pintura',
-    priority: 'baixa', status: 'executada', address: 'Av. Gov. Leonel Brizola, s/n', public_equipment_name: 'Cuca Jangurussu',
-    regional_id: '4', fiscal_id: '4', origin: 'SPU',
-    scheduled_date: '2025-06-12T08:00:00Z', vistoria_previa_date: '2025-06-10T07:00:00Z', vistoria_pos_date: '2025-06-15T15:00:00Z',
-    created_at: '2025-06-10T09:00:00Z', updated_at: '2025-06-15T16:00:00Z'
-  },
-  {
-    id: '7', protocol: 'OCR-2024-007', description: 'Troca de lâmpada queimada', service_type: 'Iluminação',
-    priority: 'alta', status: 'criada', address: 'Rua Delmiro de Farias, 1000', public_equipment_name: 'E.E.F.M. Adauto Bezerra',
-    regional_id: '3', fiscal_id: '3', origin: 'SPU',
-    created_at: '2025-07-22T11:00:00Z', updated_at: '2025-07-22T11:00:00Z'
-  },
-  {
-    id: '8', protocol: 'OCR-2024-008', description: 'Capinação de área externa', service_type: 'Limpeza',
-    priority: 'media', status: 'cancelada', address: 'Rua Pernambuco, s/n', public_equipment_name: 'Areninha do Pici',
-    regional_id: '3', fiscal_id: '3', origin: 'REG3',
-    cancel_reason: 'Serviço já executado por outra equipe.', created_at: '2025-07-15T12:00:00Z', updated_at: '2025-07-16T10:00:00Z'
-  },
-  {
-    id: '9', protocol: 'OCR-2024-009', description: 'Conserto de portão de escola', service_type: 'Serralheria',
-    priority: 'alta', status: 'agendada', address: 'Rua I, 150', public_equipment_name: 'E.M.E.I.F. Rachel de Queiroz',
-    regional_id: '4', fiscal_id: '4', origin: 'SIGEP',
-    scheduled_date: '2025-07-28T14:00:00Z', vistoria_previa_date: '2025-07-21T15:00:00Z',
-    created_at: '2025-07-21T16:00:00Z', updated_at: '2025-07-22T09:00:00Z'
-  },
-  {
-    id: '10', protocol: 'OCR-2024-010', description: 'Revisão de estrutura de parquinho', service_type: 'Inspeção',
-    priority: 'media', status: 'devolvida', address: 'Rua das Flores, 123', public_equipment_name: 'Praça do Ferreira',
-    regional_id: '1', fiscal_id: '1', origin: 'REG4',
-    cancel_reason: 'Faltam informações sobre o material necessário.', created_at: '2025-07-20T14:00:00Z', updated_at: '2025-07-21T17:00:00Z'
-  },
-  {
-    id: '11', protocol: 'OCR-2024-011', description: 'Verificação de vazamento de esgoto', service_type: 'Inspeção',
-    priority: 'alta', status: 'criada', address: 'Rua Alfa, 999', public_equipment_name: 'Centro Comunitário Alfa',
-    regional_id: '2', fiscal_id: '2', origin: 'SIGEP',
-    created_at: '2025-07-20T08:00:00Z', updated_at: '2025-07-20T08:00:00Z'
-  },
-  {
-    id: '12', protocol: 'OCR-2024-012', description: 'Reposição de bancos danificados', service_type: 'Manutenção',
-    priority: 'media', status: 'criada', address: 'Rua Beta, 88', public_equipment_name: 'Praça do Sol',
-    regional_id: '2', fiscal_id: '2', origin: 'REG5',
-    created_at: '2025-07-20T10:30:00Z', updated_at: '2025-07-20T10:30:00Z'
-  },
-  {
-    id: '13', protocol: 'OCR-2024-013', description: 'Troca de refletores', service_type: 'Iluminação',
-    priority: 'alta', status: 'executada', address: 'Rua Gama, 300', public_equipment_name: 'Campo do Gama',
-    regional_id: '6', fiscal_id: '6', origin: 'SPU',
-    scheduled_date: '2025-07-11T09:00:00Z', vistoria_previa_date: '2025-07-10T13:00:00Z', vistoria_pos_date: '2025-07-12T14:00:00Z',
-    created_at: '2025-07-10T14:00:00Z', updated_at: '2025-07-12T15:00:00Z'
-  },
-  {
-    id: '14', protocol: 'OCR-2024-014', description: 'Ajuste em grades de proteção', service_type: 'Serralheria',
-    priority: 'baixa', status: 'em_execucao', address: 'Rua Delta, 200', public_equipment_name: 'Praça Delta',
-    regional_id: '5', fiscal_id: '5', origin: 'REG6',
-    scheduled_date: '2025-07-20T10:00:00Z', vistoria_previa_date: '2025-07-19T12:00:00Z',
-    created_at: '2025-07-19T13:00:00Z', updated_at: '2025-07-20T09:00:00Z'
-  },
-  {
-    id: '15', protocol: 'OCR-2024-015', description: 'Revisão de encanamento público', service_type: 'Manutenção',
-    priority: 'alta', status: 'agendada', address: 'Rua Epsilon, 155', public_equipment_name: 'CRAS Epsilon',
-    regional_id: '6', fiscal_id: '6', origin: 'SIGEP',
-    scheduled_date: '2025-07-25T15:00:00Z', vistoria_previa_date: '2025-07-22T08:00:00Z',
-    created_at: '2025-07-22T09:00:00Z', updated_at: '2025-07-22T11:00:00Z'
-  },
-  {
-    id: '16', protocol: 'OCR-2024-016', description: 'Inspeção elétrica', service_type: 'Inspeção',
-    priority: 'media', status: 'autorizada', address: 'Rua Zeta, 444', public_equipment_name: 'Ginásio Zeta',
-    regional_id: '3', fiscal_id: '3', origin: 'REG7',
-    approved_by_regional: '3', approved_at_regional: '2025-07-21T10:00:00Z', vistoria_previa_date: '2025-07-20T11:00:00Z',
-    created_at: '2025-07-20T12:00:00Z', updated_at: '2025-07-21T10:00:00Z'
-  },
-  {
-    id: '17', protocol: 'OCR-2024-017', description: 'Manutenção de refletores', service_type: 'Iluminação',
-    priority: 'baixa', status: 'criada', address: 'Rua Teta, 777', public_equipment_name: 'Areninha Teta',
-    regional_id: '4', fiscal_id: '4', origin: 'SPU',
-    created_at: '2025-07-23T08:00:00Z', updated_at: '2025-07-23T08:00:00Z'
-  },
-  {
-    id: '18', protocol: 'OCR-2024-018', description: 'Pintura de meio-fio', service_type: 'Pintura',
-    priority: 'media', status: 'executada', address: 'Rua Ômega, 333', public_equipment_name: 'Escola Ômega',
-    regional_id: '5', fiscal_id: '5', origin: 'REG8',
-    scheduled_date: '2025-07-16T08:00:00Z', vistoria_previa_date: '2025-07-15T06:00:00Z', vistoria_pos_date: '2025-07-18T12:00:00Z',
-    created_at: '2025-07-15T07:00:00Z', updated_at: '2025-07-18T13:00:00Z'
-  },
-  {
-    id: '19', protocol: 'OCR-2024-019', description: 'Instalação de lixeiras', service_type: 'Instalação',
-    priority: 'baixa', status: 'encaminhada', address: 'Rua Sigma, 222', public_equipment_name: 'Praça Sigma',
-    regional_id: '2', fiscal_id: '2', origin: 'SIGEP',
-    forwarded_by: '2', forwarded_at: '2025-07-21T14:00:00Z', created_at: '2025-07-21T11:00:00Z', updated_at: '2025-07-21T14:00:00Z'
-  },
-  {
-    id: '20', protocol: 'OCR-2024-020', description: 'Conserto em alambrado', service_type: 'Serralheria',
-    priority: 'alta', status: 'criada', address: 'Rua Phi, 789', public_equipment_name: 'Campo do Centro',
-    regional_id: '1', fiscal_id: '1', origin: 'REG9',
-    created_at: '2025-07-22T08:00:00Z', updated_at: '2025-07-22T08:00:00Z'
-  },
+{
+  id: '1', protocol: 'OCR-2024-009', description: 'Substituição de bancos quebrados', service_type: 'Manutenção',
+  priority: 'media', status: 'criada', address: 'Av. José Bastos, 789', public_equipment_name: 'Praça José de Alencar',
+  regional_id: '2', fiscal_id: '2', origin: 'REG2',
+  created_at: '2025-07-23T09:30:00Z', updated_at: '2025-07-23T09:30:00Z',
+  bairro: 'Parangaba', regionalAn: regionalMap['2']
+},
+{
+  id: '10', protocol: 'OCR-2024-010', description: 'Verificação de esgoto a céu aberto', service_type: 'Saneamento',
+  priority: 'alta', status: 'executada', address: 'Rua Eduardo Perdigão, 321', public_equipment_name: 'Canal do Lagamar',
+  regional_id: '5', fiscal_id: '5', origin: 'SIGEP',
+  vistoria_previa_date: '2025-07-22T08:00:00Z',
+  created_at: '2025-07-22T07:30:00Z', updated_at: '2025-07-22T08:30:00Z',
+  bairro: 'São João do Tauape', regionalAn: regionalMap['5']
+},
+{
+  id: '11', protocol: 'OCR-2024-011', description: 'Conserto de lixeira danificada', service_type: 'Limpeza',
+  priority: 'baixa', status: 'encaminhada', address: 'Rua Padre Pedro de Alencar, 65', public_equipment_name: 'Praça do Lago Jacarey',
+  regional_id: '6', fiscal_id: '6', origin: 'REG6',
+  forwarded_by: '6', forwarded_at: '2025-07-21T14:00:00Z', created_at: '2025-07-21T12:00:00Z', updated_at: '2025-07-21T14:00:00Z',
+  bairro: 'Cidade dos Funcionários', regionalAn: regionalMap['6']
+},
+{
+  id: '12', protocol: 'OCR-2024-012', description: 'Reforma de muro de escola', service_type: 'Reparo',
+  priority: 'alta', status: 'autorizada', address: 'Rua Júlio César, 88', public_equipment_name: 'E.M. Antônio Sales',
+  regional_id: '3', fiscal_id: '3', origin: 'SPU',
+  approved_by_regional: '3', approved_at_regional: '2025-07-20T13:00:00Z', vistoria_previa_date: '2025-07-20T10:00:00Z',
+  created_at: '2025-07-20T08:00:00Z', updated_at: '2025-07-20T13:00:00Z',
+  bairro: 'Montese', regionalAn: regionalMap['3']
+},
+{
+  id: '13', protocol: 'OCR-2024-013', description: 'Verificação de alagamento', service_type: 'Saneamento',
+  priority: 'media', status: 'agendada', address: 'Rua dos Remédios, 12', public_equipment_name: 'Boca de lobo próxima ao mercado',
+  regional_id: '1', fiscal_id: '1', origin: 'SIGEP',
+  vistoria_previa_date: '2025-07-19T11:00:00Z',
+  created_at: '2025-07-19T10:00:00Z', updated_at: '2025-07-19T11:30:00Z',
+  bairro: 'Centro', regionalAn: regionalMap['1']
+},
+{
+  id: '14', protocol: 'OCR-2024-014', description: 'Pintura de meio-fio', service_type: 'Pintura',
+  priority: 'baixa', status: 'executada', address: 'Av. Rogaciano Leite, 99', public_equipment_name: 'Rotatória do Cambeba',
+  regional_id: '6', fiscal_id: '6', origin: 'REG6',
+  scheduled_date: '2025-07-18T07:00:00Z', vistoria_previa_date: '2025-07-17T08:00:00Z', vistoria_pos_date: '2025-07-18T18:00:00Z',
+  created_at: '2025-07-17T09:00:00Z', updated_at: '2025-07-18T18:30:00Z',
+  bairro: 'Cambeba', regionalAn: regionalMap['6']
+},
+{
+  id: '15', protocol: 'OCR-2024-015', description: 'Remoção de entulho', service_type: 'Limpeza',
+  priority: 'alta', status: 'criada', address: 'Rua Holanda, 172', public_equipment_name: 'Mercado dos Pinhões',
+  regional_id: '1', fiscal_id: '1', origin: 'REG1',
+  created_at: '2025-07-23T08:00:00Z', updated_at: '2025-07-23T08:00:00Z',
+  bairro: 'Centro', regionalAn: regionalMap['1']
+},
+{
+  id: '16', protocol: 'OCR-2024-016', description: 'Substituição de placa de trânsito', service_type: 'Sinalização',
+  priority: 'media', status: 'agendada', address: 'Av. Pontes Vieira, 400', public_equipment_name: 'Cruzamento com Rua Tibúrcio Cavalcante',
+  regional_id: '2', fiscal_id: '2', origin: 'SPU',
+  scheduled_date: '2025-07-29T10:00:00Z', created_at: '2025-07-27T14:00:00Z', updated_at: '2025-07-28T09:00:00Z',
+  bairro: 'Dionísio Torres', regionalAn: regionalMap['2']
+},
+{
+  id: '17', protocol: 'OCR-2024-017', description: 'Reparo de alambrado de quadra', service_type: 'Reparo',
+  priority: 'alta', status: 'em_execucao', address: 'Rua Dr. José Lourenço, 50', public_equipment_name: 'Quadra da Praça Luíza Távora',
+  regional_id: '1', fiscal_id: '1', origin: 'REG1',
+  scheduled_date: '2025-07-26T09:00:00Z', vistoria_previa_date: '2025-07-24T10:00:00Z',
+  created_at: '2025-07-24T11:00:00Z', updated_at: '2025-07-26T09:30:00Z',
+  bairro: 'Aldeota', regionalAn: regionalMap['1']
+},
+{
+  id: '18', protocol: 'OCR-2024-018', description: 'Limpeza de canaleta de drenagem', service_type: 'Saneamento',
+  priority: 'media', status: 'autorizada', address: 'Rua Augusto dos Anjos, 28', public_equipment_name: 'Canal do Conjunto Ceará',
+  regional_id: '4', fiscal_id: '4', origin: 'REG4',
+  approved_by_regional: '4', approved_at_regional: '2025-07-20T12:00:00Z', vistoria_previa_date: '2025-07-19T09:00:00Z',
+  created_at: '2025-07-19T08:00:00Z', updated_at: '2025-07-20T12:30:00Z',
+  bairro: 'Conjunto Ceará', regionalAn: regionalMap['4']
+},
+{
+  id: '19', protocol: 'OCR-2024-019', description: 'Pintura de faixa de pedestre', service_type: 'Sinalização',
+  priority: 'alta', status: 'executada', address: 'Av. Abolição, 1800', public_equipment_name: 'Faixa em frente ao Ideal Clube',
+  regional_id: '2', fiscal_id: '2', origin: 'SIGEP',
+  scheduled_date: '2025-07-15T23:00:00Z', vistoria_previa_date: '2025-07-14T10:00:00Z', vistoria_pos_date: '2025-07-16T02:00:00Z',
+  created_at: '2025-07-14T09:00:00Z', updated_at: '2025-07-16T02:30:00Z',
+  bairro: 'Meireles', regionalAn: regionalMap['2']
+},
+{
+  id: '20', protocol: 'OCR-2024-020', description: 'Instalação de novos brinquedos', service_type: 'Equipamentos',
+  priority: 'baixa', status: 'criada', address: 'Rua dos Tabajaras, 75', public_equipment_name: 'Praça da Estação',
+  regional_id: '1', fiscal_id: '1', origin: 'REG1',
+  created_at: '2025-07-28T10:00:00Z', updated_at: '2025-07-28T10:00:00Z',
+  bairro: 'Centro', regionalAn: regionalMap['1']
+}
+
 ];
 
 const mockEmpresas = [
@@ -169,14 +145,14 @@ const ListView = ({ ocorrencias, renderActionButtons }) => (
       <TableHeader>
         <TableRow>
           <TableHead>Protocolo</TableHead>
+          <TableHead>Origem</TableHead>
           <TableHead>Descrição</TableHead>
-          <TableHead>Equip. Público</TableHead>
           <TableHead>Prioridade</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>Criação</TableHead>
-          <TableHead>Vistoria Prévia</TableHead>
-          <TableHead>Agendamento Exec.</TableHead>
-          <TableHead>Vistoria Pós</TableHead>
+          <TableHead>Bairro</TableHead>
+          <TableHead>Criada</TableHead>
+          <TableHead>Agendamento</TableHead>
+          <TableHead>Vist. Final</TableHead>
           <TableHead className="text-right">Ações</TableHead>
         </TableRow>
       </TableHeader>
@@ -184,14 +160,14 @@ const ListView = ({ ocorrencias, renderActionButtons }) => (
         {ocorrencias.map((ocorrencia) => (
           <TableRow key={ocorrencia.id}>
             <TableCell className="font-medium">{ocorrencia.protocol}</TableCell>
+            <TableCell>{ocorrencia.origin}</TableCell>
             <TableCell>{ocorrencia.description}</TableCell>
-            <TableCell>{ocorrencia.public_equipment_name}</TableCell>
             <TableCell><Badge className={getPriorityColor(ocorrencia.priority)}>{ocorrencia.priority}</Badge></TableCell>
             <TableCell><Badge className={getStatusColor(ocorrencia.status)}>{getStatusLabel(ocorrencia.status)}</Badge></TableCell>
-            <TableCell>{new Date(ocorrencia.created_at).toLocaleDateString('pt-BR')}</TableCell>
+            <TableCell>{ocorrencia.bairro}</TableCell>
             <TableCell>
-              {ocorrencia.vistoria_previa_date 
-                ? new Date(ocorrencia.vistoria_previa_date).toLocaleDateString('pt-BR')
+              {ocorrencia.created_at 
+                ? new Date(ocorrencia.created_at).toLocaleDateString('pt-BR')
                 : '-'}
             </TableCell>
             <TableCell>
@@ -200,8 +176,8 @@ const ListView = ({ ocorrencias, renderActionButtons }) => (
                 : '-'}
             </TableCell>
             <TableCell>
-              {ocorrencia.vistoria_pos_date 
-                ? new Date(ocorrencia.vistoria_pos_date).toLocaleDateString('pt-BR')
+              {ocorrencia.approved_at_regional 
+                ? new Date(ocorrencia.approved_at_regional).toLocaleDateString('pt-BR')
                 : '-'}
             </TableCell>
             <TableCell className="text-right">
