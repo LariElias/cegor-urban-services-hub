@@ -5,6 +5,19 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Download, TrendingUp, AlertCircle, Clock, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from 'recharts';
 
 export default function DashboardGeral() {
   const { user } = useAuth();
@@ -20,6 +33,12 @@ export default function DashboardGeral() {
     sla_atendimento: 87.5,
   };
 
+  const ocorrenciasPorRegional = [
+    { regional: 'Regional 1', total: 50 },
+    { regional: 'Regional 2', total: 30 },
+    { regional: 'Regional 3', total: 76 },
+  ];
+
   const ocorrenciasPorBairro = [
     { bairro: 'Centro', total: 34, concluidas: 28 },
     { bairro: 'Savassi', total: 22, concluidas: 18 },
@@ -28,19 +47,34 @@ export default function DashboardGeral() {
     { bairro: 'Barro Preto', total: 14, concluidas: 11 },
   ];
 
+  const ocorrenciasPorPrioridade = [
+    { prioridade: 'Alta', total: 60 },
+    { prioridade: 'Média', total: 50 },
+    { prioridade: 'Baixa', total: 46 },
+  ];
+
+  const statusData = [
+    { name: 'Criadas', value: kpis.criadas },
+    { name: 'Agendadas', value: kpis.agendadas },
+    { name: 'Execução', value: kpis.em_execucao },
+    { name: 'Concluídas', value: kpis.concluidas },
+  ];
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
   const exportarCSV = () => {
     // Implementar exportação CSV
     alert('Exportando relatório em CSV...');
   };
 
-  // Verificar permissões
-  if (user?.role !== 'cegor') {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Acesso negado. Apenas usuários CEGOR podem acessar esta página.</p>
-      </div>
-    );
-  }
+  // // Verificar permissões
+  // if (user?.role !== 'cegor') {
+  //   return (
+  //     <div className="flex items-center justify-center h-64">
+  //       <p className="text-muted-foreground">Acesso negado. Apenas usuários CEGOR podem acessar esta página.</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="space-y-6">
@@ -108,7 +142,7 @@ export default function DashboardGeral() {
       </div>
 
       {/* Distribuição por Status */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Distribuição por Status</CardTitle>
         </CardHeader>
@@ -132,34 +166,115 @@ export default function DashboardGeral() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Heat Map por Bairro */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Ocorrências por Bairro</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {ocorrenciasPorBairro.map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="font-medium">{item.bairro}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-gray-600">
-                    {item.concluidas}/{item.total} concluídas
-                  </span>
-                  <Badge variant="outline">
-                    {((item.concluidas / item.total) * 100).toFixed(0)}%
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+        {/* Pizza Regional */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Distribuição Regional</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                layout="vertical"
+                data={ocorrenciasPorRegional}
+                margin={{ top: 20, right: 30, left: 50, bottom: 20 }}
+              >
+                <XAxis type="number" />
+                <YAxis
+                  dataKey="regional"
+                  type="category"
+                  width={100}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip />
+                <Bar dataKey="total" fill={COLORS[0]} name="Total" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Bairro - Barras */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Ocorrências por Bairro</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={ocorrenciasPorBairro} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="bairro" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="total" fill="#8884d8" name="Total" />
+                <Bar dataKey="concluidas" fill="#82ca9d" name="Concluídas" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+
+        {/* Prioridade - Pizza */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Prioridade</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={ocorrenciasPorPrioridade}
+                  dataKey="total"
+                  nameKey="prioridade"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  label
+                >
+                  {ocorrenciasPorPrioridade.map((entry, index) => (
+                    <Cell key={`cell-prio-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Status - Pizza */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Distribuição por Status</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={40}
+                  outerRadius={80}
+                  label
+                >
+                  {statusData.map((entry, index) => (
+                    <Cell key={`cell-status-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

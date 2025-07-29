@@ -70,7 +70,7 @@ const menuItems = [
       { title: 'Novo registro', url: '/ocorrencias/nova', icon: AlertCircle, role: ['regional'], subrole: ['operador'] },
       // { title: 'Aprovadas', url: '/ocorrencias/aprovadas', icon: CheckCircle, role: ['cegor'] },
       // { title: 'Demandas da Empresa', url: '/ocorrencias/demandas', icon: Briefcase, role: ['empresa'] },
-      { title: 'Mapa', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'],subrole: ['gestor'] },
+      { title: 'Mapa', url: '/relatorios/mapa', icon: MapPin, role: ['cegor', 'regional'],subrole: ['gestor'] },
 
     ]
   },
@@ -130,7 +130,7 @@ export function AppSidebar() {
       <SidebarContent className="bg-gray-200 text-white">
         <div className="p-4 border-b border-white/20">
           <NavLink to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <div className=" h-10flex items-center justify-center">
             </div>
             {!isCollapsed && (
               <div>
