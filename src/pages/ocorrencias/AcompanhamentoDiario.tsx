@@ -1,51 +1,88 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, Plus, MapPin, Camera, Upload, X } from 'lucide-react';
+import { ArrowLeft, Plus, MapPin, Camera, Upload, X, UserX, Minus, Sun, Moon, Sunset } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from '@/context/AuthContext';
 
-const acompanhamentoSchema = z.object({
-  date: z.string().min(1, 'Data é obrigatória'),
-  description: z.string().min(1, 'Descrição é obrigatória'),
-  latitude: z.string().optional(),
-  longitude: z.string().optional(),
+// ATUALIZAÇÃO 1: Schema e Tipos com Geolocalização no nível principal
+const shiftSchema = z.object({
+  description: z.string().min(1, 'A descrição é obrigatória para o turno preenchido.'),
   photos_before: z.array(z.string()).optional(),
   photos_after: z.array(z.string()).optional(),
+  absent_employees: z.array(
+    z.object({
+      name: z.string().min(1, "O nome não pode ser vazio."),
+    })
+  ).optional(),
+});
+
+const acompanhamentoSchema = z.object({
+  date: z.string().min(1, 'A data do registro é obrigatória.'),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
+  shifts: z.object({
+    diurno: shiftSchema.optional(),
+    vespertino: shiftSchema.optional(),
+    noturno: shiftSchema.optional(),
+  }),
+}).refine(data => {
+  return !!data.shifts.diurno?.description || !!data.shifts.vespertino?.description || !!data.shifts.noturno?.description;
+}, {
+  message: "É necessário preencher a descrição de pelo menos um turno.",
+  path: ["shifts"], 
 });
 
 type AcompanhamentoFormData = z.infer<typeof acompanhamentoSchema>;
 
+interface ShiftEntry {
+  description: string;
+  photos_before: string[];
+  photos_after: string[];
+  absent_employees?: { name: string }[];
+}
+
 interface DailyEntry {
   id: string;
   date: string;
-  description: string;
   latitude?: string;
   longitude?: string;
-  photos_before: string[];
-  photos_after: string[];
+  shifts: {
+    diurno?: ShiftEntry;
+    vespertino?: ShiftEntry;
+    noturno?: ShiftEntry;
+  };
 }
 
-// Mock data para a lista de entradas existentes
+// ATUALIZAÇÃO 2: Mock data com a estrutura correta
 const mockEntries: DailyEntry[] = [
-  { id: '1', date: '2025-07-22', description: 'Início da capinação no trecho entre a Rua A e a Rua B. Equipe de 4 pessoas no local.', latitude: '-3.731', longitude: '-38.522', photos_before: ['https://placehold.co/400x300/e2e8f0/64748b?text=Antes+1'], photos_after: [] },
-  { id: '2', date: '2025-07-21', description: 'Finalização da limpeza da Praça do Ferreira. Remoção de 2 toneladas de detritos.', latitude: '-3.725', longitude: '-38.528', photos_before: ['https://placehold.co/400x300/e2e8f0/64748b?text=Antes+2'], photos_after: ['https://placehold.co/400x300/dcfce7/166534?text=Depois+2'] },
-  { id: '3', date: '2025-07-20', description: 'Reparo da calçada na Av. Beira Mar, próximo ao quiosque 5.', latitude: '-3.723', longitude: '-38.489', photos_before: ['https://placehold.co/400x300/e2e8f0/64748b?text=Antes+3'], photos_after: ['https://placehold.co/400x300/dcfce7/166534?text=Depois+3'] },
-  { id: '4', date: '2025-07-19', description: 'Poda de 3 árvores que apresentavam risco na Rua Monsenhor Tabosa.', latitude: '-3.724', longitude: '-38.512', photos_before: ['https://placehold.co/400x300/e2e8f0/64748b?text=Antes+4'], photos_after: ['https://placehold.co/400x300/dcfce7/166534?text=Depois+4'] },
-  { id: '5', date: '2025-07-18', description: 'Instalação de nova iluminação no poste em frente ao número 2048 da Av. Santos Dumont.', latitude: '-3.738', longitude: '-38.497', photos_before: [], photos_after: ['https://placehold.co/400x300/dcfce7/166534?text=Depois+5'] },
-  { id: '6', date: '2025-07-17', description: 'Manutenção dos brinquedos do parquinho infantil no Parque do Cocó.', latitude: '-3.753', longitude: '-38.484', photos_before: ['https://placehold.co/400x300/e2e8f0/64748b?text=Antes+6'], photos_after: ['https://placehold.co/400x300/dcfce7/166534?text=Depois+6'] },
-  { id: '7', date: '2025-07-16', description: 'Pintura da faixa de pedestres na Av. 13 de Maio.', latitude: '-3.748', longitude: '-38.536', photos_before: [], photos_after: ['https://placehold.co/400x300/dcfce7/166534?text=Depois+7'] },
-  { id: '8', date: '2025-07-15', description: 'Desobstrução de bueiro na Rua Barão do Rio Branco.', latitude: '-3.728', longitude: '-38.529', photos_before: ['https://placehold.co/400x300/e2e8f0/64748b?text=Antes+8'], photos_after: ['https://placehold.co/400x300/dcfce7/166534?text=Depois+8'] },
-  { id: '9', date: '2025-07-14', description: 'Conserto de banco quebrado na Praça da Gentilândia.', latitude: '-3.741', longitude: '-38.537', photos_before: ['https://placehold.co/400x300/e2e8f0/64748b?text=Antes+9'], photos_after: [] },
-  { id: '10', date: '2025-07-13', description: 'Varrição e coleta de lixo na orla da Praia de Iracema.', latitude: '-3.718', longitude: '-38.516', photos_before: ['https://placehold.co/400x300/e2e8f0/64748b?text=Antes+10'], photos_after: ['https://placehold.co/400x300/dcfce7/166534?text=Depois+10'] },
+  { 
+    id: '1', 
+    date: '2025-07-28', 
+    latitude: '-3.731', 
+    longitude: '-38.522',
+    shifts: {
+      diurno: {
+        description: 'Início da capinação no trecho entre a Rua A e a Rua B.',
+        photos_before: ['https://placehold.co/400x300/e2e8f0/64748b?text=Antes+Diurno'], photos_after: [],
+        absent_employees: [{ name: 'Carlos Andrade' }],
+      },
+      vespertino: {
+        description: 'Continuação do serviço de capinação. Finalizado 50% do trecho.',
+        photos_before: [], photos_after: ['https://placehold.co/400x300/dcfce7/166534?text=Depois+Vespertino'],
+        absent_employees: [{ name: 'Mariana Costa' }],
+      }
+    } 
+  },
 ];
 
 export default function AcompanhamentoDiario() {
@@ -54,23 +91,34 @@ export default function AcompanhamentoDiario() {
   const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [entries, setEntries] = useState<DailyEntry[]>(mockEntries);
-  const [photosBefore, setPhotosBefore] = useState<string[]>([]);
-  const [photosAfter, setPhotosAfter] = useState<string[]>([]);
   const [isConfirmingCompletion, setIsConfirmingCompletion] = useState(false);
+  
+  const [photoPreviews, setPhotoPreviews] = useState<{ [key: string]: { before: string[], after: string[] } }>({
+    diurno: { before: [], after: [] },
+    vespertino: { before: [], after: [] },
+    noturno: { before: [], after: [] },
+  });
 
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    control,
     formState: { errors },
   } = useForm<AcompanhamentoFormData>({
     resolver: zodResolver(acompanhamentoSchema),
     defaultValues: {
       date: new Date().toISOString().split('T')[0],
+      shifts: {}
     },
   });
 
+  const { fields: diurnoFields, append: appendDiurno, remove: removeDiurno } = useFieldArray({ control, name: "shifts.diurno.absent_employees" });
+  const { fields: vespertinoFields, append: appendVespertino, remove: removeVespertino } = useFieldArray({ control, name: "shifts.vespertino.absent_employees" });
+  const { fields: noturnoFields, append: appendNoturno, remove: removeNoturno } = useFieldArray({ control, name: "shifts.noturno.absent_employees" });
+
+  // ATUALIZAÇÃO 3: Função de geolocalização simplificada
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -80,70 +128,68 @@ export default function AcompanhamentoDiario() {
         },
         (error) => {
           console.error('Erro ao obter localização:', error);
-          alert('Não foi possível obter a localização. Verifique as permissões do navegador.');
+          alert('Não foi possível obter a localização.');
         }
       );
     }
   };
 
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>, type: 'before' | 'after') => {
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>, turno: 'diurno' | 'vespertino' | 'noturno', type: 'before' | 'after') => {
     const files = Array.from(event.target.files || []);
     const newPhotos = files.map(file => URL.createObjectURL(file));
     
-    if (type === 'before') {
-      const updatedPhotos = [...photosBefore, ...newPhotos];
-      setPhotosBefore(updatedPhotos);
-      setValue('photos_before', updatedPhotos);
-    } else {
-      const updatedPhotos = [...photosAfter, ...newPhotos];
-      setPhotosAfter(updatedPhotos);
-      setValue('photos_after', updatedPhotos);
-    }
+    setPhotoPreviews(prev => {
+        const updatedTurnoPreviews = { ...prev[turno], [type]: [...prev[turno][type], ...newPhotos] };
+        setValue(`shifts.${turno}.photos_${type}`, updatedTurnoPreviews[type]);
+        return { ...prev, [turno]: updatedTurnoPreviews };
+    });
   };
 
-  const removePhoto = (index: number, type: 'before' | 'after') => {
-    if (type === 'before') {
-      const updatedPhotos = photosBefore.filter((_, i) => i !== index);
-      setPhotosBefore(updatedPhotos);
-      setValue('photos_before', updatedPhotos);
-    } else {
-      const updatedPhotos = photosAfter.filter((_, i) => i !== index);
-      setPhotosAfter(updatedPhotos);
-      setValue('photos_after', updatedPhotos);
-    }
+  const removePhoto = (index: number, turno: 'diurno' | 'vespertino' | 'noturno', type: 'before' | 'after') => {
+    const updatedPreviews = photoPreviews[turno][type].filter((_, i) => i !== index);
+    setPhotoPreviews(prev => {
+        const updatedTurnoPreviews = { ...prev[turno], [type]: updatedPreviews };
+        setValue(`shifts.${turno}.photos_${type}`, updatedPreviews);
+        return { ...prev, [turno]: updatedTurnoPreviews };
+    });
   };
 
   const onSubmit = (data: AcompanhamentoFormData) => {
+    const filledShifts: any = {};
+    (Object.keys(data.shifts) as Array<keyof typeof data.shifts>).forEach(turno => {
+      if (data.shifts[turno]?.description) {
+        filledShifts[turno] = {
+          ...data.shifts[turno],
+          absent_employees: data.shifts[turno]?.absent_employees?.filter(emp => emp.name.trim() !== '')
+        };
+      }
+    });
+
     const newEntry: DailyEntry = {
       id: Date.now().toString(),
       date: data.date,
-      description: data.description,
-      latitude: data.latitude,
-      longitude: data.longitude,
-      photos_before: data.photos_before || [],
-      photos_after: data.photos_after || [],
+      latitude: data.latitude, // Pega do nível principal
+      longitude: data.longitude, // Pega do nível principal
+      shifts: filledShifts,
     };
 
     setEntries([newEntry, ...entries]);
     setShowForm(false);
-    setPhotosBefore([]);
-    setPhotosAfter([]);
-    reset({ date: new Date().toISOString().split('T')[0] });
+    reset({ date: new Date().toISOString().split('T')[0], shifts: {}, latitude: '', longitude: '' });
+    setPhotoPreviews({ diurno: { before: [], after: [] }, vespertino: { before: [], after: [] }, noturno: { before: [], after: [] } });
   };
 
   const handleConfirmCompletion = () => {
-    // Aqui iria a lógica para mudar o status da ocorrência para "concluída"
     console.log("Serviço concluído!");
     setIsConfirmingCompletion(false);
     navigate('/ocorrencias');
   };
 
-  // Controle de acesso à página
   const allowedRoles = ['cegor', 'regional', 'empresa'];
   if (!user || !allowedRoles.includes(user.role)) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Acesso negado. Você não tem permissão para visualizar esta página.</p>
+        <p className="text-muted-foreground">Acesso negado.</p>
       </div>
     );
   }
@@ -172,18 +218,19 @@ export default function AcompanhamentoDiario() {
         <Card className="animate-in fade-in-50">
           <CardHeader>
             <CardTitle>Novo Registro Diário</CardTitle>
+            <CardDescription>Preencha os dados para os turnos em que houve atividade.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* ATUALIZAÇÃO 4: Geolocalização movida para o topo do formulário */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="date">Data *</Label>
+                  <Label htmlFor="date">Data do Registro *</Label>
                   <Input id="date" type="date" {...register('date')} />
                   {errors.date && <p className="text-sm text-red-500">{errors.date.message}</p>}
                 </div>
-
                 <div className="space-y-2">
-                  <Label>Geolocalização</Label>
+                  <Label>Geolocalização (Geral do Dia)</Label>
                   <div className="flex gap-2">
                     <Input {...register('latitude')} placeholder="Latitude" />
                     <Input {...register('longitude')} placeholder="Longitude" />
@@ -192,49 +239,76 @@ export default function AcompanhamentoDiario() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Trecho Executado / Descrição *</Label>
-                <Textarea id="description" {...register('description')} placeholder="Descreva o trabalho realizado no dia" rows={3} />
-                {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
-              </div>
+              <Tabs defaultValue="diurno" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="diurno">Diurno</TabsTrigger>
+                  <TabsTrigger value="vespertino">Vespertino</TabsTrigger>
+                  <TabsTrigger value="noturno">Noturno</TabsTrigger>
+                </TabsList>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Fotos Antes</Label>
-                  <Button type="button" variant="outline" onClick={() => document.getElementById('photos-before')?.click()} className="w-full"><Camera className="w-4 h-4 mr-2" /> Adicionar</Button>
-                  <Input type="file" multiple accept="image/*" onChange={(e) => handlePhotoUpload(e, 'before')} className="hidden" id="photos-before" />
-                  {photosBefore.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                      {photosBefore.map((photo, index) => (
-                        <div key={index} className="relative">
-                          <img src={photo} alt={`Antes ${index + 1}`} className="w-full h-20 object-cover rounded" />
-                          <Button type="button" variant="destructive" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0" onClick={() => removePhoto(index, 'before')}><X className="w-3 h-3" /></Button>
-                        </div>
-                      ))}
+                {(['diurno', 'vespertino', 'noturno'] as const).map((turno) => (
+                  <TabsContent key={turno} value={turno} className="space-y-4 pt-4 border rounded-b-md p-4">
+                    <div className="space-y-2">
+                      <Label htmlFor={`shifts.${turno}.description`}>Trecho Executado / Descrição *</Label>
+                      <Textarea id={`shifts.${turno}.description`} {...register(`shifts.${turno}.description`)} placeholder={`Descreva o trabalho realizado no turno ${turno}`} />
+                      {errors.shifts?.[turno]?.description && <p className="text-sm text-red-500">{errors.shifts[turno]?.description?.message}</p>}
                     </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Fotos Depois</Label>
-                  <Button type="button" variant="outline" onClick={() => document.getElementById('photos-after')?.click()} className="w-full"><Camera className="w-4 h-4 mr-2" /> Adicionar</Button>
-                  <Input type="file" multiple accept="image/*" onChange={(e) => handlePhotoUpload(e, 'after')} className="hidden" id="photos-after" />
-                  {photosAfter.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                      {photosAfter.map((photo, index) => (
-                        <div key={index} className="relative">
-                          <img src={photo} alt={`Depois ${index + 1}`} className="w-full h-20 object-cover rounded" />
-                          <Button type="button" variant="destructive" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0" onClick={() => removePhoto(index, 'after')}><X className="w-3 h-3" /></Button>
-                        </div>
-                      ))}
+                    
+                    <div className="space-y-4 rounded-lg border bg-gray-50 p-4">
+                        <Label className="font-semibold flex items-center gap-2"><UserX className="w-5 h-5"/>Falta de Funcionários (Opcional)</Label>
+                        {(turno === 'diurno' ? diurnoFields : turno === 'vespertino' ? vespertinoFields : noturnoFields).map((field, index) => (
+                            <div key={field.id} className="flex items-center gap-2">
+                                <Input placeholder="Nome do funcionário ausente" {...register(`shifts.${turno}.absent_employees.${index}.name`)} />
+                                <Button type="button" variant="ghost" size="icon" onClick={() => (turno === 'diurno' ? removeDiurno(index) : turno === 'vespertino' ? removeVespertino(index) : removeNoturno(index))}>
+                                    <Minus className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
+                        <Button type="button" variant="outline" size="sm" onClick={() => (turno === 'diurno' ? appendDiurno({ name: '' }) : turno === 'vespertino' ? appendVespertino({ name: '' }) : appendNoturno({ name: '' }))}>
+                            <Plus className="h-4 w-4 mr-2" /> Adicionar Falta
+                        </Button>
                     </div>
-                  )}
-                </div>
-              </div>
 
-              <div className="flex justify-end space-x-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label>Fotos Antes</Label>
+                            <Button type="button" variant="outline" onClick={() => document.getElementById(`photos-before-${turno}`)?.click()} className="w-full"><Camera className="w-4 h-4 mr-2" /> Adicionar</Button>
+                            <Input type="file" multiple accept="image/*" onChange={(e) => handlePhotoUpload(e, turno, 'before')} className="hidden" id={`photos-before-${turno}`} />
+                            {photoPreviews[turno].before.length > 0 && (
+                                <div className="grid grid-cols-3 gap-2 mt-2">
+                                {photoPreviews[turno].before.map((photo, index) => (
+                                    <div key={index} className="relative">
+                                    <img src={photo} alt={`Antes ${index + 1}`} className="w-full h-20 object-cover rounded" />
+                                    <Button type="button" variant="destructive" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0" onClick={() => removePhoto(index, turno, 'before')}><X className="w-3 h-3" /></Button>
+                                    </div>
+                                ))}
+                                </div>
+                            )}
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Fotos Depois</Label>
+                            <Button type="button" variant="outline" onClick={() => document.getElementById(`photos-after-${turno}`)?.click()} className="w-full"><Camera className="w-4 h-4 mr-2" /> Adicionar</Button>
+                            <Input type="file" multiple accept="image/*" onChange={(e) => handlePhotoUpload(e, turno, 'after')} className="hidden" id={`photos-after-${turno}`} />
+                            {photoPreviews[turno].after.length > 0 && (
+                                <div className="grid grid-cols-3 gap-2 mt-2">
+                                {photoPreviews[turno].after.map((photo, index) => (
+                                    <div key={index} className="relative">
+                                    <img src={photo} alt={`Depois ${index + 1}`} className="w-full h-20 object-cover rounded" />
+                                    <Button type="button" variant="destructive" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0" onClick={() => removePhoto(index, turno, 'after')}><X className="w-3 h-3" /></Button>
+                                    </div>
+                                ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
+              {errors.shifts && <p className="text-sm text-red-500 mt-2">{errors.shifts.message}</p>}
+
+              <div className="flex justify-end space-x-2 pt-4">
                 <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
-                <Button type="submit">Salvar Registro</Button>
+                <Button type="submit">Salvar Registro do Dia</Button>
               </div>
             </form>
           </CardContent>
@@ -245,34 +319,62 @@ export default function AcompanhamentoDiario() {
         {entries.map((entry) => (
           <AccordionItem value={`item-${entry.id}`} key={entry.id} className="border rounded-lg bg-white shadow-sm">
             <AccordionTrigger className="px-6 py-4 text-lg font-semibold hover:no-underline text-gray-800">
-              {new Date(entry.date + 'T00:00:00-03:00').toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              {new Date(entry.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </AccordionTrigger>
             <AccordionContent>
+              {/* ATUALIZAÇÃO 5: Exibição da Geolocalização geral do dia */}
               <div className="px-6 pb-6 space-y-4 border-t pt-4">
-                <p className="text-sm text-gray-700">{entry.description}</p>
                 {entry.latitude && entry.longitude && (
-                  <p className="text-xs text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3"/> Localização: {entry.latitude}, {entry.longitude}</p>
+                  <p className="text-sm text-gray-600 flex items-center gap-2 pb-4 border-b">
+                    <MapPin className="w-4 h-4"/> 
+                    <strong>Localização Geral do Dia:</strong> {entry.latitude}, {entry.longitude}
+                  </p>
                 )}
-                {(entry.photos_before.length > 0 || entry.photos_after.length > 0) && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {entry.photos_before.length > 0 && (
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Fotos Antes</Label>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                          {entry.photos_before.map((photo, index) => (<img key={index} src={photo} alt={`Antes ${index + 1}`} className="w-full h-24 object-cover rounded-md" />))}
+                <div className="space-y-6">
+                    {Object.entries(entry.shifts).length > 0 ? (
+                    Object.entries(entry.shifts).map(([turno, data]) => (
+                        data && (
+                        <div key={turno} className="space-y-3 rounded-md border p-4 bg-slate-50">
+                            <h3 className="font-semibold text-md flex items-center gap-2 text-slate-800">
+                            {turno === 'diurno' ? <Sun/> : turno === 'vespertino' ? <Sunset/> : <Moon/>}
+                            Turno {turno.charAt(0).toUpperCase() + turno.slice(1)}
+                            </h3>
+                            <p className="text-sm text-gray-700">{data.description}</p>
+                            {data.absent_employees && data.absent_employees.length > 0 && (
+                            <div className="pt-1">
+                                <p className="text-sm font-medium text-gray-800 flex items-center gap-2"><UserX className="w-4 h-4"/>Funcionários Ausentes:</p>
+                                <ul className="list-disc list-inside text-sm text-gray-600 pl-4 mt-1">
+                                {data.absent_employees.map((emp, i) => <li key={i}>{emp.name}</li>)}
+                                </ul>
+                            </div>
+                            )}
+                            {(data.photos_before.length > 0 || data.photos_after.length > 0) && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                {data.photos_before.length > 0 && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium">Fotos Antes</Label>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    {data.photos_before.map((photo, index) => (<img key={index} src={photo} alt={`Antes ${index + 1}`} className="w-full h-24 object-cover rounded-md" />))}
+                                    </div>
+                                </div>
+                                )}
+                                {data.photos_after.length > 0 && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium">Fotos Depois</Label>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    {data.photos_after.map((photo, index) => (<img key={index} src={photo} alt={`Depois ${index + 1}`} className="w-full h-24 object-cover rounded-md" />))}
+                                    </div>
+                                </div>
+                                )}
+                            </div>
+                            )}
                         </div>
-                      </div>
+                        )
+                    ))
+                    ) : (
+                    <p className="text-sm text-muted-foreground">Nenhuma atividade registrada para este dia.</p>
                     )}
-                    {entry.photos_after.length > 0 && (
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Fotos Depois</Label>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                          {entry.photos_after.map((photo, index) => (<img key={index} src={photo} alt={`Depois ${index + 1}`} className="w-full h-24 object-cover rounded-md" />))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                </div>
               </div>
             </AccordionContent>
           </AccordionItem>
