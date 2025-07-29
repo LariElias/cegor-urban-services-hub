@@ -236,7 +236,7 @@ export const getPermittedActions = (role: string, subrole?: string): string[] =>
     },
     empresa: {
       supervisor: ['visualizar', 'acompanhamento' ,  'realizar_vistoria_supervisor', 'encerrar_ocorrencia']
-    }
+    }  
   };
 
   if (!subrole || !permissions[role] || !permissions[role][subrole]) {
