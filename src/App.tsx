@@ -28,7 +28,7 @@ import VistoriaPrevia from "./pages/ocorrencias/VistoriaPrevia";
 import VistoriaFinal from "./pages/ocorrencias/VistoriaFinal";
 import AcompanhamentoDiario from "./pages/ocorrencias/AcompanhamentoDiario";
 import VisualizarOcorrencia from "./pages/ocorrencias/VisualizarOcorrencia";
-
+import VistoriaSupervisor from "./pages/ocorrencias/VistoriaSupervisor";
 // Importar páginas de relatórios
 import DashboardGeral from "./pages/relatorios/DashboardGeral";
 import ServicosEmpresa from "./pages/relatorios/ServicosEmpresa";
@@ -68,6 +68,7 @@ const App = () => (
             <Route path="/ocorrencias/:id/vistoria_final" element={<Layout><VistoriaFinal /></Layout>} />
             <Route path="/ocorrencias/:id/acompanhamento" element={<Layout><AcompanhamentoDiario /></Layout>} />
             <Route path="/ocorrencias/:id/visualizar" element={<Layout><VisualizarOcorrencia /></Layout>} />
+            <Route path="/ocorrencias/:id/vistoria_supervisor" element={<Layout><VistoriaSupervisor/></Layout>}/>
             
             {/* Rotas de relatórios - todas usando Layout */}
             <Route path="/relatorios/dashboard" element={<Layout><DashboardGeral /></Layout>} />
