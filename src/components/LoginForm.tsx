@@ -106,9 +106,7 @@ export function LoginForm() {
               <p><strong>Regional Gestor:</strong> gestor@centrosul.gov.br</p>
               <p><strong>Regional Operador:</strong> operador@centrosul.gov.br</p>
               <p><strong>Regional Fiscal:</strong> fiscal@centrosul.gov.br</p>
-              <p><strong>Empresa Gestor:</strong> gestor@limpezabh.com.br</p>
-              <p><strong>Empresa Fiscal:</strong> fiscal@limpezabh.com.br</p>
-              <p><strong>Empresa Operador:</strong> operador@limpezabh.com.br</p>
+              <p><strong>Empresa Supervisor:</strong> supervisor@limpezabh.com.br</p>
 
               <p className="text-gray-500 pt-1">(Senha: qualquer valor)</p>
             </div>
