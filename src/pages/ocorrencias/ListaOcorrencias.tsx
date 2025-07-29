@@ -364,11 +364,11 @@ export default function ListaOcorrencias() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Ocorrências</h1>
-        <Button asChild>
+        {/* <Button asChild>
           <Link to="/ocorrencias/nova">
             <Plus className="w-4 h-4 mr-2" />Nova Ocorrência
           </Link>
-        </Button>
+        </Button> */}
       </div>
 
       <Card>
@@ -453,6 +453,8 @@ export default function ListaOcorrencias() {
           </div>
         )}
       </div>
+
+      {/* fazer um componente desse trecho */}
 
       <Dialog open={!!schedulingOcorrencia} onOpenChange={(isOpen) => !isOpen && setSchedulingOcorrencia(null)}>
         <DialogContent className="sm:max-w-[600px]">

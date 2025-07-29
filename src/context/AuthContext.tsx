@@ -119,6 +119,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
+      {
+        id: '10',
+        name: 'supervisor empresa Limpeza BH',
+        email: 'supervisor@limpezabh.com.br',
+        role: 'empresa',
+        subrole: 'supervisor',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
     ];
 
     const foundUser = mockUsers.find(u => u.email === email);
