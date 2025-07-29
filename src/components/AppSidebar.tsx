@@ -36,20 +36,19 @@ import { isRegionalGestor, isRegionalOperador, isRegionalFiscal, isCegorGestor, 
 import logoPmf from '@/assets/images/logo-pmf-2025.png';
 
 const menuItems = [
-  // {
-  //   title: 'Cadastros',
-  //   icon: Settings,
-  //   role: ['cegor'],
-  //   subrole: ['gestor'],
-  //   items: [
-  //     { title: 'Regionais', url: '/cadastros/regionais', icon: Building, role: ['cegor'],subrole: ['gestor'] },
-  //     { title: 'Bairros', url: '/cadastros/bairros', icon: MapPin, role: ['cegor'], subrole: ['gestor']},
-  //     { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin, role: ['cegor'],subrole: ['gestor'] },
-  //     { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield, role: ['cegor'], subrole: ['gestor'] },
-  //     { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building, role: ['cegor'],subrole: ['gestor'] },
-  //     { title: 'Empresas', url: '/cadastros/empresas', icon: Building, role: ['cegor'],subrole: ['gestor'] },
-  //   ]
-  // },
+  {
+    title: 'Cadastros',
+    icon: Settings,
+    role: ['adm'],
+    items: [
+      { title: 'Regionais', url: '/cadastros/regionais', icon: Building},
+      { title: 'Bairros', url: '/cadastros/bairros', icon: MapPin},
+      { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin},
+      { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield },
+      { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building},
+      { title: 'Empresas', url: '/cadastros/empresas', icon: Building,},
+    ]
+  },
   // {
   //   title: 'Cadastros Regionais',
   //   icon: Settings,
@@ -93,7 +92,7 @@ const menuItems = [
   {
     title: 'Conta',
     icon: Users,
-    role: ['cegor', 'regional', 'empresa'],
+    role: ['cegor', 'regional', 'empresa', 'adm'],
     items: [  // alterar a rota de conta -> entender depois o que precisa aparecer
       { title: 'Configurações', url: '/relatorios/dashboard', icon: Settings},
       
