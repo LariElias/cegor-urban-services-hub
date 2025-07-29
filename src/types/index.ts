@@ -232,7 +232,7 @@ export const getPermittedActions = (role: string, subrole?: string): string[] =>
     regional: {
       gestor: ['visualizar', 'acompanhamento'],
       fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento','detalhar_execucao'], // "permitir execução" deve ser colocado no modal
-      operador: ['agendar_ocorrencia', 'acompanhamento' , 'visualizar']
+      operador: ['acompanhamento' , 'visualizar']
     },
     empresa: {
       supervisor: ['visualizar', 'acompanhamento' ,  'realizar_vistoria_supervisor', 'encerrar_ocorrencia']
