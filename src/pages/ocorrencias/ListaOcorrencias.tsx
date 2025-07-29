@@ -454,8 +454,6 @@ export default function ListaOcorrencias() {
         )}
       </div>
 
-      {/* fazer um componente desse trecho */}
-
       <Dialog open={!!schedulingOcorrencia} onOpenChange={(isOpen) => !isOpen && setSchedulingOcorrencia(null)}>
         <DialogContent className="sm:max-w-[600px]">
             <DialogHeader><DialogTitle>Agendamento da Ocorrência</DialogTitle></DialogHeader>

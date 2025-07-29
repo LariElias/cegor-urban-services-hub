@@ -226,16 +226,16 @@ export const getPermittedActions = (role: string, subrole?: string): string[] =>
   const permissions: Record<string, Record<string, string[]>> = {
     cegor: {
       gestor: ['visualizar', 'andamento_vistoria'],
-      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento', 'permitir_execucao'],
-      operador: ['agendar_ocorrencia', 'acompanhamento',, 'visualizar']
+      fiscal: ['visualizar', 'encerrar_ocorrencia','acompanhamento', 'permitir_execucao' ],  // " permitir execução"
+      operador: ['agendar_ocorrencia', 'acompanhamento', 'visualizar']
     },
     regional: {
       gestor: ['visualizar', 'acompanhamento'],
-      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento','detalhar_execucao'], // "permitir execução" deve ser colocado no modal
+      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento','detalhar_execucao', 'encerrar_ocorrencia'], // "permitir execução" deve ser colocado no modal
       operador: ['acompanhamento' , 'visualizar']
     },
     empresa: {
-      supervisor: ['visualizar', 'acompanhamento' ,  'realizar_vistoria_supervisor', 'encerrar_ocorrencia']
+      supervisor: ['visualizar', 'acompanhamento' ,  'realizar_vistoria_supervisor', ]
     }  
   };
 
