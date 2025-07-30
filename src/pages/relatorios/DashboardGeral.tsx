@@ -187,11 +187,7 @@ export default function DashboardGeral() {
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                layout="vertical"
-                data={ocorrenciasPorRegional}
-                margin={{ top: 20, right: 30, left: 80, bottom: 20 }}
-              >
+              <BarChart layout="vertical" data={ocorrenciasPorRegional}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   type="number"
@@ -204,7 +200,7 @@ export default function DashboardGeral() {
                 <YAxis
                   dataKey="regional"
                   type="category"
-                  width={120}
+                  width={100}
                   tick={{ fontSize: 12 }}
                   label={{
                     value: "Regional",
@@ -281,7 +277,7 @@ export default function DashboardGeral() {
           <CardHeader>
             <CardTitle>Prioridade</CardTitle>
           </CardHeader>
-          <CardContent className="h-64">
+          <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -319,7 +315,7 @@ export default function DashboardGeral() {
           <CardHeader>
             <CardTitle>Distribuição por Status</CardTitle>
           </CardHeader>
-          <CardContent className="h-64">
+          <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
