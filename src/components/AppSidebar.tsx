@@ -18,6 +18,7 @@ import {
   MapPin as MapPinIcon,
   CheckCircle,
   Briefcase,
+  StickyNote
 } from "lucide-react";
 import {
   Sidebar,
@@ -74,9 +75,9 @@ const menuItems = [
     items: [
       { title: "Lista", url: "/ocorrencias", icon: FileText },
       {
-        title: "Novo registro",
+        title: "Registrar",
         url: "/ocorrencias/nova",
-        icon: AlertCircle,
+        icon: StickyNote,
         role: ["regional"],
         subrole: ["operador"],
       },
