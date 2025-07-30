@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +7,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { Layout } from "@/components/Layout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Configuracoes from "./pages/Configuracoes";
 
 // Importar páginas de cadastros
 import Regionais from "./pages/cadastros/Regionais";
@@ -47,6 +47,9 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
+            
+            {/* Nova rota de configurações */}
+            <Route path="/teste" element={<Layout><Configuracoes /></Layout>} />
             
             {/* Rotas de cadastros - todas usando Layout */}
             <Route path="/cadastros/regionais" element={<Layout><Regionais /></Layout>} />
