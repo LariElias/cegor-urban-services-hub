@@ -18,7 +18,7 @@ import { Ocorrencia } from '@/types';
 import TimelineItem from '@/components/ocorrencias/TimelineItem';
 import GalleryItem from '@/components/ocorrencias/GalleryItem';
 
-// ATUALIZAÇÃO 1: Schema do Zod com validação condicional
+// Schema do Zod com validação condicional
 const ocorrenciaSchema = z.object({
   occurrence_date: z.string().min(1, 'Data da ocorrência é obrigatória'),
   occurrence_type: z.string().min(1, 'Tipo de ocorrência é obrigatório'),
@@ -63,9 +63,10 @@ const ocorrenciaSchema = z.object({
 
 type OcorrenciaFormData = z.infer<typeof ocorrenciaSchema>;
 
-// Mock data (sem alterações)
+// Mock data com um exemplo de ocorrência "executada" para testar o botão
 const mockOcorrencias: Record<string, Ocorrencia> = {
   '1': { id: '1', protocol: 'OCR-2024-001', description: 'Limpeza de praça pública necessária...', public_equipment_id: '1', public_equipment_name: 'Praça da Liberdade', priority: 'alta', status: 'criada', occurrence_date: '2024-07-14', occurrence_type: 'Varrição', origin: 'Ouvidoria', origin_number: '2024-001233', territory_id: '1', street_name: 'Praça da Liberdade', street_number: 's/n', neighborhood: 'Centro-Sul', fiscal_id: '1', should_schedule: true, schedule_date: '2024-07-20', observations: 'Urgente.' },
+  '6': { id: '6', protocol: 'OCR-2024-006', description: 'Pintura de quadra no Cuca Jangurussu', public_equipment_name: 'Cuca Jangurussu', priority: 'baixa', status: 'executada', occurrence_date: '2024-07-15', occurrence_type: 'Pintura', origin: 'SPU', origin_number: '2024-55123', territory_id: '4', street_name: 'Av. Gov. Leonel Brizola', street_number: 's/n', neighborhood: 'Jangurussu', fiscal_id: '4' },
 };
 const mockAttachments = [{ id: '1', src: '/placeholder.svg', alt: 'Foto inicial do problema', type: 'image' as const, category: 'Iniciais' }];
 const publicEquipments = [
@@ -107,7 +108,6 @@ export default function OcorrenciaFormPage() {
   });
 
   const shouldSchedule = watch('should_schedule');
-  // ATUALIZAÇÃO 2: Observar o valor do tipo de ocorrência
   const occurrenceType = watch('occurrence_type');
 
   useEffect(() => {
@@ -190,7 +190,17 @@ export default function OcorrenciaFormPage() {
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 {isViewMode ? 'Fechar' : 'Cancelar'}
               </Button>
+
+              {/* ATUALIZAÇÃO: Botão de Vistoria Final condicional */}
+              {isViewMode && viewData.status === 'executada' && (
+                <Button onClick={() => navigate(`/ocorrencias/${id}/vistoria_final`)}>
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Vistoria Final
+                </Button>
+              )}
+              
               {isViewMode ? (
+                // O botão de imprimir pode ser mantido ou removido conforme sua preferência
                 <Button onClick={() => window.print()}><Printer className="w-4 h-4 mr-2" />Imprimir</Button>
               ) : (
                 <Button type="submit" form="ocorrencia-form">
@@ -233,8 +243,7 @@ export default function OcorrenciaFormPage() {
                     {errors.occurrence_type && <p className="text-sm text-red-500">{errors.occurrence_type.message}</p>}
                   </div>
                   
-                  {/* ATUALIZAÇÃO 3: Renderização condicional do novo campo de data */}
-                  {occurrenceType === 'Especial' && (
+                  {occurrenceType === 'Especial' && !isViewMode && (
                     <div className="space-y-2 animate-in fade-in-50">
                       <Label htmlFor="special_schedule_date">Agendamento da Ocorrência *</Label>
                       <Input id="special_schedule_date" type="date" {...register('special_schedule_date')} disabled={isViewMode} />
@@ -279,8 +288,6 @@ export default function OcorrenciaFormPage() {
               </CardContent>
             </Card>
           </TabsContent>
-
-          {/* O restante do código permanece o mesmo... */}
           
           <TabsContent value="localizacao">
             <Card>
