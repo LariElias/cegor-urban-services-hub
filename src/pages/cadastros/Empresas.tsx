@@ -1,9 +1,8 @@
-
-import React, { useState } from 'react';
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from "react";
+import { Plus, Search, Edit, Trash2, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -11,61 +10,63 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { EmpresaForm } from '@/components/forms/EmpresaForm';
-import { useAuth } from '@/context/AuthContext';
-import { isCegorGestor, isCegorOperador } from '@/types';
-import { useNavigate } from 'react-router-dom';
+} from "@/components/ui/dialog";
+import { EmpresaForm } from "@/components/forms/EmpresaForm";
+import { useAuth } from "@/context/AuthContext";
+import { isCegorGestor, isCegorOperador, isSuperAdm } from "@/types";
+import { useNavigate } from "react-router-dom";
 
 // Mock data
 const mockEmpresas = [
   {
-    id: '1',
-    codigo: 'EMP001',
-    nome: 'Limpeza BH Ltda',
-    cnpj: '12.345.678/0001-90',
-    email: 'contato@limpezabh.com.br',
-    telefone: '(31) 3333-4444',
-    endereco: 'Rua das Empresas, 100',
-    responsavel: 'Carlos Silva',
-    created_at: '2024-01-15T10:00:00Z',
+    id: "1",
+    codigo: "EMP001",
+    nome: "Limpeza BH Ltda",
+    cnpj: "12.345.678/0001-90",
+    email: "contato@limpezabh.com.br",
+    telefone: "(31) 3333-4444",
+    endereco: "Rua das Empresas, 100",
+    responsavel: "Carlos Silva",
+    created_at: "2024-01-15T10:00:00Z",
   },
   {
-    id: '2',
-    codigo: 'EMP002',
-    nome: 'Verde Cidade S/A',
-    cnpj: '98.765.432/0001-01',
-    email: 'contato@verdecidade.com.br',
-    telefone: '(31) 3333-5555',
-    endereco: 'Av. Verde, 200',
-    responsavel: 'Ana Santos',
-    created_at: '2024-01-16T14:30:00Z',
+    id: "2",
+    codigo: "EMP002",
+    nome: "Verde Cidade S/A",
+    cnpj: "98.765.432/0001-01",
+    email: "contato@verdecidade.com.br",
+    telefone: "(31) 3333-5555",
+    endereco: "Av. Verde, 200",
+    responsavel: "Ana Santos",
+    created_at: "2024-01-16T14:30:00Z",
   },
 ];
 
 const Empresas = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedEmpresa, setSelectedEmpresa] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const canEdit = isCegorGestor(user) || isCegorOperador(user);
+  const canEdit =
+    isCegorGestor(user) || isCegorOperador(user) || isSuperAdm(user);
   const canCreate = canEdit;
 
   // Filter empresas
-  const filteredEmpresas = mockEmpresas.filter(empresa => {
-    const matchesSearch = empresa.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         empresa.codigo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         empresa.cnpj.includes(searchTerm);
-    
+  const filteredEmpresas = mockEmpresas.filter((empresa) => {
+    const matchesSearch =
+      empresa.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      empresa.codigo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      empresa.cnpj.includes(searchTerm);
+
     return matchesSearch;
   });
 
@@ -93,7 +94,9 @@ const Empresas = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Empresas Contratadas</h1>
-          <p className="text-muted-foreground">Gerencie as empresas contratadas</p>
+          <p className="text-muted-foreground">
+            Gerencie as empresas contratadas
+          </p>
         </div>
         {canCreate && (
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
@@ -106,7 +109,7 @@ const Empresas = () => {
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>
-                  {selectedEmpresa ? 'Editar Empresa' : 'Nova Empresa'}
+                  {selectedEmpresa ? "Editar Empresa" : "Nova Empresa"}
                 </DialogTitle>
               </DialogHeader>
               <EmpresaForm
@@ -160,7 +163,9 @@ const Empresas = () => {
               <TableBody>
                 {filteredEmpresas.map((empresa) => (
                   <TableRow key={empresa.id}>
-                    <TableCell className="font-medium">{empresa.codigo}</TableCell>
+                    <TableCell className="font-medium">
+                      {empresa.codigo}
+                    </TableCell>
                     <TableCell>{empresa.nome}</TableCell>
                     <TableCell>{empresa.cnpj}</TableCell>
                     <TableCell>{empresa.responsavel}</TableCell>
@@ -171,7 +176,7 @@ const Empresas = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {new Date(empresa.created_at).toLocaleDateString('pt-BR')}
+                      {new Date(empresa.created_at).toLocaleDateString("pt-BR")}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
