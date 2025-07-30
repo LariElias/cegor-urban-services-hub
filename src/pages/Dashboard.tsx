@@ -1,12 +1,34 @@
-
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, Clock, CheckCircle, TrendingUp, Users, Building, Download } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { isRegionalGestor, isCegorGestor } from '@/types';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  AlertCircle,
+  Clock,
+  CheckCircle,
+  TrendingUp,
+  Users,
+  Building,
+  Download,
+} from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { isRegionalGestor, isCegorGestor } from "@/types";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LabelList,
+} from "recharts";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -24,81 +46,87 @@ export default function Dashboard() {
 
   // Dados para o gráfico de demandas por regional
   const demandaRegionalData = [
-    { name: 'Regional 1', demandas: 45 },
-    { name: 'Regional 2', demandas: 38 },
-    { name: 'Regional 3', demandas: 32 },
-    { name: 'Regional 4', demandas: 28 },
-    { name: 'Regional 5', demandas: 25 },
-    { name: 'Regional 6', demandas: 22 },
-    { name: 'Regional 7', demandas: 20 },
-    { name: 'Regional 8', demandas: 18 },
-    { name: 'Regional 9', demandas: 15 },
+    { name: "Regional 1", demandas: 45 },
+    { name: "Regional 2", demandas: 38 },
+    { name: "Regional 3", demandas: 32 },
+    { name: "Regional 4", demandas: 28 },
+    { name: "Regional 5", demandas: 25 },
+    { name: "Regional 6", demandas: 22 },
+    { name: "Regional 7", demandas: 20 },
+    { name: "Regional 8", demandas: 18 },
+    { name: "Regional 9", demandas: 15 },
+  ];
+
+  const ocorrenciasPorBairro = [
+    { bairro: "Centro-Sul", total: 25 },
+    { bairro: "Noroeste", total: 18 },
+    { bairro: "Praia de Iracema", total: 12 },
+    { bairro: "Aldeota", total: 15 },
+    { bairro: "Meireles", total: 20 },
   ];
 
   const recentOcorrencias = [
     {
-      id: '1',
-      protocol: 'OCR-2024-001',
-      description: 'Limpeza de via pública - Rua da Bahia',
-      status: 'agendada',
-      priority: 'alta',
-      regional: 'Centro-Sul',
-      date: '2024-01-15',
+      id: "1",
+      protocol: "OCR-2024-001",
+      description: "Limpeza de via pública - Rua da Bahia",
+      status: "agendada",
+      priority: "alta",
+      regional: "Centro-Sul",
+      date: "2024-01-15",
     },
     {
-      id: '2',
-      protocol: 'OCR-2024-002',
-      description: 'Manutenção de iluminação pública',
-      status: 'em_execucao',
-      priority: 'media',
-      regional: 'Noroeste',
-      date: '2024-01-14',
+      id: "2",
+      protocol: "OCR-2024-002",
+      description: "Manutenção de iluminação pública",
+      status: "em_execucao",
+      priority: "media",
+      regional: "Noroeste",
+      date: "2024-01-14",
     },
     {
-      id: '3',
-      protocol: 'OCR-2024-003',
-      description: 'Poda de árvores - Praça da Liberdade',
-      status: 'concluida',
-      priority: 'baixa',
-      regional: 'Centro-Sul',
-      date: '2024-01-13',
+      id: "3",
+      protocol: "OCR-2024-003",
+      description: "Poda de árvores - Praça da Liberdade",
+      status: "concluida",
+      priority: "baixa",
+      regional: "Centro-Sul",
+      date: "2024-01-13",
     },
   ];
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      criada: { label: 'Criada', className: 'bg-gray-100 text-gray-800' },
-      agendada: { label: 'Agendada', className: 'bg-blue-100 text-blue-800' },
-      em_execucao: { label: 'Em Execução', className: 'bg-yellow-100 text-yellow-800' },
-      concluida: { label: 'Concluída', className: 'bg-green-100 text-green-800' },
+      criada: { label: "Criada", className: "bg-gray-100 text-gray-800" },
+      agendada: { label: "Agendada", className: "bg-blue-100 text-blue-800" },
+      em_execucao: {
+        label: "Em Execução",
+        className: "bg-yellow-100 text-yellow-800",
+      },
+      concluida: {
+        label: "Concluída",
+        className: "bg-green-100 text-green-800",
+      },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
-    return (
-      <Badge className={config.className}>
-        {config.label}
-      </Badge>
-    );
+    return <Badge className={config.className}>{config.label}</Badge>;
   };
 
   const getPriorityBadge = (priority: string) => {
     const priorityConfig = {
-      baixa: { label: 'Baixa', className: 'bg-green-100 text-green-800' },
-      media: { label: 'Média', className: 'bg-yellow-100 text-yellow-800' },
-      alta: { label: 'Alta', className: 'bg-orange-100 text-orange-800' },
-      urgente: { label: 'Urgente', className: 'bg-red-100 text-red-800' },
+      baixa: { label: "Baixa", className: "bg-green-100 text-green-800" },
+      media: { label: "Média", className: "bg-yellow-100 text-yellow-800" },
+      alta: { label: "Alta", className: "bg-orange-100 text-orange-800" },
+      urgente: { label: "Urgente", className: "bg-red-100 text-red-800" },
     };
 
     const config = priorityConfig[priority as keyof typeof priorityConfig];
-    return (
-      <Badge className={config.className}>
-        {config.label}
-      </Badge>
-    );
+    return <Badge className={config.className}>{config.label}</Badge>;
   };
 
   const exportarCSV = () => {
-    alert('Exportando relatório em CSV...');
+    alert("Exportando relatório em CSV...");
   };
 
   return (
@@ -107,12 +135,18 @@ export default function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600">
-            {user?.role === 'regional' ? 'Painel da Regional' : 'Visão geral do sistema CEGOR'}
+            {user?.role === "regional"
+              ? "Painel da Regional"
+              : "Visão geral do sistema CEGOR"}
           </p>
         </div>
         <div className="flex items-center gap-4">
           {isCegorGestor(user) && (
-            <Button onClick={exportarCSV} variant="outline" className="flex items-center gap-2">
+            <Button
+              onClick={exportarCSV}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
               <Download className="w-4 h-4" />
               Exportar CSV
             </Button>
@@ -125,13 +159,17 @@ export default function Dashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {user?.role === 'regional' ? 'Ocorrências da Regional' : 'Total de Ocorrências'}
+              {user?.role === "regional"
+                ? "Ocorrências da Regional"
+                : "Total de Ocorrências"}
             </CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {user?.role === 'regional' ? '45' : dashboardData.totalOcorrencias}
+              {user?.role === "regional"
+                ? "45"
+                : dashboardData.totalOcorrencias}
             </div>
             <p className="text-xs text-muted-foreground">
               +12% em relação ao mês anterior
@@ -142,16 +180,20 @@ export default function Dashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {isRegionalGestor(user) ? 'Pendentes de Aprovação' : 'Pendentes'}
+              {isRegionalGestor(user) ? "Pendentes de Aprovação" : "Pendentes"}
             </CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isRegionalGestor(user) ? dashboardData.pendenteAprovacao : dashboardData.ocorrenciasPendentes}
+              {isRegionalGestor(user)
+                ? dashboardData.pendenteAprovacao
+                : dashboardData.ocorrenciasPendentes}
             </div>
             <p className="text-xs text-muted-foreground">
-              {isRegionalGestor(user) ? 'Aguardando sua aprovação' : 'Aguardando agendamento'}
+              {isRegionalGestor(user)
+                ? "Aguardando sua aprovação"
+                : "Aguardando agendamento"}
             </p>
           </CardContent>
         </Card>
@@ -163,11 +205,11 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {user?.role === 'regional' ? '12' : dashboardData.ocorrenciasAndamento}
+              {user?.role === "regional"
+                ? "12"
+                : dashboardData.ocorrenciasAndamento}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Sendo executadas
-            </p>
+            <p className="text-xs text-muted-foreground">Sendo executadas</p>
           </CardContent>
         </Card>
 
@@ -178,7 +220,9 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {user?.role === 'regional' ? '28' : dashboardData.ocorrenciasConcluidas}
+              {user?.role === "regional"
+                ? "28"
+                : dashboardData.ocorrenciasConcluidas}
             </div>
             <p className="text-xs text-muted-foreground">
               Finalizadas este mês
@@ -193,13 +237,18 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle>Demandas por Regional</CardTitle>
             <CardDescription>
-              Distribuição de ocorrências criadas e encaminhadas por regional (últimos 30 dias)
+              Distribuição de ocorrências criadas e encaminhadas por regional
+              (últimos 30 dias)
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
-              <div className="text-2xl font-bold text-blue-600">{dashboardData.demandasPorRegional}</div>
-              <p className="text-sm text-muted-foreground">Total de demandas este mês</p>
+              <div className="text-2xl font-bold text-blue-600">
+                {dashboardData.demandasPorRegional}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Total de demandas este mês
+              </p>
             </div>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={demandaRegionalData}>
@@ -208,6 +257,39 @@ export default function Dashboard() {
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="demandas" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Gráfico de Ocorrências por Bairro (RegionalGestor) */}
+      {isRegionalGestor(user) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Ocorrências por Bairro</CardTitle>
+            <CardDescription>
+              Distribuição de ocorrências registradas na sua regional (últimos
+              30 dias)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={ocorrenciasPorBairro}
+                margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="bairro" />
+                <YAxis />
+                <Tooltip formatter={(value) => `${value} ocorrências`} />
+                <Bar dataKey="total" fill="#10b981" name="Total">
+                  <LabelList
+                    dataKey="total"
+                    position="top"
+                    style={{ fontSize: 12, fill: "#000" }}
+                  />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -230,7 +312,9 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Empresas Contratadas</span>
-              <Badge variant="outline">{dashboardData.empresasContratadas}</Badge>
+              <Badge variant="outline">
+                {dashboardData.empresasContratadas}
+              </Badge>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Usuários Ativos</span>
@@ -249,15 +333,24 @@ export default function Dashboard() {
           <CardContent>
             <div className="space-y-4">
               {recentOcorrencias.map((ocorrencia) => (
-                <div key={ocorrencia.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div
+                  key={ocorrencia.id}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium">{ocorrencia.protocol}</span>
+                      <span className="text-sm font-medium">
+                        {ocorrencia.protocol}
+                      </span>
                       {getStatusBadge(ocorrencia.status)}
                       {getPriorityBadge(ocorrencia.priority)}
                     </div>
-                    <p className="text-sm text-gray-600 truncate">{ocorrencia.description}</p>
-                    <p className="text-xs text-gray-500">{ocorrencia.regional} • {ocorrencia.date}</p>
+                    <p className="text-sm text-gray-600 truncate">
+                      {ocorrencia.description}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {ocorrencia.regional} • {ocorrencia.date}
+                    </p>
                   </div>
                 </div>
               ))}
