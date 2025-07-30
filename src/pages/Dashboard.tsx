@@ -105,7 +105,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Painel de regionais</h1>
           <p className="text-gray-600">
             {user?.role === 'regional' ? 'Painel da Regional' : 'Visão geral do sistema CEGOR'}
           </p>
@@ -191,7 +191,7 @@ export default function Dashboard() {
       {isCegorGestor(user) && (
         <Card>
           <CardHeader>
-            <CardTitle>Demandas por Regional</CardTitle>
+            <CardTitle>Ocorrências por Regional</CardTitle>
             <CardDescription>
               Distribuição de ocorrências criadas e encaminhadas por regional (últimos 30 dias)
             </CardDescription>
