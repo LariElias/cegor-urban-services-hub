@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useAuth } from '@/context/AuthContext';
 import { Ocorrencia, getPermittedActions } from '@/types';
@@ -11,7 +13,6 @@ import { getActionButton } from '@/utils/actionButtons';
 import { Link } from 'react-router-dom';
 import OcorrenciaViewer from '@/components/ocorrencias/OcorrenciaViewer';
 import FilterOcorrencia from '@/components/filtersOcorrencias';
-
 
 // Interface estendida para garantir que os campos existam no mock
 interface OcorrenciaDetalhada extends Ocorrencia {
@@ -24,21 +25,21 @@ const regionalMap: { [key: string]: string } = {
   '5': 'Regional V', '6': 'Regional VI'
 };
 
-// Mock de dados atualizado com bairro e regional_name
+// Mock de dados com os campos necessários para os filtros
 const mockOcorrencias: OcorrenciaDetalhada[] = [
-    { id: '1', protocol: 'OCR-2024-001', description: 'Limpeza de terreno baldio', service_type: 'Limpeza', priority: 'alta', status: 'criada', address: 'Rua das Flores, 123', public_equipment_name: 'Praça do Ferreira', regional_id: '1', fiscal_id: '1', origin: 'SIGEP', vistoria_previa_date: '2025-07-20T08:00:00Z', created_at: '2025-07-20T10:00:00Z', updated_at: '2025-07-20T10:00:00Z', bairro: 'Centro', regional_name: regionalMap['1'] },
-    { id: '2', protocol: 'OCR-2024-002', description: 'Reparo em calçada', service_type: 'Manutenção', priority: 'media', status: 'encaminhada', address: 'Av. Beira Mar, 456', public_equipment_name: 'Areninha Campo do América', regional_id: '2', fiscal_id: '2', origin: 'SPU', forwarded_by: '2', forwarded_at: '2025-07-21T11:00:00Z', created_at: '2025-07-21T09:00:00Z', updated_at: '2025-07-21T11:00:00Z', bairro: 'Meireles', regional_name: regionalMap['2'] },
-    { id: '3', protocol: 'OCR-2024-003', description: 'Poda de árvores no parque', service_type: 'Conservação', priority: 'baixa', status: 'autorizada', address: 'Av. Padre Antônio Tomás, s/n', public_equipment_name: 'Parque do Cocó', regional_id: '5', fiscal_id: '5', origin: 'REG2', approved_by_regional: '5', approved_at_regional: '2025-07-19T14:00:00Z', vistoria_previa_date: '2025-07-19T12:00:00Z', created_at: '2025-07-19T10:00:00Z', updated_at: '2025-07-19T14:00:00Z', bairro: 'Cocó', regional_name: regionalMap['5'] },
-    { id: '4', protocol: 'OCR-2024-004', description: 'Vazamento em poste de saúde', service_type: 'Reparo', priority: 'alta', status: 'agendada', address: 'Rua G, 300', public_equipment_name: 'Posto de Saúde Dr. Hélio Goes', regional_id: '6', fiscal_id: '6', origin: 'SIGEP', scheduled_date: '2025-07-25T09:00:00Z', vistoria_previa_date: '2025-07-22T07:00:00Z', created_at: '2025-07-22T08:00:00Z', updated_at: '2025-07-22T10:00:00Z', bairro: 'Messejana', regional_name: regionalMap['6'] },
-    { id: '5', protocol: 'OCR-2024-005', description: 'Manutenção de brinquedos', service_type: 'Manutenção', priority: 'media', status: 'em_execucao', address: 'Rua Paulino Nogueira, s/n', public_equipment_name: 'Praça da Gentilândia', regional_id: '1', fiscal_id: '1', origin: 'REG1', scheduled_date: '2025-07-20T14:00:00Z', vistoria_previa_date: '2025-07-18T13:00:00Z', created_at: '2025-07-18T15:00:00Z', updated_at: '2025-07-20T13:00:00Z', bairro: 'Benfica', regional_name: regionalMap['1'] },
-    { id: '6', protocol: 'OCR-2024-006', description: 'Pintura de quadra', service_type: 'Pintura', priority: 'baixa', status: 'executada', address: 'Av. Gov. Leonel Brizola, s/n', public_equipment_name: 'Cuca Jangurussu', regional_id: '4', fiscal_id: '4', origin: 'SPU', scheduled_date: '2025-06-12T08:00:00Z', vistoria_previa_date: '2025-06-10T07:00:00Z', vistoria_pos_date: '2025-06-15T15:00:00Z', created_at: '2025-06-10T09:00:00Z', updated_at: '2025-06-15T16:00:00Z', bairro: 'Jangurussu', regional_name: regionalMap['4'] },
+    { id: '1', protocol: 'OCR-2024-009', description: 'Substituição de bancos quebrados', service_type: 'Manutenção', priority: 'media', status: 'criada', address: 'Av. José Bastos, 789', public_equipment_name: 'Praça José de Alencar', regional_id: '2', fiscal_id: '2', origin: 'REG2', created_at: '2025-07-23T09:30:00Z', updated_at: '2025-07-23T09:30:00Z', bairro: 'Parangaba', regional_name: regionalMap['2'] },
+    { id: '10', protocol: 'OCR-2024-010', description: 'Verificação de esgoto a céu aberto', service_type: 'Saneamento', priority: 'alta', status: 'executada', address: 'Rua Eduardo Perdigão, 321', public_equipment_name: 'Canal do Lagamar', regional_id: '5', fiscal_id: '5', origin: 'SIGEP', vistoria_previa_date: '2025-07-22T08:00:00Z', created_at: '2025-07-22T07:30:00Z', updated_at: '2025-07-22T08:30:00Z', bairro: 'São João do Tauape', regional_name: regionalMap['5'] },
+    { id: '11', protocol: 'OCR-2024-011', description: 'Conserto de lixeira danificada', service_type: 'Limpeza', priority: 'baixa', status: 'encaminhada', address: 'Rua Padre Pedro de Alencar, 65', public_equipment_name: 'Praça do Lago Jacarey', regional_id: '6', fiscal_id: '6', origin: 'REG6', forwarded_by: '6', forwarded_at: '2025-07-21T14:00:00Z', created_at: '2025-07-21T12:00:00Z', updated_at: '2025-07-21T14:00:00Z', bairro: 'Cidade dos Funcionários', regional_name: regionalMap['6'] },
+    { id: '12', protocol: 'OCR-2024-012', description: 'Reforma de muro de escola', service_type: 'Reparo', priority: 'alta', status: 'autorizada', address: 'Rua Júlio César, 88', public_equipment_name: 'E.M. Antônio Sales', regional_id: '3', fiscal_id: '3', origin: 'SPU', approved_by_regional: '3', approved_at_regional: '2025-07-20T13:00:00Z', vistoria_previa_date: '2025-07-20T10:00:00Z', created_at: '2025-07-20T08:00:00Z', updated_at: '2025-07-20T13:00:00Z', bairro: 'Montese', regional_name: regionalMap['3'] },
+    { id: '13', protocol: 'OCR-2024-013', description: 'Verificação de alagamento', service_type: 'Saneamento', priority: 'media', status: 'agendada', address: 'Rua dos Remédios, 12', public_equipment_name: 'Boca de lobo próxima ao mercado', regional_id: '1', fiscal_id: '1', origin: 'SIGEP', vistoria_previa_date: '2025-07-19T11:00:00Z', created_at: '2025-07-19T10:00:00Z', updated_at: '2025-07-19T11:30:00Z', bairro: 'Centro', regional_name: regionalMap['1'] },
+    { id: '14', protocol: 'OCR-2024-014', description: 'Pintura de meio-fio', service_type: 'Pintura', priority: 'baixa', status: 'executada', address: 'Av. Rogaciano Leite, 99', public_equipment_name: 'Rotatória do Cambeba', regional_id: '6', fiscal_id: '6', origin: 'REG6', scheduled_date: '2025-07-18T07:00:00Z', vistoria_previa_date: '2025-07-17T08:00:00Z', vistoria_pos_date: '2025-07-18T18:00:00Z', created_at: '2025-07-17T09:00:00Z', updated_at: '2025-07-18T18:30:00Z', bairro: 'Cambeba', regional_name: regionalMap['6'] },
 ];
 
 const getStatusColor = (status: string) => ({'criada': 'bg-gray-100 text-gray-800','encaminhada': 'bg-blue-100 text-blue-800','autorizada': 'bg-teal-100 text-teal-800','cancelada': 'bg-red-100 text-red-800','devolvida': 'bg-orange-100 text-orange-800','em_analise': 'bg-yellow-100 text-yellow-800','agendada': 'bg-purple-100 text-purple-800','em_execucao': 'bg-cyan-100 text-cyan-800','executada': 'bg-green-100 text-green-800', 'concluida': 'bg-emerald-100 text-emerald-800'}[status] || 'bg-gray-100 text-gray-800');
 const getStatusLabel = (status: string) => ({'criada': 'Criada','encaminhada': 'Encaminhada','autorizada': 'Autorizada','cancelada': 'Cancelada','devolvida': 'Devolvida','em_analise': 'Em Análise','agendada': 'Agendada','em_execucao': 'Em Execução','executada': 'Executada', 'concluida': 'Concluída'}[status] || status);
 const getPriorityColor = (priority: string) => ({'baixa': 'bg-green-100 text-green-800','media': 'bg-yellow-100 text-yellow-800','alta': 'bg-red-100 text-red-800'}[priority] || 'bg-gray-100 text-gray-800');
 
-// --- Componente da Tabela Refatorado ---
+// --- Componentes de Visualização ---
 const ListView = ({ ocorrencias, renderActionButtons }: { ocorrencias: OcorrenciaDetalhada[], renderActionButtons: (o: Ocorrencia) => (JSX.Element | null)[] }) => (
   <Card>
     <Table>
@@ -80,61 +81,92 @@ const ListView = ({ ocorrencias, renderActionButtons }: { ocorrencias: Ocorrenci
   </Card>
 );
 
-// ... (Componente GridView pode ser mantido ou refatorado de forma similar)
+const GridView = ({ ocorrencias, renderActionButtons }: { ocorrencias: OcorrenciaDetalhada[], renderActionButtons: (o: Ocorrencia) => (JSX.Element | null)[] }) => (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {ocorrencias.map((ocorrencia) => (
+            <Card key={ocorrencia.id} className="flex flex-col">
+                <CardHeader>
+                    <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{ocorrencia.protocol}</CardTitle>
+                        <Badge className={getPriorityColor(ocorrencia.priority)}>{ocorrencia.priority}</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{ocorrencia.service_type}</p>
+                </CardHeader>
+                <CardContent className="flex-grow space-y-3">
+                    <p className="text-sm text-gray-600 line-clamp-2">{ocorrencia.description}</p>
+                    <p className="text-sm text-gray-600"><strong>Equipamento:</strong> {ocorrencia.public_equipment_name}</p>
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">Status:</span>
+                        <Badge className={getStatusColor(ocorrencia.status)}>{getStatusLabel(ocorrencia.status)}</Badge>
+                    </div>
+                </CardContent>
+                <div className="flex items-center justify-end gap-2 p-4 pt-2 border-t mt-auto">
+                    {renderActionButtons(ocorrencia)}
+                </div>
+            </Card>
+        ))}
+    </div>
+);
 
 export default function ListaOcorrencias() {
   const { user } = useAuth();
   const [ocorrencias, setOcorrencias] = useState<OcorrenciaDetalhada[]>(mockOcorrencias);
   
-  // Estados para filtros agora vivem em um único objeto
+  // ATUALIZAÇÃO 2: Estado dos filtros agora inclui as datas
   const [filters, setFilters] = useState({
     searchTerm: '',
     status: '',
     priority: '',
     regional: '',
     bairro: '',
+    dataInicio: '',
+    dataFim: '',
   });
   
-  // Outros estados da UI
   const [viewMode, setViewMode] = useState('list');
   const [currentPage, setCurrentPage] = useState(1);
   const [viewingOcorrencia, setViewingOcorrencia] = useState<Ocorrencia | null>(null);
-  const itemsPerPage = 5;
+  const itemsPerPage = viewMode === 'list' ? 5 : 8;
 
-  // Função para ser passada ao componente de filtro
   const handleFilterChange = (newFilters: Partial<typeof filters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
-    setCurrentPage(1); // Reseta a paginação ao aplicar um novo filtro
+    setCurrentPage(1);
   };
 
-  // --- Lógica de Filtragem ---
+  // ATUALIZAÇÃO 3: Lógica de filtragem atualizada para incluir o período
   const filteredOcorrencias = useMemo(() => {
     return ocorrencias.filter(ocorrencia => {
       if (user?.role === 'regional' && ocorrencia.regional_id !== user.regional_id) return false;
       if (user?.role === 'empresa' && !['autorizada', 'agendada', 'em_execucao', 'executada'].includes(ocorrencia.status)) return false;
 
-      const { searchTerm, status, priority, regional, bairro } = filters;
+      const { searchTerm, status, priority, regional, bairro, dataInicio, dataFim } = filters;
+      
+      const dataOcorrencia = new Date(ocorrencia.created_at);
+      const dataInicioFiltro = dataInicio ? new Date(dataInicio + 'T00:00:00') : null;
+      const dataFimFiltro = dataFim ? new Date(dataFim + 'T23:59:59') : null;
+
+      const matchesDate = 
+        (!dataInicioFiltro || dataOcorrencia >= dataInicioFiltro) &&
+        (!dataFimFiltro || dataOcorrencia <= dataFimFiltro);
+      
       const matchesSearch = searchTerm === '' || ocorrencia.protocol.toLowerCase().includes(searchTerm.toLowerCase()) || ocorrencia.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = status === '' || ocorrencia.status === status;
       const matchesPriority = priority === '' || ocorrencia.priority === priority;
       const matchesRegional = regional === '' || ocorrencia.regional_name === regional;
       const matchesBairro = bairro === '' || ocorrencia.bairro === bairro;
       
-      return matchesSearch && matchesStatus && matchesPriority && matchesRegional && matchesBairro;
+      return matchesSearch && matchesStatus && matchesPriority && matchesRegional && matchesBairro && matchesDate;
     });
   }, [ocorrencias, filters, user]);
 
-  // Gera listas únicas para passar para o componente de filtro
   const uniqueRegionais = useMemo(() => [...new Set(mockOcorrencias.map(o => o.regional_name))].sort(), [mockOcorrencias]);
   const uniqueBairros = useMemo(() => [...new Set(mockOcorrencias.map(o => o.bairro))].sort(), [mockOcorrencias]);
 
-  // --- Lógica de Paginação ---
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentListItems = filteredOcorrencias.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredOcorrencias.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredOcorrencias.length / itemsPerPage);
 
-  // --- Renderização de Botões (e outras lógicas de ação) ---
   const handleAction = (action: string, ocorrenciaId: string) => {
     const ocorrencia = ocorrencias.find(o => o.id === ocorrenciaId);
     if (!ocorrencia) return;
@@ -160,7 +192,6 @@ export default function ListaOcorrencias() {
         <h1 className="text-3xl font-bold">Ocorrências</h1>
       </div>
 
-      {/* ATUALIZAÇÃO 3: Componente de Filtro em uso */}
       <FilterOcorrencia
         filters={filters}
         onFilterChange={handleFilterChange}
@@ -176,37 +207,33 @@ export default function ListaOcorrencias() {
         </div>
       </div>
       
-      <div>
+      <div className="space-y-4">
         {filteredOcorrencias.length > 0 ? (
-          viewMode === 'list' ? (
-            <div className="space-y-4">
-              <ListView ocorrencias={currentListItems} renderActionButtons={renderActionButtons} />
-              {totalPages > 1 && (
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.max(p - 1, 1)); }} className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined} />
-                    </PaginationItem>
-                    {[...Array(totalPages).keys()].map(num => (
-                      <PaginationItem key={num + 1}>
-                        <PaginationLink href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(num + 1); }} isActive={currentPage === num + 1}>{num + 1}</PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.min(p + 1, totalPages)); }} className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined} />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              )}
-            </div>
-          ) : (
-             <p className="text-center py-16 bg-gray-50 rounded-lg text-gray-500">Visualização em grade não implementada.</p>
-            // <GridView ocorrencias={filteredOcorrencias} renderActionButtons={renderActionButtons} />
-          )
+          viewMode === 'list' 
+            ? <ListView ocorrencias={currentItems} renderActionButtons={renderActionButtons} />
+            : <GridView ocorrencias={currentItems} renderActionButtons={renderActionButtons} />
         ) : (
           <div className="text-center py-16 bg-gray-50 rounded-lg">
             <p className="text-gray-500">Nenhuma ocorrência encontrada para os filtros selecionados.</p>
           </div>
+        )}
+
+        {totalPages > 1 && (
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.max(p - 1, 1)); }} className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined} />
+              </PaginationItem>
+              {[...Array(totalPages).keys()].map(num => (
+                <PaginationItem key={num + 1}>
+                  <PaginationLink href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(num + 1); }} isActive={currentPage === num + 1}>{num + 1}</PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.min(p + 1, totalPages)); }} className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined} />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         )}
       </div>
 
