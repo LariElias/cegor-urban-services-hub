@@ -1,13 +1,12 @@
-
-import React from 'react';
-import { useLocation, NavLink } from 'react-router-dom';
-import { 
-  Settings, 
-  AlertCircle, 
-  BarChart3, 
-  Users, 
-  MapPin, 
-  Building, 
+import React from "react";
+import { useLocation, NavLink } from "react-router-dom";
+import {
+  Settings,
+  AlertCircle,
+  BarChart3,
+  Users,
+  MapPin,
+  Building,
   Shield,
   LogOut,
   Home,
@@ -18,8 +17,8 @@ import {
   History,
   MapPin as MapPinIcon,
   CheckCircle,
-  Briefcase
-} from 'lucide-react';
+  Briefcase,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -30,24 +29,30 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/components/ui/sidebar';
-import { useAuth } from '@/context/AuthContext';
-import { isRegionalGestor, isRegionalOperador, isRegionalFiscal, isCegorGestor, isCegorOperador } from '@/types';
-import logoPmf from '@/assets/images/logo-pmf-2025.png';
+} from "@/components/ui/sidebar";
+import { useAuth } from "@/context/AuthContext";
+import {
+  isRegionalGestor,
+  isRegionalOperador,
+  isRegionalFiscal,
+  isCegorGestor,
+  isCegorOperador,
+} from "@/types";
+import logoPmf from "@/assets/images/logo-pmf-2025.png";
 
 const menuItems = [
   {
-    title: 'Cadastros',
+    title: "Cadastros",
     icon: Settings,
-    role: ['adm'],
+    role: ["adm"],
     items: [
-      { title: 'Regionais', url: '/cadastros/regionais', icon: Building},
-      { title: 'Bairros', url: '/cadastros/bairros', icon: MapPin},
-      { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin},
-      { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield },
-      { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building},
-      { title: 'Empresas', url: '/cadastros/empresas', icon: Building,},
-    ]
+      { title: "Regionais", url: "/cadastros/regionais", icon: Building },
+      { title: "Bairros", url: "/cadastros/bairros", icon: MapPin },
+      { title: "Territórios", url: "/cadastros/territorios", icon: MapPin },
+      { title: "Fiscais", url: "/cadastros/fiscais", icon: Shield },
+      { title: "Equipamentos", url: "/cadastros/equipamentos", icon: Building },
+      { title: "Empresas", url: "/cadastros/empresas", icon: Building },
+    ],
   },
   // {
   //   title: 'Cadastros Regionais',
@@ -61,42 +66,74 @@ const menuItems = [
   //   ]
   // },
   {
-    title: 'Ocorrências',
+    title: "Ocorrências",
     icon: AlertCircle,
-    role: ['cegor', 'regional', 'empresa'],
-    subrole: ['gestor', 'fiscal', 'operador', 'supervisor'],
+    role: ["cegor", "regional", "empresa"],
+    subrole: ["gestor", "fiscal", "operador", "supervisor"],
     items: [
-      { title: 'Lista', url: '/ocorrencias', icon: FileText },
-      { title: 'Novo registro', url: '/ocorrencias/nova', icon: AlertCircle, role: ['regional'], subrole: ['operador'] },
+      { title: "Lista", url: "/ocorrencias", icon: FileText },
+      {
+        title: "Novo registro",
+        url: "/ocorrencias/nova",
+        icon: AlertCircle,
+        role: ["regional"],
+        subrole: ["operador"],
+      },
       // { title: 'Aprovadas', url: '/ocorrencias/aprovadas', icon: CheckCircle, role: ['cegor'] },
       // { title: 'Demandas da Empresa', url: '/ocorrencias/demandas', icon: Briefcase, role: ['empresa'] },
-      { title: 'Mapa', url: '/relatorios/mapa', icon: MapPin, role: ['cegor', 'regional'],subrole: ['gestor'] },
-
-    ]
+      {
+        title: "Mapa",
+        url: "/relatorios/mapa",
+        icon: MapPin,
+        role: ["cegor", "regional"],
+        subrole: ["gestor"],
+      },
+    ],
   },
   {
-    title: 'Relatórios',
+    title: "Relatórios",
     icon: BarChart3,
-    role: ['cegor', 'regional', 'empresa'],
-    subrole: ['gestor', 'fiscal', 'operador', 'supervisor'],
+    role: ["cegor", "regional", "empresa"],
+    subrole: ["gestor", "fiscal", "operador", "supervisor"],
     items: [
-      { title: 'Dashboard Geral', url: '/relatorios/dashboard', icon: Activity, role: ['cegor'], subrole: ['gestor']},
+      {
+        title: "Dashboard Geral",
+        url: "/relatorios/dashboard",
+        icon: Activity,
+        role: ["cegor"],
+        subrole: ["gestor"],
+      },
       // { title: 'Tempo de Execução', url: '/relatorios/tempo', icon: Clock, role: ['cegor', 'regional'], subrole: ['gestor'] },
       // { title: 'Mapa de Ocorrências', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'] },
-      { title: 'Histórico', url: '/relatorios/historico', icon: History, role: ['cegor', 'regional', 'empresa'] },
-      { title: 'Relatório Regional', url: '/relatorios/regional', icon: BarChart3, role: ['regional'] },
-      { title: 'Serviços Programados', url: '/relatorios/programados', icon: Calendar, role: ['empresa'] },
-      { title: 'Exportar CSV', url: '/relatorios/csv', icon: FileText, role: ['cegor'], subrole:['gestor', 'fiscal'] },
-    ]
+      {
+        title: "Relatório Regional",
+        url: "/relatorios/regional",
+        icon: BarChart3,
+        role: ["regional"],
+      },
+      {
+        title: "Serviços Programados",
+        url: "/relatorios/programados",
+        icon: Calendar,
+        role: ["empresa"],
+      },
+      {
+        title: "Exportar CSV",
+        url: "/relatorios/csv",
+        icon: FileText,
+        role: ["cegor", "regional"],
+        subrole: ["gestor", "operador"],
+      },
+    ],
   },
   {
-    title: 'Conta',
+    title: "Conta",
     icon: Users,
-    role: ['cegor', 'regional', 'empresa', 'adm'],
-    items: [  // alterar a rota de conta -> entender depois o que precisa aparecer
-      { title: 'Configurações', url: '/relatorios/dashboard', icon: Settings},
-      
-    ]
+    role: ["cegor", "regional", "empresa", "adm"],
+    items: [
+      // alterar a rota de conta -> entender depois o que precisa aparecer
+      { title: "Configurações", url: "/teste", icon: Settings },
+    ],
   },
 ];
 
@@ -109,36 +146,37 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path;
   const hasPermission = (roles?: string[], subroles?: string[]) => {
     if (!roles || !user) return true;
-    
+
     const roleMatch = roles.includes(user.role);
     if (!roleMatch) return false;
-    
+
     if (subroles && user.subrole) {
       return subroles.includes(user.subrole);
     }
-    
+
     return true;
   };
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? 'bg-white/20 text-gray-700 font-medium' : 'hover:bg-white/10 text-white/90';
+    isActive
+      ? "bg-white/20 text-gray-700 font-medium"
+      : "hover:bg-white/10 text-white/90";
 
-  const isCollapsed = state === 'collapsed';
+  const isCollapsed = state === "collapsed";
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
       <SidebarContent className="bg-gray-200 text-white">
         <div className="p-4 border-b border-white/20">
           <NavLink to="/" className="flex items-center gap-3">
-            <div className=" h-10flex items-center justify-center">
-            </div>
+            <div className=" h-10flex items-center justify-center"></div>
             {!isCollapsed && (
               <div>
-                  <img 
-                    src={logoPmf}
-                    alt="Logo pmf" 
-                    className="h-10 w-auto logoSide" 
-                  />
+                <img
+                  src={logoPmf}
+                  alt="Logo pmf"
+                  className="h-10 w-auto logoSide"
+                />
               </div>
             )}
           </NavLink>
@@ -157,31 +195,33 @@ export function AppSidebar() {
           </SidebarMenu>
         </div>
 
-        {menuItems.map((group) => (
-          hasPermission(group.role, group.subrole) && (
-            <SidebarGroup key={group.title}>
-              <SidebarGroupLabel className="text-gray-500 px-4">
-                {!isCollapsed && group.title}
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {group.items.map((item) => (
-                    hasPermission(item.role, item.subrole) && (
-                      <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild>
-                          <NavLink to={item.url} className={getNavCls}>
-                            <item.icon className="w-5 h-5" />
-                            {!isCollapsed && <span>{item.title}</span>}
-                          </NavLink>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    )
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          )
-        ))}
+        {menuItems.map(
+          (group) =>
+            hasPermission(group.role, group.subrole) && (
+              <SidebarGroup key={group.title}>
+                <SidebarGroupLabel className="text-gray-500 px-4">
+                  {!isCollapsed && group.title}
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {group.items.map(
+                      (item) =>
+                        hasPermission(item.role, item.subrole) && (
+                          <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton asChild>
+                              <NavLink to={item.url} className={getNavCls}>
+                                <item.icon className="w-5 h-5" />
+                                {!isCollapsed && <span>{item.title}</span>}
+                              </NavLink>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        )
+                    )}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            )
+        )}
 
         {/* <div className="mt-auto p-4 border-t border-white/20">
           <div className="flex items-center gap-3">

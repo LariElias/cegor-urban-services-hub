@@ -2,8 +2,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'cegor' | 'regional' | 'empresa' | 'adm';
-  subrole?: 'gestor' | 'operador' | 'fiscal' | 'supervisor'; // null para empresas
+  role: "cegor" | "regional" | "empresa" | "adm";
+  subrole?: "gestor" | "operador" | "fiscal" | "supervisor"; // null para empresas
   regional_id?: string;
   created_at: string;
   updated_at: string;
@@ -118,15 +118,25 @@ export interface Ocorrencia {
   description: string;
   service_type: string;
   public_equipment_name: string;
-  priority: 'baixa' | 'media' | 'alta';
-  status: 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida' | 'executada';
-  
+  priority: "baixa" | "media" | "alta";
+  status:
+    | "criada"
+    | "encaminhada"
+    | "autorizada"
+    | "cancelada"
+    | "devolvida"
+    | "em_analise"
+    | "agendada"
+    | "em_execucao"
+    | "concluida"
+    | "executada";
+
   // Campos atualizados RF010
   occurrence_date?: string;
   occurrence_type?: string;
   origin?: string;
   origin_number?: string;
-  
+
   // Localização
   address: string;
   latitude?: number;
@@ -134,25 +144,25 @@ export interface Ocorrencia {
   equipamento_id?: string;
   bairro?: string;
   equipamento?: EquipamentoPublico;
-  
+
   // Responsabilidades
   regional_id: string;
   regional?: Regional;
   regionalAn?: string;
   fiscal_id: string;
   fiscal?: Fiscal;
-  
+
   // Campos de aprovação CEGOR
   approved_by?: string;
   approved_at?: string;
   cancel_reason?: string;
-  
+
   // Campos de aprovação Regional (v1.3)
   approved_by_regional?: string;
   approved_at_regional?: string;
   forwarded_by?: string;
   forwarded_at?: string;
-  
+
   // Agendamento
   scheduled_date?: string;
   scheduled_time?: string;
@@ -161,7 +171,7 @@ export interface Ocorrencia {
   // Vistorias
   vistoria_previa_date?: string;
   vistoria_pos_date?: string;
-  
+
   // Execução
   empresa_id?: string;
   empresa?: EmpresaContratada;
@@ -172,7 +182,7 @@ export interface Ocorrencia {
   actual_hours?: number;
   execution_notes?: string;
   company_confirmed?: boolean; // Para empresa confirmar conclusão
-  
+
   created_at: string;
   updated_at: string;
 }
@@ -205,40 +215,68 @@ export interface TerritorioFormProps {
   onCancel?: () => void;
 }
 
-export type OccurrenceStatus = 'criada' | 'encaminhada' | 'autorizada' | 'cancelada' | 'devolvida' | 'em_analise' | 'agendada' | 'em_execucao' | 'concluida';
-export type Priority = 'baixa' | 'media' | 'alta';
-export type UserRole = 'cegor' | 'regional' | 'empresa' | 'adm';
-export type UserSubrole = 'gestor' | 'operador' | 'fiscal' | 'supervisor';
+export type OccurrenceStatus =
+  | "criada"
+  | "encaminhada"
+  | "autorizada"
+  | "cancelada"
+  | "devolvida"
+  | "em_analise"
+  | "agendada"
+  | "em_execucao"
+  | "concluida";
+export type Priority = "baixa" | "media" | "alta";
+export type UserRole = "cegor" | "regional" | "empresa" | "adm";
+export type UserSubrole = "gestor" | "operador" | "fiscal" | "supervisor";
 
 // Funções auxiliares para verificar permissões - com null checks
-export const isRegionalGestor = (user: User | null) => user?.role === 'regional' && user?.subrole === 'gestor';
-export const isRegionalOperador = (user: User | null) => user?.role === 'regional' && user?.subrole === 'operador';
-export const isRegionalFiscal = (user: User | null) => user?.role === 'regional' && user?.subrole === 'fiscal';
+export const isRegionalGestor = (user: User | null) =>
+  user?.role === "regional" && user?.subrole === "gestor";
+export const isRegionalOperador = (user: User | null) =>
+  user?.role === "regional" && user?.subrole === "operador";
+export const isRegionalFiscal = (user: User | null) =>
+  user?.role === "regional" && user?.subrole === "fiscal";
 
-export const isCegorGestor = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'gestor';
-export const isCegorOperador = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'operador';
-export const isCegorFiscal = (user: User | null) => user?.role === 'cegor' && user?.subrole === 'fiscal';
+export const isCegorGestor = (user: User | null) =>
+  user?.role === "cegor" && user?.subrole === "gestor";
+export const isCegorOperador = (user: User | null) =>
+  user?.role === "cegor" && user?.subrole === "operador";
+export const isCegorFiscal = (user: User | null) =>
+  user?.role === "cegor" && user?.subrole === "fiscal";
 
-export const isEmpresaSupervisor = (user: User | null) => user?.role === 'empresa' && user?.subrole === 'supervisor';
+export const isEmpresaSupervisor = (user: User | null) =>
+  user?.role === "empresa" && user?.subrole === "supervisor";
 
-export const isSuperAdm = (user: User | null) => user?.role === 'adm' ;
+export const isSuperAdm = (user: User | null) => user?.role === "adm";
 
 // Função para obter permissões de botões baseado no role e subrole
-export const getPermittedActions = (role: string, subrole?: string): string[] => {
+export const getPermittedActions = (
+  role: string,
+  subrole?: string
+): string[] => {
   const permissions: Record<string, Record<string, string[]>> = {
     cegor: {
-      gestor: ['visualizar', 'andamento_vistoria'],
-      fiscal: ['visualizar','acompanhamento' ],  // " permitir execução"
-      operador: ['agendar_ocorrencia', 'acompanhamento', 'visualizar']
+      gestor: ["visualizar", "andamento_vistoria"],
+      fiscal: ["visualizar", "acompanhamento"], // " permitir execução"
+      operador: ["agendar_ocorrencia", "acompanhamento", "visualizar"],
     },
     regional: {
-      gestor: ['visualizar', 'acompanhamento'],
-      fiscal: ['visualizar', 'realizar_vistoria', 'acompanhamento', 'encerrar_ocorrencia'], // "permitir execução" deve ser colocado no modal
-      operador: ['acompanhamento' , 'visualizar']
+      gestor: ["visualizar", "acompanhamento"],
+      fiscal: [
+        "visualizar",
+        "realizar_vistoria",
+        "acompanhamento",
+        "encerrar_ocorrencia",
+      ], // "permitir execução" deve ser colocado no modal
+      operador: ["acompanhamento", "visualizar"],
     },
     empresa: {
-      supervisor: ['visualizar', 'acompanhamento' ,  'realizar_vistoria_supervisor', ]
-    }  
+      supervisor: [
+        "visualizar",
+        "acompanhamento",
+        "realizar_vistoria_supervisor",
+      ],
+    },
   };
 
   if (!subrole || !permissions[role] || !permissions[role][subrole]) {

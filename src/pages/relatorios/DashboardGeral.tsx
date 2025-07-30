@@ -1,10 +1,15 @@
-
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Download, TrendingUp, AlertCircle, Clock, CheckCircle } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Download,
+  TrendingUp,
+  AlertCircle,
+  Clock,
+  CheckCircle,
+} from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import {
   PieChart,
   Pie,
@@ -17,7 +22,8 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-} from 'recharts';
+  LabelList,
+} from "recharts";
 
 export default function DashboardGeral() {
   const { user } = useAuth();
@@ -34,37 +40,37 @@ export default function DashboardGeral() {
   };
 
   const ocorrenciasPorRegional = [
-    { regional: 'Regional 1', total: 50 },
-    { regional: 'Regional 2', total: 30 },
-    { regional: 'Regional 3', total: 76 },
+    { regional: "Regional 1", total: 50 },
+    { regional: "Regional 2", total: 30 },
+    { regional: "Regional 3", total: 76 },
   ];
 
   const ocorrenciasPorBairro = [
-    { bairro: 'Centro', total: 34, concluidas: 28 },
-    { bairro: 'Savassi', total: 22, concluidas: 18 },
-    { bairro: 'Funcionários', total: 18, concluidas: 15 },
-    { bairro: 'Lourdes', total: 16, concluidas: 12 },
-    { bairro: 'Barro Preto', total: 14, concluidas: 11 },
+    { bairro: "Centro", total: 34, concluidas: 28 },
+    { bairro: "Savassi", total: 22, concluidas: 18 },
+    { bairro: "Funcionários", total: 18, concluidas: 15 },
+    { bairro: "Lourdes", total: 16, concluidas: 12 },
+    { bairro: "Barro Preto", total: 14, concluidas: 11 },
   ];
 
   const ocorrenciasPorPrioridade = [
-    { prioridade: 'Alta', total: 60 },
-    { prioridade: 'Média', total: 50 },
-    { prioridade: 'Baixa', total: 46 },
+    { prioridade: "Alta", total: 60 },
+    { prioridade: "Média", total: 50 },
+    { prioridade: "Baixa", total: 46 },
   ];
 
   const statusData = [
-    { name: 'Criadas', value: kpis.criadas },
-    { name: 'Agendadas', value: kpis.agendadas },
-    { name: 'Execução', value: kpis.em_execucao },
-    { name: 'Concluídas', value: kpis.concluidas },
+    { name: "Criadas", value: kpis.criadas },
+    { name: "Agendadas", value: kpis.agendadas },
+    { name: "Execução", value: kpis.em_execucao },
+    { name: "Concluídas", value: kpis.concluidas },
   ];
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
   const exportarCSV = () => {
     // Implementar exportação CSV
-    alert('Exportando relatório em CSV...');
+    alert("Exportando relatório em CSV...");
   };
 
   // // Verificar permissões
@@ -90,7 +96,9 @@ export default function DashboardGeral() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Ocorrências</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total de Ocorrências
+            </CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -129,7 +137,9 @@ export default function DashboardGeral() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">SLA de Atendimento</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              SLA de Atendimento
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -180,17 +190,38 @@ export default function DashboardGeral() {
               <BarChart
                 layout="vertical"
                 data={ocorrenciasPorRegional}
-                margin={{ top: 20, right: 30, left: 50, bottom: 20 }}
+                margin={{ top: 20, right: 30, left: 80, bottom: 20 }}
               >
-                <XAxis type="number" />
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  type="number"
+                  label={{
+                    value: "Total de Ocorrências",
+                    position: "insideBottom",
+                    offset: -5,
+                  }}
+                />
                 <YAxis
                   dataKey="regional"
                   type="category"
-                  width={100}
+                  width={120}
                   tick={{ fontSize: 12 }}
+                  label={{
+                    value: "Regional",
+                    angle: -90,
+                    position: "insideLeft",
+                  }}
                 />
-                <Tooltip />
-                <Bar dataKey="total" fill={COLORS[0]} name="Total" />
+                <Tooltip
+                  formatter={(value: number) => `${value} ocorrências`}
+                />
+                <Bar dataKey="total" fill={COLORS[0]} name="Total">
+                  <LabelList
+                    dataKey="total"
+                    position="right"
+                    formatter={(value: number) => `${value}`}
+                  />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -203,21 +234,48 @@ export default function DashboardGeral() {
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ocorrenciasPorBairro} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+              <BarChart
+                data={ocorrenciasPorBairro}
+                margin={{ top: 20, right: 20, bottom: 20, left: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="bairro" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="total" fill="#8884d8" name="Total" />
-                <Bar dataKey="concluidas" fill="#82ca9d" name="Concluídas" />
+                <XAxis
+                  dataKey="bairro"
+                  label={{
+                    value: "Bairro",
+                    position: "insideBottom",
+                    offset: -5,
+                  }}
+                />
+                <YAxis
+                  label={{
+                    value: "Quantidade",
+                    angle: -90,
+                    position: "insideLeft",
+                  }}
+                />
+                <Tooltip formatter={(value: number) => `${value}`} />
+                <Legend verticalAlign="top" />
+                <Bar dataKey="total" fill="#8884d8" name="Total">
+                  <LabelList
+                    dataKey="total"
+                    position="top"
+                    formatter={(value: number) => `${value}`}
+                  />
+                </Bar>
+                <Bar dataKey="concluidas" fill="#82ca9d" name="Concluídas">
+                  <LabelList
+                    dataKey="concluidas"
+                    position="top"
+                    formatter={(value: number) => `${value}`}
+                  />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-
         {/* Prioridade - Pizza */}
         <Card>
           <CardHeader>
@@ -233,13 +291,23 @@ export default function DashboardGeral() {
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  label
+                  label={({ name, value, percent }) =>
+                    `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                  }
                 >
                   {ocorrenciasPorPrioridade.map((entry, index) => (
-                    <Cell key={`cell-prio-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-prio-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  formatter={(value: number, name: string) => [
+                    `${value}`,
+                    name,
+                  ]}
+                />
                 <Legend verticalAlign="bottom" height={36} />
               </PieChart>
             </ResponsiveContainer>
@@ -262,13 +330,23 @@ export default function DashboardGeral() {
                   cy="50%"
                   innerRadius={40}
                   outerRadius={80}
-                  label
+                  label={({ name, value, percent }) =>
+                    `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                  }
                 >
                   {statusData.map((entry, index) => (
-                    <Cell key={`cell-status-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-status-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  formatter={(value: number, name: string) => [
+                    `${value}`,
+                    name,
+                  ]}
+                />
                 <Legend verticalAlign="bottom" height={36} />
               </PieChart>
             </ResponsiveContainer>
