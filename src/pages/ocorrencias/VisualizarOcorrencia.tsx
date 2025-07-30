@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/context/AuthContext';
@@ -166,6 +167,8 @@ export default function OcorrenciaFormPage() {
 
   const handleGoBack = () => navigate('/ocorrencias');
 
+  const [equipamentoPublico, setEquipamentoPublico] = useState("nao") 
+
   if (loading) return <div className="flex items-center justify-center h-screen"><p>Carregando...</p></div>;
   if (isViewMode && !viewData.id) return <div className="text-center p-8"><AlertCircle className="mx-auto h-12 w-12 text-gray-400" /><h3 className="mt-2 text-sm font-medium text-gray-900">Ocorrência não encontrada</h3><div className="mt-6"><Button onClick={handleGoBack}>Voltar</Button></div></div>;
 
@@ -294,14 +297,48 @@ export default function OcorrenciaFormPage() {
               <CardHeader><CardTitle className="flex items-center gap-2"><MapPin />Localização</CardTitle></CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="space-y-2 lg:col-span-3">
-                        <Label htmlFor="public_equipment_id">Equipamento Público *</Label>
-                        <select id="public_equipment_id" {...register('public_equipment_id')} disabled={isViewMode} onChange={(e) => handleEquipmentChange(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50">
-                          <option value="">Selecione o equipamento ou preencha o endereço</option>
-                          {publicEquipments.map(eq => <option key={eq.id} value={eq.id}>{eq.name}</option>)}
-                        </select>
-                        {errors.public_equipment_id && <p className="text-sm text-red-500">{errors.public_equipment_id.message}</p>}
+                    <div className="space-y-2">
+                      <Label htmlFor="equipamento-publico">Essa ocorrência é em um equip. público</Label>
+
+                        <RadioGroup 
+                          value={equipamentoPublico}
+                          onValueChange={setEquipamentoPublico}
+                          name="equipamento-publico"
+                          id="equipamento-publico" 
+                          className="flex space-x-4"
+                        >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="sim" id="radio-sim" />
+                          <Label htmlFor="radio-sim">Sim</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="nao" id="radio-nao" />
+                          <Label htmlFor="radio-nao">Não</Label>
+                        </div>
+                      </RadioGroup>
                     </div>
+                    {equipamentoPublico === "sim" && (
+                      <div className="space-y-2 lg:col-span-3">
+                        <Label htmlFor="public_equipment_id">Equipamento Público *</Label>
+                        <select
+                          id="public_equipment_id"
+                          {...register("public_equipment_id")}
+                          disabled={isViewMode}
+                          onChange={(e) => handleEquipmentChange(e.target.value)}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="">Selecione o equipamento ou preencha o endereço</option>
+                          {publicEquipments.map((eq) => (
+                            <option key={eq.id} value={eq.id}>
+                              {eq.name}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.public_equipment_id && (
+                          <p className="text-sm text-red-500">{errors.public_equipment_id.message}</p>
+                        )}
+                      </div>
+                    )}
                     <div className="space-y-2">
                         <Label htmlFor="territory_id">Território</Label>
                         <select id="territory_id" {...register('territory_id')} disabled={isViewMode || equipmentSelected} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50">
