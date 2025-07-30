@@ -54,14 +54,13 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
 
     case 'agendar_ocorrencia':
       return (
-        <Button 
-          {...buttonProps} 
-          onClick={() => onAction?.(ocorrenciaId)} 
-          title="Agendar Ocorrência"
-        >
-          <Calendar className="w-4 h-4" />
-        </Button>
+          <Button {...buttonProps} asChild title="Agendar Ocorrência">
+            <Link to={`/ocorrencias/${ocorrenciaId}/agendamento`}>
+              <Calendar className="w-4 h-4" />
+            </Link>
+          </Button>
       );
+
 
     case 'detalhar_execucao':
       return (
