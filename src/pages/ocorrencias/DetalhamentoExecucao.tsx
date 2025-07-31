@@ -76,13 +76,13 @@ export default function DetalhamentoExecucao() {
     navigate('/ocorrencias');
   };
 
-  if (user?.role !== 'regional') {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Acesso negado. Apenas usuários regionais podem detalhar execuções.</p>
-      </div>
-    );
-  }
+  // if (user?.role !== 'regional') {
+  //   return (
+  //     <div className="flex items-center justify-center h-64">
+  //       <p className="text-muted-foreground">Acesso negado. Apenas usuários regionais podem detalhar execuções.</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="space-y-6">

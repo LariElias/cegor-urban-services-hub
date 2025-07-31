@@ -103,6 +103,7 @@ export function LoginForm() {
               <p><strong>CEGOR:</strong> admin@cegor.gov.br</p>
               <p><strong>CEGOR FISCAL:</strong> fiscal@cegor.gov.br</p>
               <p><strong>CEGOR OPERADOR:</strong> operador@cegor.gov.br</p>
+              <p><strong>CEGOR GERENTE:</strong> gerente@cegor.gov.br</p>
               <p><strong>Regional Gestor:</strong> gestor@centrosul.gov.br</p>
               <p><strong>Regional Operador:</strong> operador@centrosul.gov.br</p>
               <p><strong>Regional Fiscal:</strong> fiscal@centrosul.gov.br</p>

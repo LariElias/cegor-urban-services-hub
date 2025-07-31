@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: "cegor" | "regional" | "empresa" | "adm";
-  subrole?: "gestor" | "operador" | "fiscal" | "supervisor"; // null para empresas
+  subrole?: "gestor" | "operador" | "fiscal" | "supervisor" | "gerente"; // null para empresas
   regional_id?: string;
   created_at: string;
   updated_at: string;
@@ -227,7 +227,7 @@ export type OccurrenceStatus =
   | "concluida";
 export type Priority = "baixa" | "media" | "alta";
 export type UserRole = "cegor" | "regional" | "empresa" | "adm";
-export type UserSubrole = "gestor" | "operador" | "fiscal" | "supervisor";
+export type UserSubrole = "gestor" | "operador" | "fiscal" | "supervisor" | "gerente";
 
 // Funções auxiliares para verificar permissões - com null checks
 export const isRegionalGestor = (user: User | null) =>
@@ -243,6 +243,9 @@ export const isCegorOperador = (user: User | null) =>
   user?.role === "cegor" && user?.subrole === "operador";
 export const isCegorFiscal = (user: User | null) =>
   user?.role === "cegor" && user?.subrole === "fiscal";
+export const isCegorGerente = (user: User | null) =>
+  user?.role === "cegor" && user?.subrole === "gerente";
+
 
 export const isEmpresaSupervisor = (user: User | null) =>
   user?.role === "empresa" && user?.subrole === "supervisor";
@@ -258,7 +261,8 @@ export const getPermittedActions = (
     cegor: {
       gestor: ["visualizar", "andamento_vistoria"],
       fiscal: ["visualizar", "acompanhamento"], // " permitir execução"
-      operador: ["agendar_ocorrencia", "acompanhamento", "visualizar"],
+      operador: ["agendar_ocorrencia", "acompanhamento", "visualizar", "detalhar_execucao"],
+      gerente: ["visualizar", "andamento_vistoria", "criar_equipes"],
     },
     regional: {
       gestor: ["visualizar", "acompanhamento"],

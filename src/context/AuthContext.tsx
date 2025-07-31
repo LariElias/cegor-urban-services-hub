@@ -136,6 +136,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
+      {
+        id: '12',
+        name: 'gerente CEGOR',
+        email: 'gerente@cegor.gov.br',
+        role: 'cegor',
+        subrole: 'gerente',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
 
     ];
 

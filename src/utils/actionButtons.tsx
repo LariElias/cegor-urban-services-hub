@@ -62,10 +62,19 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
       );
 
 
-    case 'detalhar_execucao':
+    // case 'detalhar_execucao':
+    //   return (
+    //     <Button {...buttonProps} asChild title="Detalhar Execução">
+    //       <Link to={`/ocorrencias/${ocorrenciaId}/detalhamento`}>
+    //         <Edit className="w-4 h-4" />
+    //       </Link>
+    //     </Button>
+    //   );
+
+    case 'criar_equipes':
       return (
-        <Button {...buttonProps} asChild title="Detalhar Execução">
-          <Link to={`/ocorrencias/${ocorrenciaId}/detalhamento`}>
+        <Button {...buttonProps} asChild title="Criar Equipes">
+          <Link to={`/ocorrencias/${ocorrenciaId}/criar_equipes`}>
             <Edit className="w-4 h-4" />
           </Link>
         </Button>
