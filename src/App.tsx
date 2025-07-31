@@ -17,6 +17,7 @@ import Fiscais from "./pages/cadastros/Fiscais";
 import Equipamentos from "./pages/cadastros/Equipamentos";
 import Empresas from "./pages/cadastros/Empresas";
 import Equipes from "./pages/cadastros/Equipes";
+import EquipesLista from "./pages/cadastros/EquipeLista";
 
 // Importar páginas de ocorrências
 import ListaOcorrencias from "./pages/ocorrencias/ListaOcorrencias";
@@ -58,7 +59,7 @@ const App = () => (
             <Route path="/cadastros/equipamentos" element={<Layout><Equipamentos /></Layout>} />
             <Route path="/cadastros/empresas" element={<Layout><Empresas /></Layout>} />
             <Route path="/cadastros/equipes" element={<Layout><Equipes /></Layout>} />
-
+            <Route path="/cadastros/equipes/lista" element={<Layout><EquipesLista /></Layout>} />
             {/* Rotas de ocorrências - todas usando Layout */}
             <Route path="/ocorrencias" element={<Layout><ListaOcorrencias /></Layout>} />
             <Route path="/ocorrencias/nova" element={<Layout><VisualizarOcorrencia /></Layout>} />

@@ -18,7 +18,8 @@ import {
   MapPin as MapPinIcon,
   CheckCircle,
   Briefcase,
-  StickyNote
+  StickyNote,
+  List
 } from "lucide-react";
 import {
   Sidebar,
@@ -56,6 +57,7 @@ const menuItems = [
       { title: "Equipamentos", url: "/cadastros/equipamentos", icon: Building, role: ["adm"] },
       { title: "Empresas", url: "/cadastros/empresas", icon: Building, role: ["adm"] },
       { title: "Equipes", url: "/cadastros/equipes", icon: Users, role: ["cegor"], subrole: ["gerente"] },
+      { title: "Lista de equipes", url: "/cadastros/equipes/lista", icon: List, role: ["cegor"], subrole: ["gerente"] }
     ],
   },
   // {
