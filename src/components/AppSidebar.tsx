@@ -46,14 +46,16 @@ const menuItems = [
   {
     title: "Cadastros",
     icon: Settings,
-    role: ["adm"],
+    role: ["adm", "cegor"],
+    subrole: ["gerente"],
     items: [
-      { title: "Regionais", url: "/cadastros/regionais", icon: Building },
-      { title: "Bairros", url: "/cadastros/bairros", icon: MapPin },
-      { title: "Territórios", url: "/cadastros/territorios", icon: MapPin },
-      { title: "Fiscais", url: "/cadastros/fiscais", icon: Shield },
-      { title: "Equipamentos", url: "/cadastros/equipamentos", icon: Building },
-      { title: "Empresas", url: "/cadastros/empresas", icon: Building },
+      { title: "Regionais", url: "/cadastros/regionais", icon: Building, role: ["adm"] },
+      { title: "Bairros", url: "/cadastros/bairros", icon: MapPin, role: ["adm"], },
+      { title: "Territórios", url: "/cadastros/territorios", icon: MapPin, role: ["adm"], },
+      { title: "Fiscais", url: "/cadastros/fiscais", icon: Shield, role: ["adm"] },
+      { title: "Equipamentos", url: "/cadastros/equipamentos", icon: Building, role: ["adm"] },
+      { title: "Empresas", url: "/cadastros/empresas", icon: Building, role: ["adm"] },
+      { title: "Equipe", url: "/cadastros/equipe", icon: Users, role: ["cegor"], subrole: ["gerente"] },
     ],
   },
   // {
@@ -71,16 +73,11 @@ const menuItems = [
     title: "Ocorrências",
     icon: AlertCircle,
     role: ["cegor", "regional", "empresa"],
-    subrole: ["gestor", "fiscal", "operador", "supervisor"],
+    subrole: ["gestor", "fiscal", "operador", "supervisor", "gerente"],
     items: [
       { title: "Lista", url: "/ocorrencias", icon: FileText },
-      {
-        title: "Registrar",
-        url: "/ocorrencias/nova",
-        icon: StickyNote,
-        role: ["regional"],
-        subrole: ["operador"],
-      },
+      { title: "Registrar", url: "/ocorrencias/nova", icon: StickyNote, role: ["regional"], subrole: ["operador"] },
+      { title: "Registrar", url: "/ocorrencias/nova", icon: StickyNote, role: ["cegor"], subrole: ["gerente"] },
       // { title: 'Aprovadas', url: '/ocorrencias/aprovadas', icon: CheckCircle, role: ['cegor'] },
       // { title: 'Demandas da Empresa', url: '/ocorrencias/demandas', icon: Briefcase, role: ['empresa'] },
       {
@@ -248,11 +245,11 @@ export function AppSidebar() {
               <LogOut className="w-5 h-5 text-white" />
             </button> */}
             {!isCollapsed && (
-                <img
-                  src={logoCitinova}
-                  alt="Logo pmf"
-                  className="h-6 w-auto logoSide"
-                />
+              <img
+                src={logoCitinova}
+                alt="Logo pmf"
+                className="h-6 w-auto logoSide"
+              />
             )}
           </div>
         </div>
