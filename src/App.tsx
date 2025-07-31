@@ -22,9 +22,11 @@ import Equipes from "./pages/cadastros/Equipes";
 import ListaOcorrencias from "./pages/ocorrencias/ListaOcorrencias";
 import NovaOcorrencia from "./pages/ocorrencias/NovaOcorrencia";
 import OcorrenciasAprovadas from "./pages/ocorrencias/OcorrenciasAprovadas";
-import DemandasEmpresa from "./pages/ocorrencias/DemandasEmpresa";
 import Agendamento from "./pages/ocorrencias/Agendamento";
+<<<<<<< HEAD
 // import DetalhamentoExecucao from "./pages/ocorrencias/DetalhamentoExecucao";
+=======
+>>>>>>> origin/main
 import VistoriaPrevia from "./pages/ocorrencias/VistoriaPrevia";
 import VistoriaFinal from "./pages/ocorrencias/VistoriaFinal";
 import AcompanhamentoDiario from "./pages/ocorrencias/AcompanhamentoDiario";
@@ -65,10 +67,12 @@ const App = () => (
             <Route path="/ocorrencias" element={<Layout><ListaOcorrencias /></Layout>} />
             <Route path="/ocorrencias/nova" element={<Layout><VisualizarOcorrencia /></Layout>} />
             <Route path="/ocorrencias/aprovadas" element={<Layout><OcorrenciasAprovadas /></Layout>} />
-            <Route path="/ocorrencias/demandas" element={<Layout><DemandasEmpresa /></Layout>} />
-            <Route path="/empresas/:id/demandas" element={<Layout><DemandasEmpresa /></Layout>} />
+           
             <Route path="/ocorrencias/:id/agendamento" element={<Layout><Agendamento /></Layout>} />
+<<<<<<< HEAD
             {/* <Route path="/ocorrencias/:id/detalhamento" element={<Layout><DetalhamentoExecucao /></Layout>} /> */}
+=======
+>>>>>>> origin/main
             <Route path="/ocorrencias/:id/vistoria" element={<Layout><VistoriaPrevia /></Layout>} />
             <Route path="/ocorrencias/:id/vistoria_final" element={<Layout><VistoriaFinal /></Layout>} />
             <Route path="/ocorrencias/:id/acompanhamento" element={<Layout><AcompanhamentoDiario /></Layout>} />
