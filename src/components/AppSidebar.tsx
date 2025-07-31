@@ -55,7 +55,7 @@ const menuItems = [
       { title: "Fiscais", url: "/cadastros/fiscais", icon: Shield, role: ["adm"] },
       { title: "Equipamentos", url: "/cadastros/equipamentos", icon: Building, role: ["adm"] },
       { title: "Empresas", url: "/cadastros/empresas", icon: Building, role: ["adm"] },
-      { title: "Equipe", url: "/cadastros/equipe", icon: Users, role: ["cegor"], subrole: ["gerente"] },
+      { title: "Equipes", url: "/cadastros/equipes", icon: Users, role: ["cegor"], subrole: ["gerente"] },
     ],
   },
   // {

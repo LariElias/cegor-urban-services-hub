@@ -61,8 +61,8 @@ export default function NovaOcorrencia() {
   } = useForm<OcorrenciaFormData>({
     resolver: zodResolver(ocorrenciaSchema),
     defaultValues: {
-        should_schedule: false,
-        priority: undefined,
+      should_schedule: false,
+      priority: undefined,
     }
   });
 
@@ -81,9 +81,9 @@ export default function NovaOcorrencia() {
   ];
 
   const fiscais = [
-      { id: '1', name: 'João Silva (Fiscal)'},
-      { id: '2', name: 'Maria Santos (Fiscal)'},
-      { id: '3', name: 'Carlos Pereira (Fiscal)'},
+    { id: '1', name: 'João Silva (Fiscal)' },
+    { id: '2', name: 'Maria Santos (Fiscal)' },
+    { id: '3', name: 'Carlos Pereira (Fiscal)' },
   ];
 
   const handleEquipmentChange = (equipmentId: string) => {
@@ -121,13 +121,13 @@ export default function NovaOcorrencia() {
     navigate('/ocorrencias');
   };
 
-  if (user?.role !== 'regional') {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Acesso negado.</p>
-      </div>
-    );
-  }
+  // if (user?.role !== 'regional') {
+  //   return (
+  //     <div className="flex items-center justify-center h-64">
+  //       <p className="text-muted-foreground">Acesso negado.</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="space-y-6">
@@ -194,7 +194,7 @@ export default function NovaOcorrencia() {
                   {territories.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="fiscal_id">Selecione o fiscal para vistoria *</Label>
                 <select id="fiscal_id" {...register('fiscal_id')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
@@ -282,7 +282,7 @@ export default function NovaOcorrencia() {
               <Label htmlFor="observations">Observações</Label>
               <Textarea id="observations" {...register('observations')} placeholder="Observações adicionais" rows={2} />
             </div>
-            
+
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Checkbox id="should_schedule" checked={shouldSchedule} onCheckedChange={(checked) => setValue('should_schedule', checked as boolean)} />
