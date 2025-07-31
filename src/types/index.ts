@@ -262,7 +262,7 @@ export const getPermittedActions = (
       gestor: ["visualizar", "andamento_vistoria"],
       fiscal: ["visualizar", "acompanhamento"], // " permitir execução"
       operador: ["agendar_ocorrencia", "acompanhamento", "visualizar", "detalhar_execucao"],
-      gerente: ["visualizar", "andamento_vistoria", "criar_equipes"],
+      gerente: ["visualizar", "andamento_vistoria"],
     },
     regional: {
       gestor: ["visualizar", "acompanhamento"],

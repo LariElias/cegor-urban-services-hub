@@ -37,16 +37,16 @@ const mockOcorrencias: OcorrenciaDetalhada[] = [
   // Novos registros:
   { id: '6', protocol: 'OCR-2024-006', description: 'Reposição de tampas de bueiro', service_type: 'Manutenção', priority: 'alta', status: 'concluida', address: 'Rua Delmiro Gouveia, 456', public_equipment_name: 'Canal do Benfica', regional_id: '4', fiscal_id: '4', origin: 'REG4', created_at: '2025-07-15T08:00:00Z', updated_at: '2025-07-25T17:00:00Z', vistoria_pos_date: '2025-07-26T08:30:00Z', bairro: 'Benfica', regional_name: regionalMap['4'] },
   { id: '7', protocol: 'OCR-2024-007', description: 'Capinação de área pública', service_type: 'Limpeza', priority: 'media', status: 'concluida', address: 'Rua Princesa Isabel, 999', public_equipment_name: 'Praça da Estação', regional_id: '2', fiscal_id: '2', origin: 'REG2', created_at: '2025-07-10T09:00:00Z', updated_at: '2025-07-26T15:00:00Z', vistoria_pos_date: '2025-07-27T09:00:00Z', bairro: 'Centro', regional_name: regionalMap['2'] },
-  { id: '15', protocol: 'OCR-2024-015', description: 'Conserto de iluminação pública', service_type: 'Iluminação', priority: 'alta', status: 'em execução', address: 'Av. Bezerra de Menezes, 101', public_equipment_name: 'Parque Rachel de Queiroz', regional_id: '3', fiscal_id: '3', origin: 'REG3', created_at: '2025-07-28T10:00:00Z', updated_at: '2025-07-28T14:00:00Z', bairro: 'Amadeu Furtado', regional_name: regionalMap['3'] },
+  { id: '15', protocol: 'OCR-2024-015', description: 'Conserto de iluminação pública', service_type: 'Iluminação', priority: 'alta', status: 'concluida', address: 'Av. Bezerra de Menezes, 101', public_equipment_name: 'Parque Rachel de Queiroz', regional_id: '3', fiscal_id: '3', origin: 'REG3', created_at: '2025-07-28T10:00:00Z', updated_at: '2025-07-28T14:00:00Z', bairro: 'Amadeu Furtado', regional_name: regionalMap['3'] },
   { id: '16', protocol: 'OCR-2024-016', description: 'Retirada de entulho', service_type: 'Limpeza', priority: 'baixa', status: 'criada', address: 'Rua Carapinima, 223', public_equipment_name: 'Praça da Gentilândia', regional_id: '4', fiscal_id: '4', origin: 'SIGEP', created_at: '2025-07-29T07:30:00Z', updated_at: '2025-07-29T07:30:00Z', bairro: 'Benfica', regional_name: regionalMap['4'] },
   { id: '17', protocol: 'OCR-2024-017', description: 'Reparo em calçamento', service_type: 'Reparo', priority: 'media', status: 'autorizada', address: 'Rua Padre Valdevino, 87', public_equipment_name: 'Escola Estadual', regional_id: '1', fiscal_id: '1', origin: 'REG1', approved_by_regional: '1', approved_at_regional: '2025-07-28T10:00:00Z', created_at: '2025-07-27T08:00:00Z', updated_at: '2025-07-28T10:00:00Z', bairro: 'Aldeota', regional_name: regionalMap['1'] },
 ];
 
 
 
-const getStatusColor = (status: string) => ({'criada': 'bg-gray-100 text-gray-800','encaminhada': 'bg-blue-100 text-blue-800','autorizada': 'bg-teal-100 text-teal-800','cancelada': 'bg-red-100 text-red-800','devolvida': 'bg-orange-100 text-orange-800','em_analise': 'bg-yellow-100 text-yellow-800','agendada': 'bg-purple-100 text-purple-800','em_execucao': 'bg-cyan-100 text-cyan-800','executada': 'bg-green-100 text-green-800', 'concluida': 'bg-emerald-100 text-emerald-800'}[status] || 'bg-gray-100 text-gray-800');
-const getStatusLabel = (status: string) => ({'criada': 'Criada','encaminhada': 'Encaminhada','autorizada': 'Autorizada','cancelada': 'Cancelada','devolvida': 'Devolvida','em_analise': 'Em Análise','agendada': 'Agendada','em_execucao': 'Em Execução','executada': 'Executada', 'concluida': 'Concluída'}[status] || status);
-const getPriorityColor = (priority: string) => ({'baixa': 'bg-green-100 text-green-800','media': 'bg-yellow-100 text-yellow-800','alta': 'bg-red-100 text-red-800'}[priority] || 'bg-gray-100 text-gray-800');
+const getStatusColor = (status: string) => ({ 'criada': 'bg-gray-100 text-gray-800', 'encaminhada': 'bg-blue-100 text-blue-800', 'autorizada': 'bg-teal-100 text-teal-800', 'cancelada': 'bg-red-100 text-red-800', 'devolvida': 'bg-orange-100 text-orange-800', 'em_analise': 'bg-yellow-100 text-yellow-800', 'agendada': 'bg-purple-100 text-purple-800', 'em_execucao': 'bg-cyan-100 text-cyan-800', 'executada': 'bg-green-100 text-green-800', 'concluida': 'bg-emerald-100 text-emerald-800' }[status] || 'bg-gray-100 text-gray-800');
+const getStatusLabel = (status: string) => ({ 'criada': 'Criada', 'encaminhada': 'Encaminhada', 'autorizada': 'Autorizada', 'cancelada': 'Cancelada', 'devolvida': 'Devolvida', 'em_analise': 'Em Análise', 'agendada': 'Agendada', 'em_execucao': 'Em Execução', 'executada': 'Executada', 'concluida': 'Concluída' }[status] || status);
+const getPriorityColor = (priority: string) => ({ 'baixa': 'bg-green-100 text-green-800', 'media': 'bg-yellow-100 text-yellow-800', 'alta': 'bg-red-100 text-red-800' }[priority] || 'bg-gray-100 text-gray-800');
 
 // --- Componentes de Visualização ---
 const ListView = ({ ocorrencias, renderActionButtons }: { ocorrencias: OcorrenciaDetalhada[], renderActionButtons: (o: Ocorrencia) => (JSX.Element | null)[] }) => (
@@ -74,7 +74,7 @@ const ListView = ({ ocorrencias, renderActionButtons }: { ocorrencias: Ocorrenci
             <TableCell>{ocorrencia.regional_name}</TableCell>
             <TableCell>{ocorrencia.bairro}</TableCell>
             <TableCell>
-              {ocorrencia.vistoria_pos_date 
+              {ocorrencia.vistoria_pos_date
                 ? new Date(ocorrencia.vistoria_pos_date).toLocaleDateString('pt-BR')
                 : '-'}
             </TableCell>
@@ -91,36 +91,36 @@ const ListView = ({ ocorrencias, renderActionButtons }: { ocorrencias: Ocorrenci
 );
 
 const GridView = ({ ocorrencias, renderActionButtons }: { ocorrencias: OcorrenciaDetalhada[], renderActionButtons: (o: Ocorrencia) => (JSX.Element | null)[] }) => (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {ocorrencias.map((ocorrencia) => (
-            <Card key={ocorrencia.id} className="flex flex-col">
-                <CardHeader>
-                    <div className="flex justify-between items-start">
-                        <CardTitle className="text-lg">{ocorrencia.protocol}</CardTitle>
-                        <Badge className={getPriorityColor(ocorrencia.priority)}>{ocorrencia.priority}</Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{ocorrencia.service_type}</p>
-                </CardHeader>
-                <CardContent className="flex-grow space-y-3">
-                    <p className="text-sm text-gray-600 line-clamp-2">{ocorrencia.description}</p>
-                    <p className="text-sm text-gray-600"><strong>Equipamento:</strong> {ocorrencia.public_equipment_name}</p>
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">Status:</span>
-                        <Badge className={getStatusColor(ocorrencia.status)}>{getStatusLabel(ocorrencia.status)}</Badge>
-                    </div>
-                </CardContent>
-                <div className="flex items-center justify-end gap-2 p-4 pt-2 border-t mt-auto">
-                    {renderActionButtons(ocorrencia)}
-                </div>
-            </Card>
-        ))}
-    </div>
+  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {ocorrencias.map((ocorrencia) => (
+      <Card key={ocorrencia.id} className="flex flex-col">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-lg">{ocorrencia.protocol}</CardTitle>
+            <Badge className={getPriorityColor(ocorrencia.priority)}>{ocorrencia.priority}</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">{ocorrencia.service_type}</p>
+        </CardHeader>
+        <CardContent className="flex-grow space-y-3">
+          <p className="text-sm text-gray-600 line-clamp-2">{ocorrencia.description}</p>
+          <p className="text-sm text-gray-600"><strong>Equipamento:</strong> {ocorrencia.public_equipment_name}</p>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Status:</span>
+            <Badge className={getStatusColor(ocorrencia.status)}>{getStatusLabel(ocorrencia.status)}</Badge>
+          </div>
+        </CardContent>
+        <div className="flex items-center justify-end gap-2 p-4 pt-2 border-t mt-auto">
+          {renderActionButtons(ocorrencia)}
+        </div>
+      </Card>
+    ))}
+  </div>
 );
 
 export default function ListaOcorrencias() {
   const { user } = useAuth();
   const [ocorrencias, setOcorrencias] = useState<OcorrenciaDetalhada[]>(mockOcorrencias);
-  
+
   // ATUALIZAÇÃO 2: Estado dos filtros agora inclui as datas
   const [filters, setFilters] = useState({
     searchTerm: '',
@@ -131,7 +131,7 @@ export default function ListaOcorrencias() {
     dataInicio: '',
     dataFim: '',
   });
-  
+
   const [viewMode, setViewMode] = useState('list');
   const [currentPage, setCurrentPage] = useState(1);
   const [viewingOcorrencia, setViewingOcorrencia] = useState<Ocorrencia | null>(null);
@@ -149,21 +149,21 @@ export default function ListaOcorrencias() {
       if (user?.role === 'empresa' && !['autorizada', 'agendada', 'em_execucao', 'executada'].includes(ocorrencia.status)) return false;
 
       const { searchTerm, status, priority, regional, bairro, dataInicio, dataFim } = filters;
-      
+
       const dataOcorrencia = new Date(ocorrencia.created_at);
       const dataInicioFiltro = dataInicio ? new Date(dataInicio + 'T00:00:00') : null;
       const dataFimFiltro = dataFim ? new Date(dataFim + 'T23:59:59') : null;
 
-      const matchesDate = 
+      const matchesDate =
         (!dataInicioFiltro || dataOcorrencia >= dataInicioFiltro) &&
         (!dataFimFiltro || dataOcorrencia <= dataFimFiltro);
-      
+
       const matchesSearch = searchTerm === '' || ocorrencia.protocol.toLowerCase().includes(searchTerm.toLowerCase()) || ocorrencia.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = status === '' || ocorrencia.status === status;
       const matchesPriority = priority === '' || ocorrencia.priority === priority;
       const matchesRegional = regional === '' || ocorrencia.regional_name === regional;
       const matchesBairro = bairro === '' || ocorrencia.bairro === bairro;
-      
+
       return matchesSearch && matchesStatus && matchesPriority && matchesRegional && matchesBairro && matchesDate;
     });
   }, [ocorrencias, filters, user]);
@@ -179,7 +179,7 @@ export default function ListaOcorrencias() {
   const handleAction = (action: string, ocorrenciaId: string) => {
     const ocorrencia = ocorrencias.find(o => o.id === ocorrenciaId);
     if (!ocorrencia) return;
-    
+
     if (action === 'visualizar') {
       setViewingOcorrencia(ocorrencia);
     } else {
@@ -190,7 +190,7 @@ export default function ListaOcorrencias() {
   const renderActionButtons = (ocorrencia: Ocorrencia) => {
     if (!user) return [];
     const permittedActions = getPermittedActions(user.role, user.subrole);
-    return permittedActions.map(action => 
+    return permittedActions.map(action =>
       getActionButton(action, ocorrencia.id, (id) => handleAction(action, id))
     ).filter(Boolean);
   };
@@ -215,10 +215,10 @@ export default function ListaOcorrencias() {
           <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setViewMode('list')}><List className="w-4 h-4" /></Button>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         {filteredOcorrencias.length > 0 ? (
-          viewMode === 'list' 
+          viewMode === 'list'
             ? <ListView ocorrencias={currentItems} renderActionButtons={renderActionButtons} />
             : <GridView ocorrencias={currentItems} renderActionButtons={renderActionButtons} />
         ) : (

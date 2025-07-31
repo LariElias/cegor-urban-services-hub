@@ -85,7 +85,7 @@ const menuItems = [
         url: "/relatorios/mapa",
         icon: MapPin,
         role: ["cegor", "regional"],
-        subrole: ["gestor"],
+        subrole: ["gestor", "gerente"],
       },
     ],
   },

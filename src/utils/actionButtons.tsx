@@ -42,9 +42,9 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
 
     case 'permitir_execucao':
       return (
-        <Button 
-          {...buttonProps} 
-          onClick={() => onAction?.(ocorrenciaId)} 
+        <Button
+          {...buttonProps}
+          onClick={() => onAction?.(ocorrenciaId)}
           title="Permitir Execução"
           className="text-green-600 hover:text-green-700"
         >
@@ -54,13 +54,12 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
 
     case 'agendar_ocorrencia':
       return (
-          <Button {...buttonProps} asChild title="Agendar Ocorrência">
-            <Link to={`/ocorrencias/${ocorrenciaId}/agendamento`}>
-              <Calendar className="w-4 h-4" />
-            </Link>
-          </Button>
+        <Button {...buttonProps} asChild title="Agendar Ocorrência">
+          <Link to={`/ocorrencias/${ocorrenciaId}/agendamento`}>
+            <Calendar className="w-4 h-4" />
+          </Link>
+        </Button>
       );
-
 
     // case 'detalhar_execucao':
     //   return (
@@ -70,15 +69,6 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
     //       </Link>
     //     </Button>
     //   );
-
-    case 'criar_equipes':
-      return (
-        <Button {...buttonProps} asChild title="Criar Equipes">
-          <Link to={`/ocorrencias/${ocorrenciaId}/criar_equipes`}>
-            <Edit className="w-4 h-4" />
-          </Link>
-        </Button>
-      );
 
     case 'acompanhamento':
       return (
@@ -91,9 +81,9 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
 
     case 'encaminhar':
       return (
-        <Button 
-          {...buttonProps} 
-          onClick={() => onAction?.(ocorrenciaId)} 
+        <Button
+          {...buttonProps}
+          onClick={() => onAction?.(ocorrenciaId)}
           title="Encaminhar"
           className="text-blue-600 hover:text-blue-700"
         >
@@ -114,7 +104,7 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
       return (
         <Button {...buttonProps} asChild title="Realizar Vistoria">
           <Link to={`/ocorrencias/${ocorrenciaId}/vistoria_supervisor`}>
-            <Camera  className="w-4 h-4" />
+            <Camera className="w-4 h-4" />
           </Link>
         </Button>
       );
