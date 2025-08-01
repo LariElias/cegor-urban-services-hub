@@ -208,7 +208,7 @@ export default function OcorrenciaFormPage() {
               ) : (
                 <Button type="submit" form="ocorrencia-form">
                   <CheckCircle className="w-4 h-4 mr-2" />
-                  {shouldSchedule || occurrenceType === 'Especial' ? 'Salvar e Agendar' : 'Salvar'}
+                  Salvar
                 </Button>
               )}
             </div>
@@ -231,6 +231,22 @@ export default function OcorrenciaFormPage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="space-y-2">
+                    <Label htmlFor="origin">Origem *</Label>
+                    <select id="origin" {...register('origin')} disabled={isViewMode} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50">
+                      <option value="">Selecione a origem</option>
+                      {/* <option value="SPU">SPU</option>
+                      <option value="SIGEP">SIGEP</option> */}
+                      <option value="Presencial">Presencial</option>
+                      <option value="Presencial">Ofício</option>
+                    </select>
+                    {errors.origin && <p className="text-sm text-red-500">{errors.origin.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="origin_number">Número de Origem *</Label>
+                    <Input id="origin_number" {...register('origin_number')} disabled={isViewMode} placeholder="Protocolo do sistema de origem" />
+                    {errors.origin_number && <p className="text-sm text-red-500">{errors.origin_number.message}</p>}
+                   </div>
+                  <div className="space-y-2">
                     <Label htmlFor="occurrence_date">Data da Ocorrência *</Label>
                     <Input id="occurrence_date" type="date" {...register('occurrence_date')} disabled={isViewMode} />
                     {errors.occurrence_date && <p className="text-sm text-red-500">{errors.occurrence_date.message}</p>}
@@ -239,36 +255,17 @@ export default function OcorrenciaFormPage() {
                     <Label htmlFor="occurrence_type">Tipo de Ocorrência *</Label>
                     <select id="occurrence_type" {...register('occurrence_type')} disabled={isViewMode} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50">
                       <option value="">Selecione o tipo</option>
-                      <option value="Varrição">Varrição</option>
-                      <option value="Capina/Poda">Capina/Poda</option>
+                      <option value="limp_canal">Limpeza de canal</option>
+                      <option value="limp_boca">Limpeza de Boca de Lobo</option>
+                      <option value="capina">Capina</option>
+                      <option value="varricao">Varrição</option>
+                      <option value="retirada">Retirada de animais mortos </option>
                       <option value="Especial">Especial</option>
                     </select>
                     {errors.occurrence_type && <p className="text-sm text-red-500">{errors.occurrence_type.message}</p>}
                   </div>
                   
-                  {occurrenceType === 'Especial' && !isViewMode && (
-                    <div className="space-y-2 animate-in fade-in-50">
-                      <Label htmlFor="special_schedule_date">Agendamento da Ocorrência *</Label>
-                      <Input id="special_schedule_date" type="date" {...register('special_schedule_date')} disabled={isViewMode} />
-                      {errors.special_schedule_date && <p className="text-sm text-red-500">{errors.special_schedule_date.message}</p>}
-                    </div>
-                  )}
 
-                   <div className="space-y-2">
-                    <Label htmlFor="origin">Origem *</Label>
-                    <select id="origin" {...register('origin')} disabled={isViewMode} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50">
-                      <option value="">Selecione a origem</option>
-                      <option value="SPU">SPU</option>
-                      <option value="SIGEP">SIGEP</option>
-                      <option value="Presencial">Presencial</option>
-                    </select>
-                    {errors.origin && <p className="text-sm text-red-500">{errors.origin.message}</p>}
-                  </div>
-                   <div className="space-y-2">
-                    <Label htmlFor="origin_number">Número de Origem *</Label>
-                    <Input id="origin_number" {...register('origin_number')} disabled={isViewMode} placeholder="Protocolo do sistema de origem" />
-                    {errors.origin_number && <p className="text-sm text-red-500">{errors.origin_number.message}</p>}
-                  </div>
                    <div className="space-y-2">
                     <Label htmlFor="priority">Prioridade *</Label>
                     <select id="priority" {...register('priority')} disabled={isViewMode} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50">
