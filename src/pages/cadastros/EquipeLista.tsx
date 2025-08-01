@@ -47,12 +47,12 @@ interface TeamSnapshot {
 
 
 const teamSizeMap: Record<string, number> = {
-  "Equipe Manutenção Sul": 6,
-  "Equipe Saneamento Leste": 8,
-  "Equipe Limpeza Urbana A": 5,
-  "Equipe Limpeza Urbana B": 4,
-  "Equipe Obras Norte": 7,
-  "Equipe Iluminação Noturna": 3,
+  "Equipe Manutenção Sul": 10,
+  "Equipe Saneamento Leste": 12,
+  "Equipe Limpeza Urbana A": 10,
+  "Equipe Limpeza Urbana B": 20,
+  "Equipe Obras Norte": 10,
+  "Equipe Iluminação Noturna": 15,
 };
 
 const useTeamSnapshots = () =>
@@ -91,7 +91,7 @@ const ListView = ({ teams }: { teams: TeamSnapshot[] }) => {
           <TableRow>
             <TableHead>Equipe</TableHead>
             <TableHead>Atividade</TableHead>
-            <TableHead># Pessoas</TableHead>
+            <TableHead>#Pessoas</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
