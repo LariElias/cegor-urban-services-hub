@@ -28,7 +28,6 @@ import {
   Legend,
 } from "recharts";
 
-/* ─── Tipos --------------------------------------------------------------- */
 export interface CommonData {
   name: string;
   value: number;
@@ -43,7 +42,7 @@ interface ChartsProps {
   colors?: string[];
 }
 
-/* ─── Paleta padrão ------------------------------------------------------- */
+
 const DEFAULT_COLORS = [
   "#ee8023",
   "#ffd55a",
@@ -54,7 +53,7 @@ const DEFAULT_COLORS = [
   "#8ec3ff",
 ];
 
-/* ─── Mini wrapper: cabeçalho + botão expandir --------------------------- */
+
 function ChartCard({
   title,
   onExpand,
@@ -82,7 +81,7 @@ function ChartCard({
       </CardHeader>
       <CardContent
         className={scroll ? "h-[340px] overflow-y-auto" : ""}
-        onClick={onExpand}                // ⇦ clicar no gráfico também expande
+        onClick={onExpand}
         role="button"
         tabIndex={0}
       >
@@ -92,7 +91,7 @@ function ChartCard({
   );
 }
 
-/* ─── Componente principal ------------------------------------------------ */
+
 const PowerBICharts: React.FC<ChartsProps> = ({
   statusData,
   bairroData,
@@ -121,7 +120,7 @@ const PowerBICharts: React.FC<ChartsProps> = ({
     []
   );
 
-  /* Render para “normal” (cards) ---------------------------------------- */
+
   const renderChart = (key: Key) => {
     switch (key) {
       case "status":
@@ -165,7 +164,6 @@ const PowerBICharts: React.FC<ChartsProps> = ({
                   <Cell key={i} fill={colors[i % colors.length]} />
                 ))}
               </Pie>
-              {/* <Legend layout="vertical" align="right" verticalAlign="middle" /> */}
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
@@ -197,7 +195,7 @@ const PowerBICharts: React.FC<ChartsProps> = ({
     }
   };
 
-  /* Render para modal expandido (telas maiores) -------------------------- */
+
   const renderExpanded = (key: Key) => {
     switch (key) {
       case "status":
@@ -311,7 +309,7 @@ const PowerBICharts: React.FC<ChartsProps> = ({
         </div>
       </div>
 
-      {/* Modal de expansão */}
+
       <Dialog open={expanded !== null} onOpenChange={() => setExpanded(null)}>
         <DialogContent className="max-w-[1100px] w-[95vw]">
           {expanded && (

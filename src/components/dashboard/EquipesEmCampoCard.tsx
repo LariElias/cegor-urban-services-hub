@@ -34,7 +34,6 @@ export function buildEquipesOcupadas<T extends Record<string, any>>(ocorrencias:
     }));
 }
 
-/* Badges locais (independe do seu Dashboard) */
 const getPriorityBadge = (p?: string) => {
   const map: Record<string, string> = {
     baixa: "bg-green-100 text-green-800",
@@ -49,12 +48,12 @@ const StatusAlocada = () => <Badge className="bg-blue-100 text-blue-800">Alocada
 
 interface Props {
   items: EquipeOcupadaItem[];
-  onGoToOcorrencia?: (ocorrenciaId: string) => void; // ação do botão "Ocorrência"
+  onGoToOcorrencia?: (ocorrenciaId: string) => void; 
   title?: string;
   description?: string;
 }
 
-/* Card reutilizável */
+
 const EquipesEmCampoCard: React.FC<Props> = ({
   items,
   onGoToOcorrencia,
