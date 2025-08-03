@@ -70,9 +70,9 @@ export function LoginForm() {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Senha</Label>
-                <a href="#" className="ml-auto inline-block text-sm underline">
+                {/* <a href="#" className="ml-auto inline-block text-sm underline">
                   Esqueceu sua senha?
-                </a>
+                </a> */}
               </div>
               <div className="relative">
                 <Input
