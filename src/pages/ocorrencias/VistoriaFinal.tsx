@@ -3,92 +3,79 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-// --- ALTERADO: Removidos ícones que não são mais necessários (Sun, Moon, Sunset, AlertTriangle) ---
-import { ArrowLeft, Camera } from 'lucide-react'; 
+import { ArrowLeft, Camera, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-// --- REMOVIDO: Importações do Accordion não são mais necessárias ---
-// import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/context/AuthContext';
 
+// --- Schema de Validação ---
 const vistoriaFinalSchema = z.object({
   real_start_date: z.string().min(1, 'Data de início é obrigatória'),
   real_end_date: z.string().min(1, 'Data de fim é obrigatória'),
-  // --- REMOVIDO: O campo 'real_start_shift' foi removido conforme solicitado ---
-  total_time_spent: z.string().min(1, 'Tempo total é obrigatório'),
-  inspection_responsible: z.string(),
   inspection_date: z.string().min(1, 'Data da vistoria é obrigatória'),
+  hasMetragemDifference: z.boolean().optional(),
+  metragemFinal: z.string().optional(),
+  hasCanteiroCentral: z.boolean().optional(), // --- 1. ADICIONADO: Declarar o campo no schema
   reproval_reason: z.string().optional(),
   final_photo: z.instanceof(FileList).optional(),
+}).superRefine((data, ctx) => {
+  if (data.hasMetragemDifference && !data.metragemFinal?.trim()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'A metragem final é obrigatória quando há diferença.',
+      path: ['metragemFinal'],
+    });
+  }
 });
 
 type VistoriaFinalFormData = z.infer<typeof vistoriaFinalSchema>;
 
-interface AbsenceEntry {
+// --- Interfaces e Dados Mockados ---
+interface AbsenceData {
   date: string;
-  // A estrutura de turnos ainda pode existir nos dados, mas não será usada na renderização
-  shifts: {
-    [key: string]: { name: string }[] | undefined;
-  };
+  quantity: number;
 }
 
-const mockAbsences: AbsenceEntry[] = [
-  {
-    date: '2024-10-13',
-    shifts: {
-      diurno: [{ name: 'Antonio Joao' }, { name: 'Maria Ana' }],
-      noturno: [{ name: 'Carlos Joao' }],
-    },
-  },
-  {
-    date: '2024-10-09',
-    shifts: {
-      tarde: [{ name: 'Antonio Joao' }],
-    },
-  },
-  {
-    date: '2025-08-01', // Adicionado para exemplo com data atual
-    shifts: {
-      diurno: [{ name: 'Joana Silva' }],
-    },
-  },
+const occurrenceData = {
+    protocolo: '2024-08-A45',
+    tipoServico: 'Especial',
+    bairro: 'Centro',
+    prioridade: 'Alta',
+    atividades: [
+        { descricao: 'Serviço Capinação em pavimentação poliédrica' },
+        { descricao: 'Serviço Capinação sem pavimentação (terra natural)' },
+    ],
+};
+
+const mockAbsences: AbsenceData[] = [
+  { date: '2025-08-01', quantity: 3 },
+  { date: '2025-07-31', quantity: 1 },
 ];
 
-
-// --- ALTERADO: Componente foi simplificado para uma lista, removendo o Accordion ---
-const ListaFaltas = ({ data }: { data: AbsenceEntry[] }) => {
-  // A função para calcular o total de faltas por dia continua útil
-  const calculateTotalAbsences = (entry: AbsenceEntry) => {
-    return Object.values(entry.shifts).reduce((total, shift) => {
-      return total + (shift?.length || 0);
-    }, 0);
-  };
-
+// --- Componente ListaFaltas ---
+const ListaFaltas = ({ data }: { data: AbsenceData[] }) => {
+  if (!data || data.length === 0) {
+    return null;
+  }
+  
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Falta de funcionários</h3>
+    <div className="space-y-3">
+      <h3 className="text-base font-semibold text-slate-800">Resumo de Faltas de Funcionários</h3>
       <div className="space-y-2">
-        {data.map((entry, index) => {
-          const totalFaltas = calculateTotalAbsences(entry);
-          if (totalFaltas === 0) return null;
-
-          return (
-            // Cada item agora é uma div simples, sem funcionalidade de Accordion
-            <div key={index} className="border rounded-md px-4 py-3 flex justify-between items-center">
-              <span className="font-semibold">
-                {/* A formatação da data é mantida */}
-                {new Date(entry.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
-              </span>
-              {/* O Badge com o total de faltas é mantido */}
-              <Badge variant="destructive">{totalFaltas} Falta{totalFaltas > 1 ? 's' : ''}</Badge>
-            </div>
-          );
-        })}
+        {data.map((item, index) => (
+          <div key={index} className="border rounded-md px-4 py-3 flex justify-between items-center bg-slate-50">
+            <span className="font-medium text-sm text-slate-700">
+              {new Date(item.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+            </span>
+            <Badge variant="destructive">{item.quantity} Falta{item.quantity > 1 ? 's' : ''}</Badge>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -116,12 +103,16 @@ export default function VistoriaFinal() {
   } = useForm<VistoriaFinalFormData>({
     resolver: zodResolver(vistoriaFinalSchema),
     defaultValues: {
-      inspection_responsible: user?.name || 'Demostenes Araujo Ferreira',
+      hasMetragemDifference: false,
+      metragemFinal: '',
+      hasCanteiroCentral: false, // --- 2. ADICIONADO: Definir valor padrão
     }
   });
 
   const reprovalReason = watch('reproval_reason');
   const photoFile = watch('final_photo');
+  const hasMetragemDifference = watch('hasMetragemDifference');
+  const hasCanteiroCentral = watch('hasCanteiroCentral'); // --- 3. ADICIONADO: Monitorar o valor
 
   useEffect(() => {
     if (photoFile && photoFile.length > 0) {
@@ -135,10 +126,10 @@ export default function VistoriaFinal() {
   }, [photoFile]);
 
   useEffect(() => {
-    if (user?.name) {
-      setValue('inspection_responsible', user.name);
+    if (!hasMetragemDifference) {
+      setValue('metragemFinal', '', { shouldValidate: true });
     }
-  }, [user, setValue]);
+  }, [hasMetragemDifference, setValue]);
 
   const handleOpenApproveModal = async () => {
     const isValid = await trigger();
@@ -176,124 +167,188 @@ export default function VistoriaFinal() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={() => navigate('/ocorrencias')}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Voltar
-        </Button>
-        <h1 className="text-3xl font-bold">Vistoria Final</h1>
-      </div>
+    <div className="bg-slate-50 min-h-screen p-4 sm:p-6 lg:p-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={() => navigate('/ocorrencias')}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar
+          </Button>
+          <h1 className="text-2xl sm:text-3xl font-bold">Vistoria Final</h1>
+        </div>
 
-      <Card>
-        <CardHeader className="rounded-t-lg">
-          <CardTitle>Ocorrência OCR-2024-015 </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6 pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="real_start_date">Data real do início</Label>
-                <Input id="real_start_date" type="date" {...register('real_start_date')} />
-                {errors.real_start_date && <p className="text-sm text-red-500">{errors.real_start_date.message}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="real_end_date">Data real do Fim</Label>
-                <Input id="real_end_date" type="date" {...register('real_end_date')} />
-                {errors.real_end_date && <p className="text-sm text-red-500">{errors.real_end_date.message}</p>}
-              </div>
-              {/* --- REMOVIDO: O campo de seleção de turno foi removido do formulário --- */}
-              <div className="space-y-2">
-                <Label htmlFor="total_time_spent">Tempo Real total gasto (em horas)</Label>
-                <Input id="total_time_spent" type="number" {...register('total_time_spent')} placeholder="Ex: 8" />
-                {errors.total_time_spent && <p className="text-sm text-red-500">{errors.total_time_spent.message}</p>}
-              </div>
-            </div>
-
-            <hr className="my-4" />
-            
-            {/* --- ALTERADO: Chamando o novo componente de lista de faltas --- */}
-            <ListaFaltas data={mockAbsences} />
-
-            <hr className="my-4" />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                    <Label htmlFor="total_hours_calculated">Cálculo do total de horas da ocorrência</Label>
-                    <Input id="total_hours_calculated" value="12 horas" disabled className="bg-gray-100" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="inspection_responsible">Responsável Vistoria (ZGL vistoria):</Label>
-                    <Input id="inspection_responsible" {...register('inspection_responsible')} disabled className="bg-gray-100" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="inspection_date">Data da vistoria:</Label>
-                    <Input id="inspection_date" type="date" {...register('inspection_date')} />
-                    {errors.inspection_date && <p className="text-sm text-red-500">{errors.inspection_date.message}</p>}
-                </div>
-            </div>
-
-            <hr className="my-4" />
-            <div className="space-y-4">
-              <Label htmlFor="final_photo" className="text-lg font-semibold">Foto Final da Ocorrência</Label>
-              <div className="flex items-center gap-4">
-                <Label htmlFor="final_photo" className="flex items-center gap-2 cursor-pointer rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
-                  <Camera className="w-4 h-4" />
-                  Selecionar Foto
-                </Label>
-                <Input 
-                  id="final_photo" 
-                  type="file" 
-                  accept="image/*" 
-                  className="hidden" 
-                  {...register('final_photo')} 
-                />
-                {photoPreview && (
-                  <div className="w-32 h-32 border rounded-md overflow-hidden">
-                    <img src={photoPreview} alt="Pré-visualização" className="w-full h-full object-cover" />
+        <Card>
+          <CardHeader>
+            <CardTitle>Ocorrência OCR-2024-015</CardTitle>
+          </CardHeader>
+          <CardContent>
+              {/* Seção de Detalhes da Ocorrência */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-6">
+                  <div className="flex flex-col">
+                      <span className="font-semibold text-slate-500">PROTOCOLO</span>
+                      <span className="text-slate-800 font-medium">{occurrenceData.protocolo}</span>
                   </div>
-                )}
+                  <div className="flex flex-col">
+                      <span className="font-semibold text-slate-500">TIPO DE SERVIÇO</span>
+                      <span className="text-slate-800 font-medium">{occurrenceData.tipoServico}</span>
+                  </div>
+                  <div className="flex flex-col">
+                      <span className="font-semibold text-slate-500">BAIRRO</span>
+                      <span className="text-slate-800 font-medium">{occurrenceData.bairro}</span>
+                  </div>
+                  <div className="flex flex-col">
+                      <span className="font-semibold text-slate-500">PRIORIDADE</span>
+                      <span className="flex items-center gap-1">
+                          <Star className="w-4 h-4 text-amber-500 fill-current" />
+                          <span className="text-slate-800 font-medium">{occurrenceData.prioridade}</span>
+                      </span>
+                  </div>
+                   <div className="col-span-2 md:col-span-4 flex flex-col pt-2">
+                      <span className="font-semibold text-slate-500">ATIVIDADES</span>
+                      <span className="text-slate-800 font-medium">
+                        {occurrenceData.atividades.map(item => item.descricao).join(', ')}
+                      </span>
+                   </div>
               </div>
-              {errors.final_photo && <p className="text-sm text-red-500">{errors.final_photo.message}</p>}
-            </div>
+              
+              <hr className="mb-8" />
 
-            <div className="flex justify-start space-x-2 pt-4">
-              <Button type="button" onClick={handleOpenApproveModal} className="bg-green-600 hover:bg-green-700">
-                Aprovar Vistoria
-              </Button>
-              <Button type="button" variant="destructive" onClick={handleOpenReproveModal}>
-                Reprovar Vistoria
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Aprovar Vistoria</DialogTitle></DialogHeader>
-          <div className="py-4"><p>Você confirma a vistoria e a ocorrência aprovada?</p></div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsApproveOpen(false)}>Voltar</Button>
-            <Button onClick={handleConfirmApproval} className="bg-green-600 hover:bg-green-700">Confirmar</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={isReproveOpen} onOpenChange={setIsReproveOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Reprovar Vistoria</DialogTitle></DialogHeader>
-          <div className="py-4 space-y-4">
-            <Label htmlFor="reproval_reason">Descreva um resumo do por que da sua desaprovação</Label>
-            <Textarea id="reproval_reason" {...register('reproval_reason')} placeholder="Descreva o motivo aqui..."/>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsReproveOpen(false)}>Voltar</Button>
-            <Button variant="destructive" onClick={handleConfirmReproval}>Reprovar</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+            {/* Início do Formulário */}
+            <form onSubmit={handleSubmit(handleConfirmApproval)} className="space-y-8">
+              
+              {/* Seção de Datas */}
+              <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                          <Label htmlFor="inspection_date">Data da vistoria *</Label>
+                          <Input id="inspection_date" type="date" {...register('inspection_date')} />
+                          {errors.inspection_date && <p className="text-sm text-red-500">{errors.inspection_date.message}</p>}
+                      </div>
+                      <div className="space-y-2">
+                          <Label htmlFor="real_start_date">Data real do início *</Label>
+                          <Input id="real_start_date" type="date" {...register('real_start_date')} />
+                          {errors.real_start_date && <p className="text-sm text-red-500">{errors.real_start_date.message}</p>}
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                          <Label htmlFor="real_end_date">Data real do Fim *</Label>
+                          <Input id="real_end_date" type="date" {...register('real_end_date')} />
+                          {errors.real_end_date && <p className="text-sm text-red-500">{errors.real_end_date.message}</p>}
+                      </div>
+                  </div>
+              </div>
 
+              <hr />
+
+              {/* Seção de Faltas */}
+              <ListaFaltas data={mockAbsences} />
+
+              <hr />
+
+              {/* Seção de Medição e Canteiro */}
+              <div className="space-y-4">
+                  <h3 className="text-base font-semibold text-slate-800">Detalhes Adicionais</h3>
+                  <div className="flex items-center space-x-3 pt-4">
+                      <Checkbox
+                          id="hasCanteiroCentral"
+                          checked={hasCanteiroCentral}
+                          onCheckedChange={(checked) => setValue('hasCanteiroCentral', checked as boolean)}
+                      />
+                      <Label htmlFor="hasCanteiroCentral" className="cursor-pointer font-medium">
+                          Existe canteiro central?
+                      </Label>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                      <Checkbox
+                          id="hasMetragemDifference"
+                          checked={hasMetragemDifference}
+                          onCheckedChange={(checked) => setValue('hasMetragemDifference', checked as boolean, { shouldValidate: true })}
+                      />
+                      <Label htmlFor="hasMetragemDifference" className="font-medium cursor-pointer">
+                          Existe diferença entre a metragem final e a metragem inicial?
+                      </Label>
+                  </div>
+
+                  {hasMetragemDifference && (
+                      <div className="pl-8 animate-in fade-in-50 duration-300">
+                          <Label htmlFor="metragemFinal">Metragem Final *</Label>
+                          <Input
+                              id="metragemFinal"
+                              {...register('metragemFinal')}
+                              placeholder="Ex: 1500m"
+                              className="mt-2"
+                          />
+                          {errors.metragemFinal && <p className="text-sm text-red-500 mt-1">{errors.metragemFinal.message}</p>}
+                      </div>
+                  )}
+
+
+              </div>
+
+              <hr />
+
+              {/* Seção de Foto Final */}
+              <div className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800">Foto Final da Ocorrência</h3>
+                <div className="flex items-center gap-4">
+                  <Label htmlFor="final_photo" className="flex items-center gap-2 cursor-pointer rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
+                    <Camera className="w-4 h-4" />
+                    Selecionar Foto
+                  </Label>
+                  <Input 
+                    id="final_photo" 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    {...register('final_photo')} 
+                  />
+                  {photoPreview && (
+                    <div className="w-24 h-24 border rounded-md overflow-hidden">
+                      <img src={photoPreview} alt="Pré-visualização" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+                {errors.final_photo && <p className="text-sm text-red-500">{errors.final_photo.message}</p>}
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="flex justify-start space-x-3 pt-4 border-t">
+                <Button type="button" onClick={handleOpenApproveModal} className="bg-green-600 hover:bg-green-700">
+                  Aprovar Vistoria
+                </Button>
+                <Button type="button" variant="destructive" onClick={handleOpenReproveModal}>
+                  Reprovar Vistoria
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+        
+        {/* Diálogos de Aprovação e Reprovação */}
+        <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Aprovar Vistoria</DialogTitle></DialogHeader>
+            <div className="py-4"><p>Você confirma a aprovação desta vistoria?</p></div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsApproveOpen(false)}>Cancelar</Button>
+              <Button onClick={handleConfirmApproval} className="bg-green-600 hover:bg-green-700">Confirmar Aprovação</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+        
+        <Dialog open={isReproveOpen} onOpenChange={setIsReproveOpen}>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Reprovar Vistoria</DialogTitle></DialogHeader>
+            <div className="py-4 space-y-4">
+              <Label htmlFor="reproval_reason">Descreva o motivo da reprovação *</Label>
+              <Textarea id="reproval_reason" {...register('reproval_reason')} placeholder="Explique por que a vistoria não pode ser aprovada..."/>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsReproveOpen(false)}>Cancelar</Button>
+              <Button variant="destructive" onClick={handleConfirmReproval}>Confirmar Reprovação</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }
