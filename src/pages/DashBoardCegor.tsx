@@ -30,9 +30,14 @@ import {
   isRegionalGestor,
   isCegorGestor,
 } from "@/types";
-import PowerBICharts, {
-  CommonData,
-} from "@/components/dashboard/PowerBICharts";
+
+import { CommonData } from "@/components/charts/types";
+import ChartStatusBar from "@/components/charts/ChartStatusBar";
+import ChartOcorrenciasPorBairro from "@/components/charts/ChartOcorrenciasPorBairro";
+import ChartTipoEquipamentoPie from "@/components/charts/ChartTipoEquipamentoPie";
+import ChartOrigemDemanda from "@/components/charts/ChartOrigemdemanda";
+import ChartServicosPorRequerente from "@/components/charts/ChartServicosPorRequerente";
+
 import EquipesEmCampoCard, { buildEquipesOcupadas } from "@/components/dashboard/EquipesEmCampoCard";
 import { mockOcorrencias } from "@/pages/ocorrencias/ListaOcorrencias";
 import { useNavigate } from "react-router-dom";
@@ -276,13 +281,15 @@ export default function Dashboard() {
       />
 
       {/* 2) NOVO bloco de gráficos                            */}
-      <PowerBICharts
-        statusData={statusData}
-        bairroData={bairroData}
-        equipamentoData={equipamentoData}
-        origemData={origemData}
-        requerenteData={requerenteData}
-      />
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <ChartStatusBar data={statusData} />
+        <ChartOcorrenciasPorBairro data={bairroData} />
+        <ChartTipoEquipamentoPie data={equipamentoData} />
+        <ChartOrigemDemanda data={origemData} />
+        <div className="xl:col-span-2">
+          <ChartServicosPorRequerente data={requerenteData} />
+        </div>
+      </div>
 
     </div>
   );
