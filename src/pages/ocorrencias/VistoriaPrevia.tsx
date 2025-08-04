@@ -63,7 +63,6 @@ const equipes = [
     { id: 'eq4', name: 'Equipe Delta' },
 ];
 
-// --- NOVO: Constante com as atividades que exibem o campo de equipe ---
 const ACTIVITIES_REQUIRING_EQUIPE = [
   'Serviço Capinação em pavimentação asfáltica',
   'Serviço Capinação em pavimentação poliédrica',
@@ -82,9 +81,9 @@ const vistoriaSchema = z.object({
   medicao: z.string().optional(),
   cannot_execute: z.boolean().default(false),
   cannot_execute_reason: z.string().optional(),
-  quantCanteiro: z.number().optional()
+  quantCanteiro: z.number().optional(),
+  hasCanteiroCentral: z.boolean().optional(), // --- ADICIONADO ---
 }).superRefine((data, ctx) => {
-  // Validação para o motivo de não execução
   if (data.cannot_execute && !data.cannot_execute_reason?.trim()) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -93,7 +92,6 @@ const vistoriaSchema = z.object({
     });
   }
 
-  // --- NOVO: Validação condicional para o campo equipe ---
   const equipeIsRequired = data.activity?.some(activity => ACTIVITIES_REQUIRING_EQUIPE.includes(activity));
 
   if (equipeIsRequired && !data.equipe) {
@@ -127,20 +125,19 @@ export default function VistoriaPreviaRefatorado() {
       photos: [],
       activity: [],
       equipe: '',
+      hasCanteiroCentral: false, // --- ADICIONADO ---
     }
   });
 
-  // --- NOVO: Monitora os campos 'cannot_execute' e 'activity' ---
   const cannotExecute = watch('cannot_execute');
   const watchedActivities = watch('activity');
+  const hasCanteiroCentral = watch('hasCanteiroCentral'); // --- ADICIONADO ---
 
-  // --- NOVO: Determina se o campo de equipe deve ser exibido ---
   const showEquipeField = React.useMemo(() => {
     if (!watchedActivities || watchedActivities.length === 0) return false;
     return watchedActivities.some(activity => ACTIVITIES_REQUIRING_EQUIPE.includes(activity));
   }, [watchedActivities]);
   
-  // --- NOVO: Limpa o valor de equipe se ele for ocultado ---
   useEffect(() => {
     if (!showEquipeField) {
       setValue('equipe', '', { shouldValidate: true });
@@ -290,7 +287,6 @@ export default function VistoriaPreviaRefatorado() {
                   {errors.activity && <p className="text-sm text-red-600">{errors.activity.message}</p>}
                 </div>
 
-                {/* --- NOVO: Renderização condicional do campo de equipe --- */}
                 {showEquipeField && (
                   <div className="space-y-2 md:col-span-2 animate-in fade-in-50 duration-300">
                     <Label htmlFor="equipe">Selecionar a Equipe *</Label>
@@ -303,16 +299,27 @@ export default function VistoriaPreviaRefatorado() {
                 )}             
               </div>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="medicao">Medição</Label>
-                  <Input id="medicao" {...register('medicao')} 
-                  placeholder="Metros ou Km" />
+                <div className="md:col-span-2 flex items-center gap-3 pt-2">
+                    <Checkbox
+                        id="hasCanteiroCentral"
+                        checked={hasCanteiroCentral}
+                        onCheckedChange={(checked) => setValue('hasCanteiroCentral', checked as boolean)}
+                    />
+                    <Label htmlFor="hasCanteiroCentral" className="cursor-pointer font-medium text-slate-700">
+                        Existe canteiro central?
+                    </Label>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="quantCanteiro">Quantidade de canteiros</Label>
                   <Input id="quantCanteiro" {...register('quantCanteiro')} 
                   placeholder="Número de canteiros" />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="medicao">Medição do serviço</Label>
+                  <Input id="medicao" {...register('medicao')} 
+                  placeholder="Metros ou Km" />
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="ponto_inicial">Ponto Inicial</Label>
                   <Input id="ponto_inicial" {...register('ponto_inicial')} placeholder="Ex: Esquina da Rua A" />
