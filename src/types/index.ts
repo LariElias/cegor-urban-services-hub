@@ -182,6 +182,7 @@ export interface Ocorrencia {
   actual_hours?: number;
   execution_notes?: string;
   company_confirmed?: boolean; // Para empresa confirmar conclusão
+  requester_name?: string;
 
   created_at: string;
   updated_at: string;

@@ -14,7 +14,10 @@ const ChartOrigemDemanda: React.FC<Props> = ({ data, colors = DEFAULT_COLORS }) 
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data} layout="vertical">
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis type="number" />
+        <XAxis type="number"
+          allowDecimals={false}          // só inteiros
+          domain={[0, 'dataMax']}
+        />
         <YAxis type="category" dataKey="name" width={120} interval={0} />
         <Tooltip />
         <Bar dataKey="value" fill={colors[0]} />
@@ -27,7 +30,10 @@ const ChartOrigemDemanda: React.FC<Props> = ({ data, colors = DEFAULT_COLORS }) 
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} layout="vertical">
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis type="number" />
+          <XAxis type="number"
+            allowDecimals={false}
+            domain={[0, 'dataMax']}
+          />
           <YAxis type="category" dataKey="name" width={200} interval={0} />
           <Tooltip />
           <Bar dataKey="value" fill={colors[0]} />
