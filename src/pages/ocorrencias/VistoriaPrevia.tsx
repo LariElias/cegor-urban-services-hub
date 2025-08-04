@@ -1,28 +1,90 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { ArrowLeft, Upload, X, Camera, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { useAuth } from '@/context/AuthContext';
+import { z } from 'zod';
+import { ArrowLeft, Upload, X, Camera, AlertCircle, FileText, MapPin, Tag, Star } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import Select from 'react-select';
 
-// Schema de validação atualizado com os novos campos e lógica condicional
+// Simulação de um hook de navegação e autenticação
+const useNavigate = () => (path) => console.log(`Navegando para: ${path}`);
+const useParams = () => ({ id: 'PROTOCOLO-12345' });
+const useAuth = () => ({ user: { name: 'Fiscal Padrão' } });
+
+
+// --- Dados Mockados ---
+const occurrenceData = {
+    protocolo: '2024-08-A45',
+    tipoServico: 'Especial',
+    bairro: 'Centro',
+    prioridade: 'Alta',
+};
+
+const activities = [
+    { id: '1', name: 'Serviço Capinação em pavimentação asfáltica' },
+    { id: '2', name: 'Serviço Capinação em pavimentação poliédrica' },
+    { id: '3', name: 'Serviço Capinação sem pavimentação (terra natural)' },
+    { id: '4', name: 'Pintura de meio fio' },
+    { id: '5', name: 'Roço em áreas abertas com roçadeira costal' },
+    { id: '6', name: 'Serviço varrição em pavimentação asfáltica' },
+    { id: '7', name: 'Serviço varrição em pavimentação poliédrica' },
+    { id: '8', name: 'Serviço varrição sem pavimentação (terra natural)' },
+    { id: '9', name: 'Serviço varrição em vias costeira e calçadões da orla marítima' },
+    { id: '10', name: 'Serviço de varrição (ciscada) de praia na faixa de areia' },
+    { id: '11', name: 'Serviços Especiais extraordinários' },
+    { id: '12', name: 'Serviço de limpeza e desobstrução nas Bocas de Lobo com remoção' },
+    { id: '13', name: 'Serviço de limpeza manual em recursos hídricos' },
+    { id: '14', name: 'Serviço de limpeza mecanizado em recursos hídricos a céu aberto com retroescavadeira de pneus' },
+    { id: '15', name: 'Serviço de limpeza mecanizado em recursos hídricos a céu aberto com escavadeira de esteira' },
+    { id: '16', name: 'Coleta e transporte dos Resíduos Sólidos oriundos da varrição vias costeiras e calçadões' },
+    { id: '17', name: 'Coleta e transporte dos resíduos da varrição nas vias e logradouros públicos, com veículo equipado com caçamba basculante' },
+    { id: '18', name: 'Coleta e transporte dos Resíduos Sólidos oriundos da Capinação' },
+    { id: '19', name: 'Coleta e transporte dos Resíduos Sólidos oriundos da limpeza manual de recursos hídricos' },
+    { id: '20', name: 'Coleta e transporte dos Resíduos Sólidos oriundos dos serviços de limpeza mecanizada em recursos hídricos a céu aberto' },
+    { id: '21', name: 'Coleta e Transporte dos Resíduos sólidos oriundos da limpeza de praias com trator' },
+    { id: '22', name: 'Coleta e Transporte dos Resíduos sólidos oriundos da limpeza de praias com roll on roll off' },
+    { id: '23', name: 'Coleta e Transporte dos resíduos oriundos dos serviços especiais extraordinários' },
+    { id: '24', name: 'Fornecimento de veículo para o acompanhamento dos serviços de limpeza (fiscalização)' },
+    { id: '25', name: 'Serviço de higienização de mobiliário e logradouros públicos' },
+    { id: '26', name: 'Serviço com apoio do Multijato na desobstrução de boca de lobo' },
+    { id: '27', name: 'Serviço com apoio do Munck na remoção de animais mortos, toros vegetais, etc' },
+    { id: '28', name: 'Serviço de Apoio ao contratante' },
+];
+
+const equipes = [
+    { id: 'eq1', name: 'Equipe Alpha' },
+    { id: 'eq2', name: 'Equipe Bravo' },
+    { id: 'eq3', name: 'Equipe Charlie' },
+    { id: 'eq4', name: 'Equipe Delta' },
+];
+
+// --- NOVO: Constante com as atividades que exibem o campo de equipe ---
+const ACTIVITIES_REQUIRING_EQUIPE = [
+  'Serviço Capinação em pavimentação asfáltica',
+  'Serviço Capinação em pavimentação poliédrica',
+  'Serviço Capinação sem pavimentação (terra natural)',
+  'Pintura de meio fio',
+];
+
+// --- Schema de Validação ATUALIZADO ---
 const vistoriaSchema = z.object({
-  photos: z.array(z.string()).min(1, 'Pelo menos uma foto é obrigatória'),
-  responsible: z.string().min(1, 'Responsável é obrigatório'),
-  inspection_date: z.string().min(1, 'Data da vistoria é obrigatória'),
-  activity: z.string().min(1, 'Atividade é obrigatória'),
+  photos: z.array(z.string()).min(1, 'Pelo menos uma foto é obrigatória.'),
+  inspection_date: z.string().min(1, 'Data da vistoria é obrigatória.'),
+  activity: z.array(z.string()).min(1, { message: 'Pelo menos uma atividade é obrigatória.' }),
+  equipe: z.string().optional(),
   ponto_inicial: z.string().optional(),
   ponto_final: z.string().optional(),
+  medicao: z.string().optional(),
   cannot_execute: z.boolean().default(false),
   cannot_execute_reason: z.string().optional(),
+  quantCanteiro: z.number().optional()
 }).superRefine((data, ctx) => {
+  // Validação para o motivo de não execução
   if (data.cannot_execute && !data.cannot_execute_reason?.trim()) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -30,14 +92,26 @@ const vistoriaSchema = z.object({
       path: ['cannot_execute_reason'],
     });
   }
+
+  // --- NOVO: Validação condicional para o campo equipe ---
+  const equipeIsRequired = data.activity?.some(activity => ACTIVITIES_REQUIRING_EQUIPE.includes(activity));
+
+  if (equipeIsRequired && !data.equipe) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'A seleção da equipe é obrigatória para esta atividade.',
+      path: ['equipe'],
+    });
+  }
 });
 
 type VistoriaFormData = z.infer<typeof vistoriaSchema>;
 
-export default function VistoriaPrevia() {
+
+// --- Componente Principal ---
+export default function VistoriaPreviaRefatorado() {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const { id } = useParams();
   const [photos, setPhotos] = useState<string[]>([]);
 
   const {
@@ -50,28 +124,34 @@ export default function VistoriaPrevia() {
     resolver: zodResolver(vistoriaSchema),
     defaultValues: {
       cannot_execute: false,
-      responsible: user?.name || '',
+      photos: [],
+      activity: [],
+      equipe: '',
     }
   });
 
+  // --- NOVO: Monitora os campos 'cannot_execute' e 'activity' ---
   const cannotExecute = watch('cannot_execute');
+  const watchedActivities = watch('activity');
 
-  // Seta o nome do usuário no campo responsável quando o componente monta
+  // --- NOVO: Determina se o campo de equipe deve ser exibido ---
+  const showEquipeField = React.useMemo(() => {
+    if (!watchedActivities || watchedActivities.length === 0) return false;
+    return watchedActivities.some(activity => ACTIVITIES_REQUIRING_EQUIPE.includes(activity));
+  }, [watchedActivities]);
+  
+  // --- NOVO: Limpa o valor de equipe se ele for ocultado ---
   useEffect(() => {
-    if (user?.name) {
-      setValue('responsible', user.name);
+    if (!showEquipeField) {
+      setValue('equipe', '', { shouldValidate: true });
     }
-  }, [user, setValue]);
+  }, [showEquipeField, setValue]);
 
-  // Mock data
-  const activities = [
-    { id: '1', name: 'Varrição de via pública' },
-    { id: '2', name: 'Capina e poda de vegetação' },
-    { id: '3', name: 'Corte de árvore' },
-  ];
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
+    
     const newPhotos = files.map(file => URL.createObjectURL(file));
     const updatedPhotos = [...photos, ...newPhotos];
     setPhotos(updatedPhotos);
@@ -85,116 +165,199 @@ export default function VistoriaPrevia() {
   };
 
   const onSubmit = (data: VistoriaFormData) => {
-    console.log('Vistoria salva:', data);
+    console.log('Vistoria salva:', { ...data, occurrenceInfo: occurrenceData });
+    alert('Vistoria salva com sucesso! Verifique o console.');
     navigate('/ocorrencias');
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={() => navigate('/ocorrencias')}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Voltar
-        </Button>
-        <h1 className="text-3xl font-bold">Vistoria Prévia</h1>
-      </div>
+  const activityOptions = activities.map((a) => ({
+    label: a.name,
+    value: a.name,
+  }));
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Camera className="w-5 h-5" />
-            Registro de Vistoria
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="photos">Fotos da Vistoria *</Label>
-              <div className="flex items-center gap-2">
-                <Input type="file" multiple accept="image/*" onChange={handlePhotoUpload} className="hidden" id="photo-upload" />
-                <Button type="button" variant="outline" onClick={() => document.getElementById('photo-upload')?.click()}>
-                  <Upload className="w-4 h-4 mr-2" /> Adicionar Fotos
+  return (
+    <div className="bg-slate-50 min-h-screen p-4 sm:p-6 lg:p-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={() => navigate('/ocorrencias')}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar
+          </Button>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Vistoria Prévia</h1>
+        </div>
+
+        {/* Informações da Ocorrência */}
+        <Card className="bg-white">
+            <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2 text-slate-700">
+                    <FileText className="w-6 h-6" />
+                    Detalhes da Ocorrência
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div className="flex flex-col">
+                        <span className="font-semibold text-slate-500">PROTOCOLO</span>
+                        <span className="text-slate-800 font-medium">{occurrenceData.protocolo}</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-semibold text-slate-500">TIPO DE SERVIÇO</span>
+                        <span className="text-slate-800 font-medium">{occurrenceData.tipoServico}</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-semibold text-slate-500">BAIRRO</span>
+                        <span className="text-slate-800 font-medium">{occurrenceData.bairro}</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-semibold text-slate-500">PRIORIDADE</span>
+                        <span className="flex items-center gap-1">
+                            <Star className="w-4 h-4 text-amber-500 fill-current" />
+                            <span className="text-slate-800 font-medium">{occurrenceData.prioridade}</span>
+                        </span>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+
+        {/* Formulário de Vistoria */}
+        <Card className="bg-white">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-xl text-slate-700">
+              <Camera className="w-6 h-6" />
+              Registro de Vistoria
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              
+              {/* Seção de Fotos */}
+              <div className="space-y-2">
+                <Label htmlFor="photo-upload" className="font-semibold">Fotos da Vistoria *</Label>
+                <div className="flex items-center gap-4">
+                  <Input type="file" multiple accept="image/*" onChange={handlePhotoUpload} className="hidden" id="photo-upload" />
+                  <Button type="button" variant="outline" onClick={() => document.getElementById('photo-upload')?.click()}>
+                    <Upload className="w-4 h-4 mr-2" /> Adicionar Fotos
+                  </Button>
+                </div>
+                {errors.photos && <p className="text-sm text-red-600">{errors.photos.message}</p>}
+                {photos.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mt-4">
+                    {photos.map((photo, index) => (
+                      <div key={index} className="relative group">
+                        <img src={photo} alt={`Foto ${index + 1}`} className="w-full h-24 object-cover rounded-md border" />
+                        <Button type="button" variant="destructive" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => removePhoto(index)}><X className="w-3 h-3" /></Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Campos do Formulário */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="inspection_date">Data da Vistoria *</Label>
+                  <Input id="inspection_date" type="date" {...register('inspection_date')} />
+                  {errors.inspection_date && <p className="text-sm text-red-600">{errors.inspection_date.message}</p>}
+                </div>
+
+                <div className="space-y-2 md:col-span-3">
+                  <Label htmlFor="activity">Atividade(s) *</Label>
+                  <Select
+                    inputId="activity"
+                    options={activityOptions}
+                    isSearchable
+                    isMulti
+                    placeholder="Digite para buscar atividade..."
+                    classNames={{
+                      control: () => 'border border-slate-300 rounded-md shadow-sm min-h-[42px]',
+                      multiValue: () => 'bg-slate-200 text-slate-800 rounded px-2 py-1 text-sm',
+                      menu: () => 'z-50 bg-white shadow-lg border border-slate-300',
+                      option: ({ isFocused, isSelected }) =>
+                        `px-3 py-2 text-sm cursor-pointer ${
+                          isFocused ? 'bg-slate-100' : ''
+                        } ${isSelected ? 'bg-slate-200 font-semibold' : ''}`,
+                    }}
+                    classNamePrefix="react-select"
+                    onChange={(selectedOptions) =>
+                      setValue(
+                        'activity',
+                        selectedOptions.map((opt) => opt.value),
+                        { shouldValidate: true }
+                      )
+                    }
+                  />
+                  {errors.activity && <p className="text-sm text-red-600">{errors.activity.message}</p>}
+                </div>
+
+                {/* --- NOVO: Renderização condicional do campo de equipe --- */}
+                {showEquipeField && (
+                  <div className="space-y-2 md:col-span-2 animate-in fade-in-50 duration-300">
+                    <Label htmlFor="equipe">Selecionar a Equipe *</Label>
+                    <select id="equipe" {...register('equipe')} className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400">
+                      <option value="">Selecione a equipe responsável</option>
+                      {equipes.map(equipe => <option key={equipe.id} value={equipe.name}>{equipe.name}</option>)}
+                    </select>
+                    {errors.equipe && <p className="text-sm text-red-600">{errors.equipe.message}</p>}
+                  </div>   
+                )}             
+              </div>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="medicao">Medição</Label>
+                  <Input id="medicao" {...register('medicao')} 
+                  placeholder="Metros ou Km" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="quantCanteiro">Quantidade de canteiros</Label>
+                  <Input id="quantCanteiro" {...register('quantCanteiro')} 
+                  placeholder="Número de canteiros" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ponto_inicial">Ponto Inicial</Label>
+                  <Input id="ponto_inicial" {...register('ponto_inicial')} placeholder="Ex: Esquina da Rua A" />
+                  {errors.ponto_inicial && <p className="text-sm text-red-600">{errors.ponto_inicial.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ponto_final">Ponto Final</Label>
+                  <Input id="ponto_final" {...register('ponto_final')} placeholder="Ex: Em frente ao nº 123" />
+                  {errors.ponto_final && <p className="text-sm text-red-600">{errors.ponto_final.message}</p>}
+                </div>
+               </div>
+
+              {/* Seção Condicional */}
+              <div className="space-y-4 pt-6 border-t border-slate-200">
+                  <div className="flex items-center space-x-3">
+                      <Checkbox id="cannot_execute" checked={cannotExecute} onCheckedChange={(checked) => setValue('cannot_execute', checked as boolean)} />
+                      <Label htmlFor="cannot_execute" className="flex items-center gap-2 cursor-pointer text-red-600 font-semibold">
+                          <AlertCircle className="w-5 h-5" />
+                          Não é possível realizar a ocorrência
+                      </Label>
+                  </div>
+
+                  {cannotExecute && (
+                      <div className="space-y-2 pl-8 animate-in fade-in-50 duration-300">
+                          <Label htmlFor="cannot_execute_reason" className="font-semibold">Descreva o motivo *</Label>
+                          <Textarea id="cannot_execute_reason" {...register('cannot_execute_reason')} placeholder="Explique por que a ocorrência não pode ser realizada..." rows={4} />
+                          {errors.cannot_execute_reason && <p className="text-sm text-red-600">{errors.cannot_execute_reason.message}</p>}
+                      </div>
+                  )}
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="flex justify-end space-x-3 pt-6 border-t border-slate-200">
+                <Button type="button" variant="outline" onClick={() => navigate('/ocorrencias')}>
+                  Cancelar
+                </Button>
+                <Button type="submit">
+                  Salvar 
                 </Button>
               </div>
-              {errors.photos && <p className="text-sm text-red-500">{errors.photos.message}</p>}
-              {photos.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-                  {photos.map((photo, index) => (
-                    <div key={index} className="relative">
-                      <img src={photo} alt={`Foto ${index + 1}`} className="w-full h-20 object-cover rounded" />
-                      <Button type="button" variant="destructive" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0" onClick={() => removePhoto(index)}><X className="w-3 h-3" /></Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-              {/* <div className="space-y-2">
-                <Label htmlFor="responsible">Responsável pela Vistoria *</Label>
-                <Input id="responsible" {...register('responsible')} readOnly className="bg-gray-100"/>
-                {errors.responsible && <p className="text-sm text-red-500">{errors.responsible.message}</p>}
-              </div> */}
-              <div className="space-y-2">
-                <Label htmlFor="inspection_date">Data da Vistoria *</Label>
-                <Input id="inspection_date" type="date" {...register('inspection_date')} />
-                {errors.inspection_date && <p className="text-sm text-red-500">{errors.inspection_date.message}</p>}
-              </div>
-
-
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="activity">Atividade *</Label>
-                <select id="activity" {...register('activity')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                  <option value="">Selecione a atividade</option>
-                  {activities.map(activity => <option key={activity.id} value={activity.id}>{activity.name}</option>)}
-                </select>
-                {errors.activity && <p className="text-sm text-red-500">{errors.activity.message}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="ponto_inicial">Ponto Inicial</Label>
-                <Input id="ponto_inicial" {...register('ponto_inicial')} placeholder="Ex: Esquina da Rua A com Av. B" />
-                {errors.ponto_inicial && <p className="text-sm text-red-500">{errors.ponto_inicial.message}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="ponto_final">Ponto Final</Label>
-                <Input id="ponto_final" {...register('ponto_final')} placeholder="Ex: Em frente ao número 123" />
-                {errors.ponto_final && <p className="text-sm text-red-500">{errors.ponto_final.message}</p>}
-              </div>
-            </div>
-
-            {/* --- CHECKBOX E TEXTAREA CONDICIONAL --- */}
-            <div className="space-y-4 pt-4 border-t">
-                <div className="flex items-center space-x-2">
-                    <Checkbox id="cannot_execute" checked={cannotExecute} onCheckedChange={(checked) => setValue('cannot_execute', checked as boolean)} />
-                    <Label htmlFor="cannot_execute" className="flex items-center gap-2 cursor-pointer text-red-600 font-medium">
-                        <AlertCircle className="w-4 h-4" />
-                        Não é possível realizar a ocorrência
-                    </Label>
-                </div>
-
-                {cannotExecute && (
-                    <div className="space-y-2 pl-6 animate-in fade-in-50">
-                        <Label htmlFor="cannot_execute_reason">Descreva o motivo *</Label>
-                        <Textarea id="cannot_execute_reason" {...register('cannot_execute_reason')} placeholder="Explique por que a ocorrência não pode ser realizada..." rows={3} />
-                        {errors.cannot_execute_reason && <p className="text-sm text-red-500">{errors.cannot_execute_reason.message}</p>}
-                    </div>
-                )}
-            </div>
-
-            <div className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={() => navigate('/ocorrencias')}>
-                Cancelar
-              </Button>
-              <Button type="submit">
-                Salvar Vistoria
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
