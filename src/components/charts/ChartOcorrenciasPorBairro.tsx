@@ -1,53 +1,49 @@
 import React from "react";
 import ExpandableChartCard from "./ExpandableChartCard";
+import { CommonData } from "./types";
 import {
-    ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LabelList,
+    ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
 
-export interface BairroData { bairro: string; total: number; concluidas: number }
+const DEFAULT_COLORS = ["#ee8023"];
 
-export default function ChartOcorrenciasPorBairro({ data }: { data: BairroData[] }) {
+type Props = { data: CommonData[]; colors?: string[] };
+
+const ChartOcorrenciasPorBairro: React.FC<Props> = ({ data, colors = DEFAULT_COLORS }) => {
+    const compact = () => (
+        <ResponsiveContainer width="100%" height={320}>
+            <BarChart data={data} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis type="category" dataKey="name" width={110} interval={0} />
+                <Tooltip />
+                <Bar dataKey="value" fill={colors[0]} />
+            </BarChart>
+        </ResponsiveContainer>
+    );
+
+    const expanded = () => (
+        <div className="h-[520px]">
+            <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="name" width={180} interval={0} />
+                    <Tooltip />
+                    <Bar dataKey="value" fill={colors[0]} />
+                </BarChart>
+            </ResponsiveContainer>
+        </div>
+    );
+
     return (
         <ExpandableChartCard
-            title="Ocorrências por Bairro"
-            children={
-                <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data} margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="bairro" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend verticalAlign="top" />
-                            <Bar dataKey="total" fill="#8884d8" name="Total">
-                                <LabelList dataKey="total" position="top" />
-                            </Bar>
-                            <Bar dataKey="concluidas" fill="#82ca9d" name="Concluídas">
-                                <LabelList dataKey="concluidas" position="top" />
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-            }
-            expanded={
-                <div className="h-[520px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data} margin={{ top: 24, right: 24, bottom: 24, left: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="bairro" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="total" fill="#8884d8" name="Total">
-                                <LabelList dataKey="total" position="top" />
-                            </Bar>
-                            <Bar dataKey="concluidas" fill="#82ca9d" name="Concluídas">
-                                <LabelList dataKey="concluidas" position="top" />
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-            }
+            title="Quantidade por Bairro"
+            renderCompact={compact}
+            renderExpanded={expanded}
+            scroll
         />
     );
-}
+};
+
+export default ChartOcorrenciasPorBairro;

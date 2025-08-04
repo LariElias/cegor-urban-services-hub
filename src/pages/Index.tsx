@@ -3,7 +3,7 @@ import { useAuth } from '@/context/AuthContext';
 import { LoginForm } from '@/components/LoginForm';
 import { Layout } from '@/components/Layout';
 import Dashboard from '@/pages/Dashboard';
-import DashboardCegor from './DashBoardCegor';
+import DashboardCegor from './DashboardCegor';
 
 const Index = () => {
   const { isAuthenticated, user } = useAuth();
