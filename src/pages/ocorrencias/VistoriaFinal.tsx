@@ -3,21 +3,23 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, Camera, AlertTriangle, Sun, Moon, Sunset } from 'lucide-react';
+// --- ALTERADO: Removidos ícones que não são mais necessários (Sun, Moon, Sunset, AlertTriangle) ---
+import { ArrowLeft, Camera } from 'lucide-react'; 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+// --- REMOVIDO: Importações do Accordion não são mais necessárias ---
+// import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/context/AuthContext';
 
 const vistoriaFinalSchema = z.object({
   real_start_date: z.string().min(1, 'Data de início é obrigatória'),
   real_end_date: z.string().min(1, 'Data de fim é obrigatória'),
-  real_start_shift: z.string().min(1, 'Turno de início é obrigatório'),
+  // --- REMOVIDO: O campo 'real_start_shift' foi removido conforme solicitado ---
   total_time_spent: z.string().min(1, 'Tempo total é obrigatório'),
   inspection_responsible: z.string(),
   inspection_date: z.string().min(1, 'Data da vistoria é obrigatória'),
@@ -27,13 +29,11 @@ const vistoriaFinalSchema = z.object({
 
 type VistoriaFinalFormData = z.infer<typeof vistoriaFinalSchema>;
 
-// ATUALIZAÇÃO 1: Nova estrutura de dados para as faltas
 interface AbsenceEntry {
   date: string;
+  // A estrutura de turnos ainda pode existir nos dados, mas não será usada na renderização
   shifts: {
-    diurno?: { name: string }[];
-    vespertino?: { name: string }[];
-    noturno?: { name: string }[];
+    [key: string]: { name: string }[] | undefined;
   };
 }
 
@@ -51,10 +51,18 @@ const mockAbsences: AbsenceEntry[] = [
       tarde: [{ name: 'Antonio Joao' }],
     },
   },
+  {
+    date: '2025-08-01', // Adicionado para exemplo com data atual
+    shifts: {
+      diurno: [{ name: 'Joana Silva' }],
+    },
+  },
 ];
 
-// ATUALIZAÇÃO 2: Novo componente para renderizar o Accordion de Faltas
-const FaltasAccordion = ({ data }: { data: AbsenceEntry[] }) => {
+
+// --- ALTERADO: Componente foi simplificado para uma lista, removendo o Accordion ---
+const ListaFaltas = ({ data }: { data: AbsenceEntry[] }) => {
+  // A função para calcular o total de faltas por dia continua útil
   const calculateTotalAbsences = (entry: AbsenceEntry) => {
     return Object.values(entry.shifts).reduce((total, shift) => {
       return total + (shift?.length || 0);
@@ -64,47 +72,24 @@ const FaltasAccordion = ({ data }: { data: AbsenceEntry[] }) => {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Falta de funcionários</h3>
-      <Accordion type="single" collapsible className="w-full space-y-2">
+      <div className="space-y-2">
         {data.map((entry, index) => {
           const totalFaltas = calculateTotalAbsences(entry);
           if (totalFaltas === 0) return null;
 
           return (
-            <AccordionItem value={`item-${index}`} key={index} className="border rounded-md px-4">
-              <AccordionTrigger className="hover:no-underline">
-                <div className="flex justify-between w-full items-center pr-4">
-                  <span className="font-semibold">
-                    {new Date(entry.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
-                  </span>
-                  <Badge variant="destructive">{totalFaltas} Falta{totalFaltas > 1 ? 's' : ''}</Badge>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pt-2 pb-4">
-                <div className="space-y-4">
-                  {Object.entries(entry.shifts).map(([turno, faltas]) => (
-                    (faltas && faltas.length > 0) && (
-                      <div key={turno}>
-                        <h4 className="font-semibold text-sm flex items-center gap-2 text-slate-700">
-                          {turno === 'diurno' ? <Sun size={16}/> : turno === 'vespertino' ? <Sunset size={16}/> : <Moon size={16}/>}
-                          Turno {turno.charAt(0).toUpperCase() + turno.slice(1)}
-                        </h4>
-                        <ul className="mt-1 pl-5 space-y-1">
-                          {faltas.map((func, i) => (
-                            <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
-                              <AlertTriangle className="w-4 h-4 text-orange-500" />
-                              {func.name}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+            // Cada item agora é uma div simples, sem funcionalidade de Accordion
+            <div key={index} className="border rounded-md px-4 py-3 flex justify-between items-center">
+              <span className="font-semibold">
+                {/* A formatação da data é mantida */}
+                {new Date(entry.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+              </span>
+              {/* O Badge com o total de faltas é mantido */}
+              <Badge variant="destructive">{totalFaltas} Falta{totalFaltas > 1 ? 's' : ''}</Badge>
+            </div>
           );
         })}
-      </Accordion>
+      </div>
     </div>
   );
 };
@@ -217,15 +202,7 @@ export default function VistoriaFinal() {
                 <Input id="real_end_date" type="date" {...register('real_end_date')} />
                 {errors.real_end_date && <p className="text-sm text-red-500">{errors.real_end_date.message}</p>}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="real_start_shift">Turno Real Início</Label>
-                <select id="real_start_shift" {...register('real_start_shift')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                    <option value="">Selecione o turno</option>
-                    <option value="Diurno">Diurno</option>
-                    <option value="Noturno">Noturno</option>
-                </select>
-                {errors.real_start_shift && <p className="text-sm text-red-500">{errors.real_start_shift.message}</p>}
-              </div>
+              {/* --- REMOVIDO: O campo de seleção de turno foi removido do formulário --- */}
               <div className="space-y-2">
                 <Label htmlFor="total_time_spent">Tempo Real total gasto (em horas)</Label>
                 <Input id="total_time_spent" type="number" {...register('total_time_spent')} placeholder="Ex: 8" />
@@ -235,8 +212,8 @@ export default function VistoriaFinal() {
 
             <hr className="my-4" />
             
-            {/* ATUALIZAÇÃO 3: Seção de faltas substituída pelo novo componente */}
-            <FaltasAccordion data={mockAbsences} />
+            {/* --- ALTERADO: Chamando o novo componente de lista de faltas --- */}
+            <ListaFaltas data={mockAbsences} />
 
             <hr className="my-4" />
 
