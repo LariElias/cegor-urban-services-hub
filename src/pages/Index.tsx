@@ -2,8 +2,9 @@ import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { LoginForm } from '@/components/LoginForm';
 import { Layout } from '@/components/Layout';
-import Dashboard from '@/pages/Dashboard';
-import DashboardCegor from './DashboardCegor';
+import Dashboard from '@/pages/dashboard/Dashboard';
+import DashboardCegor from './dashboard/cegor/DashboardCegor';
+import DashboardRegional from './dashboard/regional/DashboardRegional';
 
 const Index = () => {
   const { isAuthenticated, user } = useAuth();
@@ -14,7 +15,7 @@ const Index = () => {
 
   return (
     <Layout>
-      {user?.role === 'cegor' ? <DashboardCegor /> : <Dashboard />}
+      {user?.role === 'cegor' ? <DashboardCegor /> : user.role === 'regional' ? <DashboardRegional /> : <Dashboard />}
     </Layout>
   );
 };

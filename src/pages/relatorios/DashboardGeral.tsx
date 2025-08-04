@@ -5,7 +5,7 @@ import { Download, TrendingUp, AlertCircle, Clock, CheckCircle } from "lucide-re
 import { useAuth } from "@/context/AuthContext";
 
 import ChartDistribuicaoRegional, { RegionalData } from "@/components/charts/ChartDistribuicaoRegional";
-import ChartOcorrenciasPorBairro, { BairroData } from "@/components/charts/ChartOcorrenciasPorBairro";
+import ChartOcorrenciasPorBairro from "@/components/charts/ChartOcorrenciasPorBairro";
 import ChartPrioridadePie, { PrioridadeData } from "@/components/charts/ChartPrioridadePie";
 import ChartStatusDonut, { StatusData } from "@/components/charts/ChartStatusDonut";
 
@@ -21,13 +21,14 @@ export default function DashboardGeral() {
     { regional: "Regional 3", total: 76 },
   ];
 
-  const ocorrenciasPorBairro: BairroData[] = [
-    { bairro: "Centro", total: 34, concluidas: 28 },
-    { bairro: "Savassi", total: 22, concluidas: 18 },
-    { bairro: "Funcionários", total: 18, concluidas: 15 },
-    { bairro: "Lourdes", total: 16, concluidas: 12 },
-    { bairro: "Barro Preto", total: 14, concluidas: 11 },
+  const ocorrenciasPorBairro: { name: string; value: number }[] = [
+    { name: "Centro", value: 34 },
+    { name: "Savassi", value: 22 },
+    { name: "Funcionários", value: 18 },
+    { name: "Lourdes", value: 16 },
+    { name: "Barro Preto", value: 14 },
   ];
+
 
   const ocorrenciasPorPrioridade: PrioridadeData[] = [
     { prioridade: "Alta", total: 60 },
