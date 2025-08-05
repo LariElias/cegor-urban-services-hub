@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Eye, Camera, FileText, CheckCircle, Send, Play, Edit, Calendar, Building } from 'lucide-react';
+import { Eye, Camera, FileText, CheckCircle, Send, Play, Edit,  Calendar, Building, Users, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -52,14 +52,27 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
         </Button>
       );
 
-    case 'agendar_ocorrencia':
+    // case 'agendar_ocorrencia':
+    //   return (
+    //     <Button {...buttonProps} asChild title="Agendar Ocorrência">
+    //       <Link to={`/ocorrencias/${ocorrenciaId}/dialogaqui`}>
+    //         <Calendar className="w-4 h-4" />
+    //       </Link>
+    //     </Button>
+    //   );
+
+    case 'direcionar_ocorrencia':
       return (
-        <Button {...buttonProps} asChild title="Agendar Ocorrência">
-          <Link to={`/ocorrencias/${ocorrenciaId}/agendamento`}>
-            <Calendar className="w-4 h-4" />
-          </Link>
+        <Button
+          {...buttonProps}
+          onClick={() => onAction?.(ocorrenciaId)}
+          title="Direcionar Equipe"
+          className="text-purple-600 hover:text-purple-700"
+        >
+          <Users className="w-4 h-4" />
         </Button>
       );
+
 
     // case 'detalhar_execucao':
     //   return (
@@ -91,12 +104,27 @@ export const getActionButton = (action: string, ocorrenciaId: string, onAction?:
         </Button>
       );
 
-    case 'encerrar_ocorrencia':
+    case 'pausar_execucao':
       return (
-        <Button {...buttonProps} asChild title="Encerrar Ocorrência">
-          <Link to={`/ocorrencias/${ocorrenciaId}/vistoria_final`}>
-            <CheckCircle className="w-4 h-4" />
-          </Link>
+        <Button
+          {...buttonProps}
+          onClick={() => onAction?.(ocorrenciaId)}
+          title="Encaminhar"
+          className="text-blue-600 hover:text-blue-700"
+        >
+          <Pause className="w-4 h-4" />
+        </Button>
+      );
+
+    case 'retomar_ocorrencia':
+      return (
+        <Button
+          {...buttonProps}
+          onClick={() => onAction?.(ocorrenciaId)}
+          title="Retomar Execução"
+          className="text-blue-600 hover:text-blue-700"
+        >
+          <Play className="w-4 h-4" />
         </Button>
       );
 
