@@ -19,10 +19,8 @@ import { Link } from "react-router-dom";
 // Importações necessárias para o react-leaflet
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css"; // ESSENCIAL: Importa o CSS do Leaflet
+import "leaflet/dist/leaflet.css";
 
-// Interface estendida para garantir que 'bairro' e 'regional_name' existam nos nossos dados de mock.
-// Em um projeto real, esses campos viriam da sua API e estariam no tipo 'Ocorrencia'.
 interface OcorrenciaComBairro extends Ocorrencia {
   bairro: string;
   regional_name: string;
@@ -35,10 +33,10 @@ export default function MapaOcorrencias() {
     prioridade: "",
     regional: "",
     bairro: "",
+    service_type: "", // NOVO: Adiciona o estado para o novo filtro
   });
 
-  // ATUALIZAÇÃO 1: Mock data reduzido para 8 ocorrências com dados variados.
-  const ocorrencias: OcorrenciaComBairro[] = [
+  const ocorrencias: OcorrenciaComBairro[] = useMemo(() => [
     {
       id: "1",
       protocol: "OCR-2024-001",
@@ -183,9 +181,8 @@ export default function MapaOcorrencias() {
       bairro: "Messejana",
       regional_name: "Regional VI",
     },
-  ];
+  ], []);
 
-  // ATUALIZAÇÃO 2: Lógica de filtragem revisada
   const filteredOcorrencias = useMemo(() => {
     return ocorrencias.filter((ocorrencia) => {
       const statusMatch =
@@ -204,7 +201,13 @@ export default function MapaOcorrencias() {
         !filters.bairro ||
         filters.bairro === "todos" ||
         ocorrencia.bairro === filters.bairro;
-      return statusMatch && prioridadeMatch && regionalMatch && bairroMatch;
+      // NOVO: Condição de filtro para tipo de serviço
+      const serviceTypeMatch =
+        !filters.service_type ||
+        filters.service_type === "todos" ||
+        ocorrencia.service_type === filters.service_type;
+
+      return statusMatch && prioridadeMatch && regionalMatch && bairroMatch && serviceTypeMatch;
     });
   }, [ocorrencias, filters]);
 
@@ -217,34 +220,27 @@ export default function MapaOcorrencias() {
     () => [...new Set(ocorrencias.map((o) => o.bairro))].sort(),
     [ocorrencias]
   );
+  // NOVO: Lista dinâmica para os tipos de serviço
+  const serviceTypes = useMemo(
+    () => [...new Set(ocorrencias.map((o) => o.service_type))].sort(),
+    [ocorrencias]
+  );
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "encaminhada":
-        return "bg-red-500";
-      case "autorizada":
-      case "agendada":
-        return "bg-orange-500";
-      case "em_execucao":
-        return "bg-blue-500";
-      case "concluida":
-        return "bg-green-500";
-      default:
-        return "bg-gray-500";
+      case "encaminhada": return "bg-red-500";
+      case "autorizada": case "agendada": return "bg-orange-500";
+      case "em_execucao": return "bg-blue-500";
+      case "concluida": return "bg-green-500";
+      default: return "bg-gray-500";
     }
   };
 
   const getStatusLabel = (status: string) => {
     const labels: { [key: string]: string } = {
-      criada: "Criada",
-      encaminhada: "Encaminhada",
-      autorizada: "Autorizada",
-      cancelada: "Cancelada",
-      devolvida: "Devolvida",
-      em_analise: "Em Análise",
-      agendada: "Agendada",
-      em_execucao: "Em Execução",
-      concluida: "Concluída",
+      criada: "Criada", encaminhada: "Encaminhada", autorizada: "Autorizada",
+      cancelada: "Cancelada", devolvida: "Devolvida", em_analise: "Em Análise",
+      agendada: "Agendada", em_execucao: "Em Execução", concluida: "Concluída",
     };
     return labels[status] || status;
   };
@@ -259,14 +255,6 @@ export default function MapaOcorrencias() {
     });
   };
 
-  // if (user?.role !== 'cegor') {
-  //   return (
-  //     <div className="flex items-center justify-center h-64">
-  //       <p className="text-muted-foreground">Acesso negado. Apenas usuários CEGOR podem visualizar o mapa.</p>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -275,7 +263,6 @@ export default function MapaOcorrencias() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* ATUALIZAÇÃO 3: Painel de Filtros completo e funcional */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -286,18 +273,8 @@ export default function MapaOcorrencias() {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select
-                value={filters.status}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    status: value === "todos" ? "" : value,
-                  }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
+              <Select value={filters.status} onValueChange={(value) => setFilters((prev) => ({ ...prev, status: value === "todos" ? "" : value, }))}>
+                <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos</SelectItem>
                   <SelectItem value="encaminhada">Encaminhada</SelectItem>
@@ -309,20 +286,26 @@ export default function MapaOcorrencias() {
               </Select>
             </div>
 
+            {/* NOVO: Componente Select para o filtro de Tipo de Serviço */}
+            <div>
+              <Label htmlFor="service_type">Tipo de Serviço</Label>
+              <Select value={filters.service_type} onValueChange={(value) => setFilters((prev) => ({ ...prev, service_type: value === "todos" ? "" : value, }))}>
+                <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  {serviceTypes.map((st) => (
+                    <SelectItem key={st} value={st}>
+                      {st}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <Label htmlFor="prioridade">Prioridade</Label>
-              <Select
-                value={filters.prioridade}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    prioridade: value === "todas" ? "" : value,
-                  }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas" />
-                </SelectTrigger>
+              <Select value={filters.prioridade} onValueChange={(value) => setFilters((prev) => ({ ...prev, prioridade: value === "todos" ? "" : value, }))}>
+                <SelectTrigger><SelectValue placeholder="Todas" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todas">Todas</SelectItem>
                   <SelectItem value="baixa">Baixa</SelectItem>
@@ -334,50 +317,22 @@ export default function MapaOcorrencias() {
 
             <div>
               <Label htmlFor="regional">Regional</Label>
-              <Select
-                value={filters.regional}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    regional: value === "todas" ? "" : value,
-                  }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas" />
-                </SelectTrigger>
+              <Select value={filters.regional} onValueChange={(value) => setFilters((prev) => ({ ...prev, regional: value === "todos" ? "" : value, }))}>
+                <SelectTrigger><SelectValue placeholder="Todas" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todas">Todas</SelectItem>
-                  {regionais.map((r) => (
-                    <SelectItem key={r} value={r}>
-                      {r}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="todos">Todas</SelectItem>
+                  {regionais.map((r) => (<SelectItem key={r} value={r}>{r}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
 
             <div>
               <Label htmlFor="bairro">Bairro</Label>
-              <Select
-                value={filters.bairro}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    bairro: value === "todos" ? "" : value,
-                  }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
+              <Select value={filters.bairro} onValueChange={(value) => setFilters((prev) => ({ ...prev, bairro: value === "todos" ? "" : value, }))}>
+                <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos</SelectItem>
-                  {bairros.map((b) => (
-                    <SelectItem key={b} value={b}>
-                      {b}
-                    </SelectItem>
-                  ))}
+                  {bairros.map((b) => (<SelectItem key={b} value={b}>{b}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
@@ -390,6 +345,7 @@ export default function MapaOcorrencias() {
                   prioridade: "",
                   regional: "",
                   bairro: "",
+                  service_type: "", // NOVO: Limpa o filtro de tipo de serviço
                 })
               }
             >
@@ -407,17 +363,11 @@ export default function MapaOcorrencias() {
             </CardHeader>
             <CardContent>
               <div className="h-96 w-full rounded-lg overflow-hidden z-0">
-                <MapContainer
-                  center={[-3.732, -38.527]}
-                  zoom={12}
-                  scrollWheelZoom={true}
-                  style={{ height: "100%", width: "100%" }}
-                >
+                <MapContainer center={[-3.732, -38.527]} zoom={12} scrollWheelZoom={true} style={{ height: "100%", width: "100%" }}>
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-
                   {filteredOcorrencias.map((ocorrencia) => (
                     <Marker
                       key={ocorrencia.id}
@@ -479,11 +429,7 @@ export default function MapaOcorrencias() {
                       className="flex items-center justify-between p-3 border rounded-lg"
                     >
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`w-3 h-3 rounded-full ${getStatusColor(
-                            ocorrencia.status
-                          )}`}
-                        ></div>
+                        <div className={`w-3 h-3 rounded-full ${getStatusColor(ocorrencia.status)}`}></div>
                         <div>
                           <p className="font-medium">{ocorrencia.protocol}</p>
                           <p className="text-sm text-muted-foreground">
