@@ -129,9 +129,6 @@ All colors MUST be HSL.
   }
 }
 
-html {
-  filter: grayscale(100%) !important;
-}
 .logoSide {
   filter: grayscale(10%) !important;
 }
