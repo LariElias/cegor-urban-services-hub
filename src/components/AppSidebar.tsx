@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useLocation, NavLink } from "react-router-dom";
 import {
@@ -60,17 +61,6 @@ const menuItems = [
       { title: "Lista de equipes", url: "/cadastros/equipes/lista", icon: List, role: ["cegor"], subrole: ["gerente"] }
     ],
   },
-  // {
-  //   title: 'Cadastros Regionais',
-  //   icon: Settings,
-  //   role: ['regional'],
-  //   subrole: ['gestor'],
-  //   items: [
-  //     { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin, role: ['regional'], subrole: ['gestor'] },
-  //     { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield, role: ['regional'], subrole: ['gestor'] },
-  //     { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building, role: ['regional'], subrole: ['gestor'] },
-  //   ]
-  // },
   {
     title: "Ocorrências",
     icon: AlertCircle,
@@ -80,8 +70,6 @@ const menuItems = [
       { title: "Lista", url: "/ocorrencias", icon: FileText },
       { title: "Registrar", url: "/ocorrencias/nova", icon: StickyNote, role: ["regional"], subrole: ["operador"] },
       { title: "Registrar", url: "/ocorrencias/nova", icon: StickyNote, role: ["cegor"], subrole: ["gerente"] },
-      // { title: 'Aprovadas', url: '/ocorrencias/aprovadas', icon: CheckCircle, role: ['cegor'] },
-      // { title: 'Demandas da Empresa', url: '/ocorrencias/demandas', icon: Briefcase, role: ['empresa'] },
       {
         title: "Mapa",
         url: "/relatorios/mapa",
@@ -104,8 +92,6 @@ const menuItems = [
         role: ["cegor"],
         subrole: ["gestor", "gerente"],
       },
-      // { title: 'Tempo de Execução', url: '/relatorios/tempo', icon: Clock, role: ['cegor', 'regional'], subrole: ['gestor'] },
-      // { title: 'Mapa de Ocorrências', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'] },
       {
         title: "Relatório Regional",
         url: "/relatorios/regional",
@@ -132,7 +118,6 @@ const menuItems = [
     icon: Users,
     role: ["cegor", "regional", "empresa", "adm"],
     items: [
-      // alterar a rota de conta -> entender depois o que precisa aparecer
       { title: "Configurações", url: "/teste", icon: Settings },
     ],
   },
@@ -160,17 +145,17 @@ export function AppSidebar() {
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive
-      ? "bg-white/20 text-gray-700 font-medium"
-      : "hover:bg-white/10 text-white/90";
+      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+      : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground";
 
   const isCollapsed = state === "collapsed";
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
-      <SidebarContent className="bg-gray-200 text-white">
-        <div className="p-4 border-b border-white/20">
+      <SidebarContent className="bg-sidebar text-sidebar-foreground">
+        <div className="p-4 border-b border-sidebar-border">
           <NavLink to="/" className="flex items-center gap-3">
-            <div className=" h-10flex items-center justify-center"></div>
+            <div className="h-10 flex items-center justify-center"></div>
             {!isCollapsed && (
               <div>
                 <img
@@ -200,7 +185,7 @@ export function AppSidebar() {
           (group) =>
             hasPermission(group.role, group.subrole) && (
               <SidebarGroup key={group.title}>
-                <SidebarGroupLabel className="text-gray-500 px-4">
+                <SidebarGroupLabel className="text-sidebar-foreground/70 px-4">
                   {!isCollapsed && group.title}
                 </SidebarGroupLabel>
                 <SidebarGroupContent>
@@ -224,32 +209,12 @@ export function AppSidebar() {
             )
         )}
 
-        <div className="mt-auto p-4 border-t border-white/20">
+        <div className="mt-auto p-4 border-t border-sidebar-border">
           <div className="flex items-center">
-            {/* <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <span className="text-sm font-bold text-white">
-                {user?.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
-            {!isCollapsed && (
-              <div className="flex-1">
-                <p className="text-sm font-medium text-white">{user?.name}</p>
-                <p className="text-xs text-white/70 capitalize">
-                  {user?.role} {user?.subrole && `- ${user.subrole}`}
-                </p>
-              </div>
-            )}
-            <button
-              onClick={logout}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-              title="Sair"
-            >
-              <LogOut className="w-5 h-5 text-white" />
-            </button> */}
             {!isCollapsed && (
               <img
                 src={logoCitinova}
-                alt="Logo pmf"
+                alt="Logo Citinova"
                 className="h-6 w-auto logoSide"
               />
             )}
