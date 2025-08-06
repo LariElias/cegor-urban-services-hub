@@ -105,8 +105,8 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Painel de regionais</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold text-gray-900">Painel de regionais</h1>
+          <p className="text-gray-600">
             {user?.role === 'regional' ? 'Painel da Regional' : 'Visão geral do sistema CEGOR'}
           </p>
         </div>
@@ -122,15 +122,15 @@ export default function Dashboard() {
 
       {/* Métricas principais */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">
+            <CardTitle className="text-sm font-medium">
               {user?.role === 'regional' ? 'Ocorrências da Regional' : 'Total de Ocorrências'}
             </CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">
+            <div className="text-2xl font-bold">
               {user?.role === 'regional' ? '45' : dashboardData.totalOcorrencias}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -139,15 +139,15 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">
+            <CardTitle className="text-sm font-medium">
               {isRegionalGestor(user) ? 'Pendentes de Aprovação' : 'Pendentes'}
             </CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">
+            <div className="text-2xl font-bold">
               {isRegionalGestor(user) ? dashboardData.pendenteAprovacao : dashboardData.ocorrenciasPendentes}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -156,13 +156,13 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">Em Andamento</CardTitle>
+            <CardTitle className="text-sm font-medium">Em Andamento</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">
+            <div className="text-2xl font-bold">
               {user?.role === 'regional' ? '12' : dashboardData.ocorrenciasAndamento}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -171,13 +171,13 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">Concluídas</CardTitle>
+            <CardTitle className="text-sm font-medium">Concluídas</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">
+            <div className="text-2xl font-bold">
               {user?.role === 'regional' ? '28' : dashboardData.ocorrenciasConcluidas}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -189,10 +189,10 @@ export default function Dashboard() {
 
       {/* Card adicional de demandas por regional para CEGOR */}
       {isCegorGestor(user) && (
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-card-foreground">Ocorrências por Regional</CardTitle>
-            <CardDescription className="text-muted-foreground">
+            <CardTitle>Ocorrências por Regional</CardTitle>
+            <CardDescription>
               Distribuição de ocorrências criadas e encaminhadas por regional (últimos 30 dias)
             </CardDescription>
           </CardHeader>
@@ -216,48 +216,48 @@ export default function Dashboard() {
 
       {/* Informações do sistema */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-card-foreground">
+            <CardTitle className="flex items-center gap-2">
               <Building className="h-5 w-5" />
               Resumo do Sistema
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-card-foreground">Regionais Ativas</span>
+              <span className="text-sm font-medium">Regionais Ativas</span>
               <Badge variant="outline">{dashboardData.regionaisAtivas}</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-card-foreground">Empresas Contratadas</span>
+              <span className="text-sm font-medium">Empresas Contratadas</span>
               <Badge variant="outline">{dashboardData.empresasContratadas}</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-card-foreground">Usuários Ativos</span>
+              <span className="text-sm font-medium">Usuários Ativos</span>
               <Badge variant="outline">127</Badge>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-card-foreground">Ocorrências Recentes</CardTitle>
-            <CardDescription className="text-muted-foreground">
+            <CardTitle>Ocorrências Recentes</CardTitle>
+            <CardDescription>
               Últimas ocorrências registradas no sistema
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {recentOcorrencias.map((ocorrencia) => (
-                <div key={ocorrencia.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div key={ocorrencia.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium text-foreground">{ocorrencia.protocol}</span>
+                      <span className="text-sm font-medium">{ocorrencia.protocol}</span>
                       {getStatusBadge(ocorrencia.status)}
                       {getPriorityBadge(ocorrencia.priority)}
                     </div>
-                    <p className="text-sm text-muted-foreground truncate">{ocorrencia.description}</p>
-                    <p className="text-xs text-muted-foreground">{ocorrencia.regional} • {ocorrencia.date}</p>
+                    <p className="text-sm text-gray-600 truncate">{ocorrencia.description}</p>
+                    <p className="text-xs text-gray-500">{ocorrencia.regional} • {ocorrencia.date}</p>
                   </div>
                 </div>
               ))}

@@ -8,7 +8,6 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useTheme } from 'next-themes';
 import { Settings, Moon, Sun, Phone, Mail, MapPin, Clock, Lock, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,7 +27,7 @@ type PasswordFormData = z.infer<typeof passwordSchema>;
 export default function Configuracoes() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { theme, setTheme } = useTheme();
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
@@ -40,8 +39,8 @@ export default function Configuracoes() {
   });
 
   const handleThemeChange = (checked: boolean) => {
-    const newTheme = checked ? 'dark' : 'light';
-    setTheme(newTheme);
+    setIsDarkMode(checked);
+    // Aqui você pode implementar a lógica real de mudança de tema
     toast({
       title: "Tema alterado",
       description: `Tema ${checked ? 'escuro' : 'claro'} aplicado com sucesso.`,
@@ -118,23 +117,23 @@ export default function Configuracoes() {
                 </div>
                 <Switch
                   id="theme-toggle"
-                  checked={theme === 'dark'}
+                  checked={isDarkMode}
                   onCheckedChange={handleThemeChange}
                 />
               </div>
               
               <div className="flex items-center space-x-4 p-4 border rounded-lg">
-                {theme === 'dark' ? (
+                {isDarkMode ? (
                   <Moon className="w-8 h-8 text-blue-500" />
                 ) : (
                   <Sun className="w-8 h-8 text-yellow-500" />
                 )}
                 <div>
                   <p className="font-medium">
-                    {theme === 'dark' ? 'Tema Escuro' : theme === 'light' ? 'Tema Claro' : 'Tema do Sistema'}
+                    {isDarkMode ? 'Tema Escuro' : 'Tema Claro'}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {theme === 'dark' ? 'Interface com cores escuras' : theme === 'light' ? 'Interface com cores claras' : 'Segue a preferência do sistema'}
+                    {isDarkMode ? 'Interface com cores escuras' : 'Interface com cores claras'}
                   </p>
                 </div>
               </div>
