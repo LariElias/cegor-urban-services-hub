@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useAuth } from '@/context/AuthContext';
-import { Ocorrencia, getPermittedActions } from '@/types';
+import { Ocorrencia, getPermittedActions, getPermittedStatus } from '@/types';
 import { getActionButton } from '@/utils/actionButtons';
 import OcorrenciaViewer from '@/components/ocorrencias/OcorrenciaViewer';
 
@@ -29,8 +29,8 @@ const regionalMap: { [key: string]: string } = {
 
 // Mock de dados com os campos necessários para os filtros
 export const mockOcorrencias: OcorrenciaDetalhada[] = [
-  { id: '1', protocol: 'OCR-2024-009', tipo_de_ocorrencia: 'Substituição de bancos quebrados', description: 'Solicitação para trocar bancos danificados em praça pública do bairro Parangaba.', service_type: 'Manutenção', priority: 'media', status: 'criada', address: 'Av. José Bastos, 789', public_equipment_name: 'Praça José de Alencar', regional_id: '2', fiscal_id: '2', origin: 'REG2', equipe_id: 'Equipe Manutenção Sul', requester_name: 'Matheus Augusto', created_at: '2025-07-23T09:30:00Z', updated_at: '2025-07-23T09:30:00Z', bairro: 'Parangaba', regional_name: regionalMap['2'] },
-  { id: '2', protocol: 'OCR-2024-009', tipo_de_ocorrencia: 'Substituição de bancos quebrados', description: 'Solicitação para trocar bancos danificados em praça pública do bairro Parangaba.', service_type: 'Manutenção', priority: 'media', status: 'criada', address: 'Av. José Bastos, 789', public_equipment_name: 'Praça José de Alencar', regional_id: '1', fiscal_id: '2', origin: 'REG1', equipe_id: 'Equipe Manutenção Sul', requester_name: 'Carlos Moura', created_at: '2025-07-23T09:30:00Z', updated_at: '2025-07-23T09:30:00Z', bairro: 'Parangaba', regional_name: regionalMap['1'] },
+  { id: '1', protocol: 'OCR-2024-009', tipo_de_ocorrencia: 'Substituição de bancos quebrados', description: 'Solicitação para trocar bancos danificados em praça pública do bairro Parangaba.', service_type: 'Manutenção', priority: 'media', status: 'em_execucao', address: 'Av. José Bastos, 789', public_equipment_name: 'Praça José de Alencar', regional_id: '2', fiscal_id: '2', origin: 'REG2', equipe_id: 'Equipe Manutenção Sul', requester_name: 'Matheus Augusto', created_at: '2025-07-23T09:30:00Z', updated_at: '2025-07-23T09:30:00Z', bairro: 'Parangaba', regional_name: regionalMap['2'] },
+  { id: '2', protocol: 'OCR-2024-009', tipo_de_ocorrencia: 'Substituição de bancos quebrados', description: 'Solicitação para trocar bancos danificados em praça pública do bairro Parangaba.', service_type: 'Manutenção', priority: 'media', status: 'pausada', address: 'Av. José Bastos, 789', public_equipment_name: 'Praça José de Alencar', regional_id: '1', fiscal_id: '2', origin: 'REG1', equipe_id: 'Equipe Manutenção Sul', requester_name: 'Carlos Moura', created_at: '2025-07-23T09:30:00Z', updated_at: '2025-07-23T09:30:00Z', bairro: 'Parangaba', regional_name: regionalMap['1'] },
   { id: '10', protocol: 'OCR-2024-010', tipo_de_ocorrencia: 'Verificação de esgoto a céu aberto', description: 'Denúncia de esgoto exposto em via pública próxima ao Canal do Lagamar.', service_type: 'Saneamento', priority: 'alta', status: 'executada', address: 'Rua Eduardo Perdigão, 321', public_equipment_name: 'Canal do Lagamar', regional_id: '5', fiscal_id: '5', origin: 'SIGEP', equipe_id: 'Equipe Saneamento Leste', requester_name: 'Marcela Cavalcante', vistoria_previa_date: '2025-07-22T08:00:00Z', created_at: '2025-07-22T07:30:00Z', updated_at: '2025-07-22T08:30:00Z', bairro: 'São João do Tauape', regional_name: regionalMap['5'] },
   { id: '11', protocol: 'OCR-2024-011', tipo_de_ocorrencia: 'Conserto de lixeira danificada', description: 'Reparo solicitado em lixeira pública quebrada na Praça do Lago Jacarey.', service_type: 'Limpeza', priority: 'baixa', status: 'encaminhada', address: 'Rua Padre Pedro de Alencar, 65', public_equipment_name: 'Praça do Lago Jacarey', regional_id: '6', fiscal_id: '6', origin: 'REG6', equipe_id: 'Equipe Limpeza Urbana A', requester_name: 'Rafael Oliveira', forwarded_by: '6', forwarded_at: '2025-07-21T14:00:00Z', created_at: '2025-07-21T12:00:00Z', updated_at: '2025-07-21T14:00:00Z', bairro: 'Cidade dos Funcionários', regional_name: regionalMap['6'] },
   { id: '12', protocol: 'OCR-2024-012', tipo_de_ocorrencia: 'Reforma de muro de escola', description: 'Solicitação para reforma estrutural do muro da escola E.M. Antônio Sales.', service_type: 'Reparo', priority: 'alta', status: 'autorizada', address: 'Rua Júlio César, 88', public_equipment_name: 'E.M. Antônio Sales', regional_id: '3', fiscal_id: '3', origin: 'SPU', equipe_id: 'Equipe Obras Norte', requester_name: 'Pedro Alves', approved_by_regional: '3', approved_at_regional: '2025-07-20T13:00:00Z', vistoria_previa_date: '2025-07-20T10:00:00Z', created_at: '2025-07-20T08:00:00Z', updated_at: '2025-07-20T13:00:00Z', bairro: 'Montese', regional_name: regionalMap['3'] },
@@ -230,21 +230,29 @@ export default function ListaOcorrencias() {
       console.log('Ação genérica', action, ocorrenciaId, payload);
     }
   };
-
   const renderActionButtons = (ocorrencia: Ocorrencia) => {
     if (!user) return [];
-    const permittedActions = getPermittedActions(user.role, user.subrole);
 
-    return permittedActions.map(action =>
-      getActionButton(
-        action,
-        ocorrencia.id,
-        (id, payload) => handleAction(action, id, payload),
-        { equipes: uniqueEquipes, currentEquipe: ocorrencia.equipe_id ?? null }
+    const permittedActions = getPermittedActions(user.role, user.subrole) || [];
+    const permittedStatusActions = getPermittedStatus(ocorrencia.status, user.subrole) || [];
+
+    // Combina as duas permissões, evitando duplicatas
+    const allActions = Array.from(new Set([...permittedActions, ...permittedStatusActions]));
+
+    return allActions
+      .map(action =>
+        getActionButton(
+          action,
+          ocorrencia.id,
+          (id, payload) => handleAction(action, id, payload),
+          { equipes: uniqueEquipes, currentEquipe: ocorrencia.equipe_id ?? null }
+        )
       )
-    ).filter(Boolean);
+      .filter(Boolean);
   };
-  
+
+
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

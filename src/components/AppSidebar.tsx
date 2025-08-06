@@ -78,8 +78,8 @@ const menuItems = [
     subrole: ["gestor", "fiscal", "operador", "supervisor", "gerente"],
     items: [
       { title: "Lista", url: "/ocorrencias", icon: FileText },
-      { title: "Registrar", url: "/ocorrencias/nova", icon: StickyNote, role: ["regional"], subrole: ["operador"] },
-      { title: "Registrar", url: "/ocorrencias/nova", icon: StickyNote, role: ["cegor"], subrole: ["gerente"] },
+      { title: "Registrar", url: "/ocorrencias/nova", icon: StickyNote, role: ["regional", "cegor"], subrole: ["operador", "gerente"] },
+
       // { title: 'Aprovadas', url: '/ocorrencias/aprovadas', icon: CheckCircle, role: ['cegor'] },
       // { title: 'Demandas da Empresa', url: '/ocorrencias/demandas', icon: Briefcase, role: ['empresa'] },
       {
