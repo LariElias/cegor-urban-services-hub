@@ -1,118 +1,192 @@
-import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
-/* Itens que o card renderiza */
-export interface EquipeOcupadaItem {
-  equipe: string;                 // Nome da equipe
-  ocorrenciaId: string;           // Para abrir a tela da ocorrência
-  protocolo: string;              // OCR-2024-...
-  atividade?: string;             // service_type / tipo de serviço
-  prioridade?: "baixa" | "media" | "alta" | "urgente" | string;
-  regional?: string;
-  descricao?: string;
-  dataRef?: string;               // updated_at / data/hora (ISO)
-}
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Users, MapPin, Clock, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 
-/* Constrói a lista a partir do seu array de ocorrências:
-   pega SOMENTE as que estão em execução e têm equipe atribuída,
-   ordenadas da mais recente para a mais antiga. */
-export function buildEquipesOcupadas<T extends Record<string, any>>(ocorrencias: T[]): EquipeOcupadaItem[] {
-  return ocorrencias
-    .filter(o => o?.equipe_id && o?.status === "em_execucao")
-    .sort((a, b) => new Date(b?.updated_at ?? 0).getTime() - new Date(a?.updated_at ?? 0).getTime())
-    .map(o => ({
-      equipe: String(o.equipe_id),
-      ocorrenciaId: String(o.id),
-      protocolo: String(o.protocol ?? o.protocolo ?? ""),
-      atividade: String(o.service_type ?? o.tipo_de_ocorrencia ?? ""),
-      prioridade: o.priority,
-      regional: o.regional_name ?? o.regional,
-      descricao: o.description,
-      dataRef: o.updated_at ?? o.date,
-    }));
-}
-
-const getPriorityBadge = (p?: string) => {
-  const map: Record<string, string> = {
-    baixa: "bg-green-100 text-green-800",
-    media: "bg-yellow-100 text-yellow-800",
-    alta: "bg-orange-100 text-orange-800",
-    urgente: "bg-red-100 text-red-800",
+interface Equipe {
+  id: string;
+  nome: string;
+  regional: string;
+  status: 'em_campo' | 'disponivel' | 'manutencao';
+  localizacao: string;
+  ocorrencia_atual?: {
+    protocolo: string;
+    tipo: string;
+    inicio: string;
   };
-  return p ? <Badge className={map[p] ?? "bg-gray-100 text-gray-800"}>{p}</Badge> : null;
-};
-
-const StatusAlocada = () => <Badge className="bg-blue-100 text-blue-800">Alocada</Badge>;
-
-interface Props {
-  items: EquipeOcupadaItem[];
-  onGoToOcorrencia?: (ocorrenciaId: string) => void; 
-  title?: string;
-  description?: string;
+  membros: number;
 }
 
+const mockEquipes: Equipe[] = [
+  {
+    id: '1',
+    nome: 'Equipe Alpha',
+    regional: 'Centro-Sul',
+    status: 'em_campo',
+    localizacao: 'Rua da Bahia, 1200',
+    ocorrencia_atual: {
+      protocolo: 'OCR-2024-001',
+      tipo: 'Limpeza de via pública',
+      inicio: '08:30'
+    },
+    membros: 4
+  },
+  {
+    id: '2',
+    nome: 'Equipe Beta',
+    regional: 'Noroeste',
+    status: 'em_campo',
+    localizacao: 'Av. Antônio Sales, 800',
+    ocorrencia_atual: {
+      protocolo: 'OCR-2024-002',
+      tipo: 'Poda de árvores',
+      inicio: '09:15'
+    },
+    membros: 3
+  },
+  {
+    id: '3',
+    nome: 'Equipe Gamma',
+    regional: 'Regional 6',
+    status: 'disponivel',
+    localizacao: 'Base Regional 6',
+    membros: 5
+  },
+  {
+    id: '4',
+    nome: 'Equipe Delta',
+    regional: 'Centro',
+    status: 'manutencao',
+    localizacao: 'Oficina Central',
+    membros: 4
+  }
+];
 
-const EquipesEmCampoCard: React.FC<Props> = ({
-  items,
-  onGoToOcorrencia,
-  title = "Equipes em campo",
-  description = "Equipes atualmente alocadas em ocorrências",
-}) => {
+export function EquipesEmCampoCard() {
+  const [equipes, setEquipes] = useState<Equipe[]>(mockEquipes);
+  const [loading, setLoading] = useState(false);
+
+  const atualizarLocalizacoes = async () => {
+    setLoading(true);
+    // Simular chamada da API
+    setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      em_campo: { label: 'Em Campo', className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' },
+      disponivel: { label: 'Disponível', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100' },
+      manutencao: { label: 'Manutenção', className: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100' }
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig];
+    return (
+      <Badge className={config.className}>
+        {config.label}
+      </Badge>
+    );
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'em_campo':
+        return <Users className="w-4 h-4 text-green-600" />;
+      case 'disponivel':
+        return <CheckCircle className="w-4 h-4 text-blue-600" />;
+      case 'manutencao':
+        return <AlertCircle className="w-4 h-4 text-orange-600" />;
+      default:
+        return <Users className="w-4 h-4 text-muted-foreground" />;
+    }
+  };
+
+  const equipesEmCampo = equipes.filter(e => e.status === 'em_campo');
+  const equipesDisponiveis = equipes.filter(e => e.status === 'disponivel');
+
   return (
-    <Card>
+    <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {items.length === 0 ? (
-          <div className="p-6 text-sm text-muted-foreground text-center bg-gray-50 rounded-lg">
-            Nenhuma equipe alocada no momento.
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-card-foreground">
+              <Users className="h-5 w-5" />
+              Equipes em Campo
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Status atual das equipes de campo
+            </CardDescription>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {items.map((item) => (
-              <div
-                key={`${item.ocorrenciaId}-${item.equipe}`}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-medium">{item.equipe}</span>
-                    <StatusAlocada />
-                    {getPriorityBadge(item.prioridade)}
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={atualizarLocalizacoes}
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Atualizando...' : 'Atualizar'}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Resumo */}
+        <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600">{equipesEmCampo.length}</div>
+            <div className="text-xs text-muted-foreground">Em Campo</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">{equipesDisponiveis.length}</div>
+            <div className="text-xs text-muted-foreground">Disponíveis</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-600">
+              {equipes.filter(e => e.status === 'manutencao').length}
+            </div>
+            <div className="text-xs text-muted-foreground">Manutenção</div>
+          </div>
+        </div>
+
+        {/* Lista de equipes */}
+        <div className="space-y-3">
+          {equipes.map((equipe) => (
+            <div 
+              key={equipe.id} 
+              className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border"
+            >
+              <div className="flex items-center gap-3">
+                {getStatusIcon(equipe.status)}
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-card-foreground">{equipe.nome}</span>
+                    {getStatusBadge(equipe.status)}
                   </div>
-
-                  <p className="text-sm text-gray-600 truncate">
-                    {item.atividade ?? "—"} • {item.protocolo}
-                  </p>
-
-                  <p className="text-xs text-gray-500">
-                    {item.regional ?? "—"}
-                    {item.dataRef ? ` • ${new Date(item.dataRef).toLocaleString("pt-BR")}` : ""}
-                  </p>
-
-                  {item.descricao && (
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.descricao}</p>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="w-3 h-3" />
+                    <span>{equipe.localizacao}</span>
+                    <span>•</span>
+                    <span>{equipe.regional}</span>
+                    <span>•</span>
+                    <span>{equipe.membros} membros</span>
+                  </div>
+                  {equipe.ocorrencia_atual && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                      <Clock className="w-3 h-3" />
+                      <span>{equipe.ocorrencia_atual.protocolo} - {equipe.ocorrencia_atual.tipo}</span>
+                      <span>•</span>
+                      <span>Início: {equipe.ocorrencia_atual.inicio}</span>
+                    </div>
                   )}
                 </div>
-
-                {onGoToOcorrencia && (
-                  <div className="pl-3">
-                    <Button size="sm" onClick={() => onGoToOcorrencia(item.ocorrenciaId)}>
-                      Ocorrência
-                    </Button>
-                  </div>
-                )}
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
-};
-
-export default EquipesEmCampoCard;
+}
