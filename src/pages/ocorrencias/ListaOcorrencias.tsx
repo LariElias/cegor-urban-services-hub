@@ -147,6 +147,8 @@ export default function ListaOcorrencias() {
   const [currentPage, setCurrentPage] = useState(1);
   const [viewingOcorrencia, setViewingOcorrencia] = useState<Ocorrencia | null>(null);
   const itemsPerPage = viewMode === 'list' ? 10 : 8;
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedEquipe, setSelectedEquipe] = useState<string>('');
 
   const handleFilterChange = (newFilters: Partial<FiltersState>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
@@ -208,25 +210,41 @@ export default function ListaOcorrencias() {
 
   const totalPages = Math.ceil(filteredOcorrencias.length / itemsPerPage);
 
-  const handleAction = (action: string, ocorrenciaId: string) => {
-    const ocorrencia = mockOcorrencias.find(o => o.id === ocorrenciaId);
-    if (!ocorrencia) return;
-
-    if (action === 'visualizar') {
-      setViewingOcorrencia(ocorrencia);
+  const handleAction = (action: string, ocorrenciaId: string, payload?: any) => {
+    if (action === 'direcionar_ocorrencia') {
+      console.log('Direcionar', ocorrenciaId, payload); // payload = { equipe: 'Equipe X' }
+      // chamar API para atribuir equipe...
+    }
+    else if (action === 'pausar_execucao') {
+      console.log('Pausar', ocorrenciaId, payload); // payload = { paused: true }
+      // chamar API para pausar...
+    }
+    else if (action === 'retomar_ocorrencia') {
+      console.log('Retomar', ocorrenciaId, payload); // payload = { resumed: true, equipe: 'Equipe X' }
+      // chamar API para retomar...
+    }
+    else if (action === 'visualizar') {
+      const ocorr = mockOcorrencias.find(o => o.id === ocorrenciaId);
+      if (ocorr) setViewingOcorrencia(ocorr);
     } else {
-      console.log(`Ação ${action} para ocorrência ${ocorrenciaId}`);
+      console.log('Ação genérica', action, ocorrenciaId, payload);
     }
   };
 
   const renderActionButtons = (ocorrencia: Ocorrencia) => {
     if (!user) return [];
     const permittedActions = getPermittedActions(user.role, user.subrole);
+
     return permittedActions.map(action =>
-      getActionButton(action, ocorrencia.id, (id) => handleAction(action, id))
+      getActionButton(
+        action,
+        ocorrencia.id,
+        (id, payload) => handleAction(action, id, payload),
+        { equipes: uniqueEquipes, currentEquipe: ocorrencia.equipe_id ?? null }
+      )
     ).filter(Boolean);
   };
-
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
