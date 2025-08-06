@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/context/AuthContext";
 import { Layout } from "@/components/Layout";
 import Index from "./pages/Index";
@@ -40,52 +41,59 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange={false}
+    >
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
 
-            {/* Nova rota de configurações */}
-            <Route path="/teste" element={<Layout><Configuracoes /></Layout>} />
+              {/* Nova rota de configurações */}
+              <Route path="/teste" element={<Layout><Configuracoes /></Layout>} />
 
-            {/* Rotas de cadastros - todas usando Layout */}
-            <Route path="/cadastros/regionais" element={<Layout><Regionais /></Layout>} />
-            <Route path="/cadastros/bairros" element={<Layout><Bairros /></Layout>} />
-            <Route path="/cadastros/territorios" element={<Layout><Territorios /></Layout>} />
-            <Route path="/cadastros/fiscais" element={<Layout><Fiscais /></Layout>} />
-            <Route path="/cadastros/equipamentos" element={<Layout><Equipamentos /></Layout>} />
-            <Route path="/cadastros/empresas" element={<Layout><Empresas /></Layout>} />
-            <Route path="/cadastros/equipes" element={<Layout><Equipes /></Layout>} />
-            <Route path="/cadastros/equipes/lista" element={<Layout><EquipesLista /></Layout>} />
+              {/* Rotas de cadastros - todas usando Layout */}
+              <Route path="/cadastros/regionais" element={<Layout><Regionais /></Layout>} />
+              <Route path="/cadastros/bairros" element={<Layout><Bairros /></Layout>} />
+              <Route path="/cadastros/territorios" element={<Layout><Territorios /></Layout>} />
+              <Route path="/cadastros/fiscais" element={<Layout><Fiscais /></Layout>} />
+              <Route path="/cadastros/equipamentos" element={<Layout><Equipamentos /></Layout>} />
+              <Route path="/cadastros/empresas" element={<Layout><Empresas /></Layout>} />
+              <Route path="/cadastros/equipes" element={<Layout><Equipes /></Layout>} />
+              <Route path="/cadastros/equipes/lista" element={<Layout><EquipesLista /></Layout>} />
 
-            {/* Rotas de ocorrências - todas usando Layout */}
-            <Route path="/ocorrencias" element={<Layout><ListaOcorrencias /></Layout>} />
-            <Route path="/ocorrencias/nova" element={<Layout><VisualizarOcorrencia /></Layout>} />
-            <Route path="/ocorrencias/aprovadas" element={<Layout><OcorrenciasAprovadas /></Layout>} />
+              {/* Rotas de ocorrências - todas usando Layout */}
+              <Route path="/ocorrencias" element={<Layout><ListaOcorrencias /></Layout>} />
+              <Route path="/ocorrencias/nova" element={<Layout><VisualizarOcorrencia /></Layout>} />
+              <Route path="/ocorrencias/aprovadas" element={<Layout><OcorrenciasAprovadas /></Layout>} />
 
-            <Route path="/ocorrencias/:id/agendamento" element={<Layout><Agendamento /></Layout>} />
-            <Route path="/ocorrencias/:id/vistoria" element={<Layout><VistoriaPrevia /></Layout>} />
-            <Route path="/ocorrencias/:id/vistoria_final" element={<Layout><VistoriaFinal /></Layout>} />
-            <Route path="/ocorrencias/:id/acompanhamento" element={<Layout><AcompanhamentoDiario /></Layout>} />
-            <Route path="/ocorrencias/:id/visualizar" element={<Layout><VisualizarOcorrencia /></Layout>} />
-            <Route path="/ocorrencias/:id/vistoria_supervisor" element={<Layout><VistoriaSupervisor /></Layout>} />
+              <Route path="/ocorrencias/:id/agendamento" element={<Layout><Agendamento /></Layout>} />
+              <Route path="/ocorrencias/:id/vistoria" element={<Layout><VistoriaPrevia /></Layout>} />
+              <Route path="/ocorrencias/:id/vistoria_final" element={<Layout><VistoriaFinal /></Layout>} />
+              <Route path="/ocorrencias/:id/acompanhamento" element={<Layout><AcompanhamentoDiario /></Layout>} />
+              <Route path="/ocorrencias/:id/visualizar" element={<Layout><VisualizarOcorrencia /></Layout>} />
+              <Route path="/ocorrencias/:id/vistoria_supervisor" element={<Layout><VistoriaSupervisor /></Layout>} />
 
-            {/* Rotas de relatórios - todas usando Layout */}
-            <Route path="/relatorios/dashboard" element={<Layout><DashboardGeral /></Layout>} />
-            <Route path="/relatorios/programados" element={<Layout><ServicosEmpresa /></Layout>} />
-            <Route path="/relatorios/mapa" element={<Layout><MapaOcorrencias /></Layout>} />
-            <Route path="/relatorios/historico" element={<Layout><HistoricoOcorrencias /></Layout>} />
-            <Route path="/relatorios/tempo" element={<Layout><TempoExecucao /></Layout>} />
+              {/* Rotas de relatórios - todas usando Layout */}
+              <Route path="/relatorios/dashboard" element={<Layout><DashboardGeral /></Layout>} />
+              <Route path="/relatorios/programados" element={<Layout><ServicosEmpresa /></Layout>} />
+              <Route path="/relatorios/mapa" element={<Layout><MapaOcorrencias /></Layout>} />
+              <Route path="/relatorios/historico" element={<Layout><HistoricoOcorrencias /></Layout>} />
+              <Route path="/relatorios/tempo" element={<Layout><TempoExecucao /></Layout>} />
 
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
