@@ -1,3 +1,5 @@
+import { permission } from "process";
+
 export interface User {
   id: string;
   name: string;
@@ -52,17 +54,6 @@ export interface Fiscal {
   updated_at: string;
 }
 
-// export interface Supervisor {
-//   id: string;
-//   name: string;
-//   cpf: string;
-//   phone: string;
-//   email: string;
-//   regional_id: string;
-//   regional?: Regional;
-//   created_at: string;
-//   updated_at: string;
-// }
 
 export interface ZGL {
   id: string;
@@ -129,7 +120,8 @@ export interface Ocorrencia {
     | "agendada"
     | "em_execucao"
     | "concluida"
-    | "executada";
+    | "executada"
+    | "pausada";
 
   // Campos atualizados RF010
   occurrence_date?: string;
@@ -216,19 +208,6 @@ export interface TerritorioFormProps {
   onCancel?: () => void;
 }
 
-export type OccurrenceStatus =
-  | "criada"
-  | "encaminhada"
-  | "autorizada"
-  | "cancelada"
-  | "devolvida"
-  | "em_analise"
-  | "agendada"
-  | "em_execucao"
-  | "concluida";
-
-  
-
 export type Priority = "baixa" | "media" | "alta";
 export type UserRole = "cegor" | "regional" | "empresa" | "adm";
 export type UserSubrole = "gestor" | "operador" | "fiscal" | "supervisor" | "gerente";
@@ -250,11 +229,16 @@ export const isCegorFiscal = (user: User | null) =>
 export const isCegorGerente = (user: User | null) =>
   user?.role === "cegor" && user?.subrole === "gerente";
 
-
 export const isEmpresaSupervisor = (user: User | null) =>
   user?.role === "empresa" && user?.subrole === "supervisor";
 
 export const isSuperAdm = (user: User | null) => user?.role === "adm";
+
+export const isPausada = (ocorrencia: Ocorrencia| null) =>
+  ocorrencia?.status === "pausada";
+export const IsExecucao = (ocorrencia: Ocorrencia| null) =>
+  ocorrencia?.status === "em_execucao"
+
 
 // Função para obter permissões de botões baseado no role e subrole
 export const getPermittedActions = (
@@ -266,7 +250,7 @@ export const getPermittedActions = (
       gestor: ["visualizar", "andamento_vistoria"],
       fiscal: ["visualizar", "acompanhamento"], // " permitir execução"
       operador: ["agendar_ocorrencia", "acompanhamento", "visualizar", "detalhar_execucao"],
-      gerente: ["visualizar", "andamento_vistoria", "pausar_execucao", "retomar_ocorrencia", "direcionar_ocorrencia"],
+      gerente: ["visualizar", "andamento_vistoria", ],
     },
     regional: {
       gestor: ["visualizar", "acompanhamento"],
@@ -286,9 +270,26 @@ export const getPermittedActions = (
     },
   };
 
-  if (!subrole || !permissions[role] || !permissions[role][subrole]) {
-    return [];
-  }
+  // if (!subrole || !permissions[role] || !permissions[role][subrole]) {
+  //   return [];
+  // }
 
   return permissions[role][subrole];
+};
+
+
+export const getPermittedStatus = (
+  status: string,
+  subrole?: string
+): string[] => {
+  const permissionsStatus: Record<string, Record<string, string[]>> = {
+    pausada: {
+      gerente: ["retomar_ocorrencia", "direcionar_ocorrencia"]
+    },
+    em_execucao: {
+      gerente: ["pausar_execucao"]
+    }
+  };
+
+  return permissionsStatus[status]?.[subrole] ?? [];
 };
