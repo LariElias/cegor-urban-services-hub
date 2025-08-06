@@ -226,6 +226,9 @@ export type OccurrenceStatus =
   | "agendada"
   | "em_execucao"
   | "concluida";
+
+  
+
 export type Priority = "baixa" | "media" | "alta";
 export type UserRole = "cegor" | "regional" | "empresa" | "adm";
 export type UserSubrole = "gestor" | "operador" | "fiscal" | "supervisor" | "gerente";
@@ -263,7 +266,7 @@ export const getPermittedActions = (
       gestor: ["visualizar", "andamento_vistoria"],
       fiscal: ["visualizar", "acompanhamento"], // " permitir execução"
       operador: ["agendar_ocorrencia", "acompanhamento", "visualizar", "detalhar_execucao"],
-      gerente: ["visualizar", "andamento_vistoria"],
+      gerente: ["visualizar", "andamento_vistoria", "pausar_execucao", "retomar_ocorrencia", "direcionar_ocorrencia"],
     },
     regional: {
       gestor: ["visualizar", "acompanhamento"],
@@ -279,7 +282,6 @@ export const getPermittedActions = (
       supervisor: [
         "visualizar",
         "acompanhamento",
-        "realizar_vistoria_supervisor",
       ],
     },
   };
