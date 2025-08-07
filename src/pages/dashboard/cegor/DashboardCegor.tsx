@@ -273,12 +273,12 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-
+      {/* 
 
       <EquipesEmCampoCard
         items={equipesOcupadas}
         onGoToOcorrencia={(id) => navigate(`/ocorrencias/${id}`)}
-      />
+      /> */}
 
       {/* 2) NOVO bloco de gráficos                            */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
