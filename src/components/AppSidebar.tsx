@@ -94,8 +94,8 @@ const menuItems = [
   {
     title: "Relatórios",
     icon: BarChart3,
-    role: ["cegor", "regional", "empresa"],
-    subrole: ["gestor", "fiscal", "operador", "supervisor", "gerente"],
+    role: ["cegor", "regional"],
+    subrole: ["gestor", "supervisor", "gerente"],
     items: [
       {
         title: "Dashboard Geral",
@@ -106,24 +106,18 @@ const menuItems = [
       },
       // { title: 'Tempo de Execução', url: '/relatorios/tempo', icon: Clock, role: ['cegor', 'regional'], subrole: ['gestor'] },
       // { title: 'Mapa de Ocorrências', url: '/relatorios/mapa', icon: MapPin, role: ['cegor'] },
-      {
-        title: "Relatório Regional",
-        url: "/relatorios/regional",
-        icon: BarChart3,
-        role: ["regional", "gerente"],
-      },
-      {
-        title: "Serviços Programados",
-        url: "/relatorios/programados",
-        icon: Calendar,
-        role: ["empresa", "gerente"],
-      },
+      // {
+      //   title: "Serviços Programados",
+      //   url: "/relatorios/programados",
+      //   icon: Calendar,
+      //   role: ["empresa", "gerente"],
+      // },
       {
         title: "Exportar CSV",
         url: "/relatorios/csv",
         icon: FileText,
         role: ["cegor", "regional"],
-        subrole: ["gestor", "operador", "gerente"],
+        subrole: ["gestor", "gerente"],
       },
     ],
   },
