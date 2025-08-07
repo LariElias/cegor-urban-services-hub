@@ -248,7 +248,7 @@ export const getPermittedActions = (
   const permissions: Record<string, Record<string, string[]>> = {
     cegor: {
       gestor: ["visualizar", "andamento_vistoria"],
-      fiscal: ["visualizar", "acompanhamento"], // " permitir execução"
+      fiscal: ["visualizar", "acompanhamento", "realizar_vistoria_supervisor"], // " permitir execução"
       operador: ["agendar_ocorrencia", "acompanhamento", "visualizar", "detalhar_execucao"],
       gerente: ["visualizar", "andamento_vistoria", ],
     },
@@ -256,7 +256,6 @@ export const getPermittedActions = (
       gestor: ["visualizar", "acompanhamento"],
       fiscal: [
         "visualizar",
-        "realizar_vistoria",
         "acompanhamento",
         "encerrar_ocorrencia",
       ], // "permitir execução" deve ser colocado no modal
@@ -284,11 +283,18 @@ export const getPermittedStatus = (
 ): string[] => {
   const permissionsStatus: Record<string, Record<string, string[]>> = {
     pausada: {
-      gerente: ["retomar_ocorrencia", "direcionar_ocorrencia"]
+      gerente: ["retomar_ocorrencia", "direcionar_ocorrencia"],
+      fiscal: ["realizar_vistoria_supervisor"],
     },
     em_execucao: {
       gerente: ["pausar_execucao"]
-    }
+    },
+    executada: {
+      fiscal: ["realizar_vistoria_supervisor"]
+    },
+    criada: {
+      fiscal: ["realizar_vistoria"]
+    },
   };
 
   return permissionsStatus[status]?.[subrole] ?? [];

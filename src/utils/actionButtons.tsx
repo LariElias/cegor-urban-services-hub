@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, Camera, FileText, CheckCircle, Send, Play, Edit, Calendar, Building, Users, Pause } from 'lucide-react';
+import { Eye, Camera, FileText, CheckCircle, Send, Play, Edit, Calendar, Building, Users, Pause, CircleCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -260,8 +260,8 @@ export const getActionButton = (
     case 'realizar_vistoria_supervisor':
       return (
         <Button key={action} {...buttonProps} asChild title="Realizar Vistoria">
-          <Link to={`/ocorrencias/${ocorrenciaId}/vistoria_supervisor`}>
-            <Camera className="w-4 h-4" />
+          <Link to={`/ocorrencias/${ocorrenciaId}/vistoria_final`}>
+            <CircleCheck className="w-4 h-4"  />
           </Link>
         </Button>
       );
