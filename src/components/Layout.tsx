@@ -14,7 +14,7 @@ export function Layout({ children }: LayoutProps) {
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-gray-50">
         <AppSidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col w-full">
           <header 
               className="h-16 w-100 flex 
               items-center justify-between border-b bg-white px-6 shadow-sm"
