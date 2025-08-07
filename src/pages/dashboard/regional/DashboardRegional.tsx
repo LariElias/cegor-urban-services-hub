@@ -8,9 +8,12 @@ import { mockOcorrencias } from "@/pages/ocorrencias/ListaOcorrencias";
 import { CommonData } from "@/components/charts/types";
 import ChartOcorrenciasPorBairro from "@/components/charts/ChartOcorrenciasPorBairro";
 import ChartTipoEquipamentoPie from "@/components/charts/ChartTipoEquipamentoPie";
-import ChartOrigemDemanda from "@/components/charts/ChartOrigemdemanda";
-import ChartStatusBar from "@/components/charts/ChartStatusBar";
-import ChartServicosPorRequerente from "@/components/charts/ChartServicosPorRequerente";
+
+
+import ChartDistribuicaoRegional, { RegionalData } from "@/components/charts/ChartDistribuicaoRegional";
+
+import ChartPrioridadePie, { PrioridadeData } from "@/components/charts/ChartPrioridadePie";
+import ChartStatusDonut, { StatusData } from "@/components/charts/ChartStatusDonut";
 
 function groupCount<T>(items: T[], getKey: (x: T) => string | undefined | null): CommonData[] {
   const map = new Map<string, number>();
@@ -49,6 +52,36 @@ function getRequester(o: any): string | undefined {
 export default function DashboardRegional() {
   const { user } = useAuth();
 
+  const kpis = { total: 156, criadas: 23, agendadas: 45, em_execucao: 34, concluidas: 54, pendentes: 70, media_tempo: 4.2, sla_atendimento: 87.5 };
+
+  const ocorrenciasPorRegional: RegionalData[] = [
+    { regional: "Regional 1", total: 50 },
+    { regional: "Regional 2", total: 30 },
+    { regional: "Regional 3", total: 76 },
+  ];
+
+  const ocorrenciasPorBairro: { name: string; value: number }[] = [
+    { name: "Centro", value: 34 },
+    { name: "Savassi", value: 22 },
+    { name: "Funcionários", value: 18 },
+    { name: "Lourdes", value: 16 },
+    { name: "Barro Preto", value: 14 },
+  ];
+
+
+  const ocorrenciasPorPrioridade: PrioridadeData[] = [
+    { prioridade: "Alta", total: 60 },
+    { prioridade: "Média", total: 50 },
+    { prioridade: "Baixa", total: 46 },
+  ];
+
+  const statusData: StatusData[] = [
+    { name: "Criadas", value: kpis.criadas },
+    { name: "Agendadas", value: kpis.agendadas },
+    { name: "Execução", value: kpis.em_execucao },
+    { name: "Concluídas", value: kpis.concluidas },
+  ];
+
   const regionalId = user?.regional_id ? String(user.regional_id) : null;
   const tituloPainel = regionalId ? `Painel Regional ${regionalId}` : "Painel Regional";
 
@@ -62,35 +95,35 @@ export default function DashboardRegional() {
     [ocorrenciasRegional]
   );
 
-  const dataBairro: CommonData[] = useMemo(
-    () => groupCount(ocorrenciasRegional, (o: any) => o.bairro),
-    [ocorrenciasRegional]
-  );
+  // const dataBairro: CommonData[] = useMemo(
+  //   () => groupCount(ocorrenciasRegional, (o: any) => o.bairro),
+  //   [ocorrenciasRegional]
+  // );
 
-  const dataStatus: CommonData[] = useMemo(
-    () => groupCount(ocorrenciasRegional, (o: any) => o.status),
-    [ocorrenciasRegional]
-  );
+  // const dataStatus: CommonData[] = useMemo(
+  //   () => groupCount(ocorrenciasRegional, (o: any) => o.status),
+  //   [ocorrenciasRegional]
+  // );
 
-  const dataOrigem: CommonData[] = useMemo(
-    () => groupCount(ocorrenciasRegional, (o: any) => o.origin),
-    [ocorrenciasRegional]
-  );
+  // const dataOrigem: CommonData[] = useMemo(
+  //   () => groupCount(ocorrenciasRegional, (o: any) => o.origin),
+  //   [ocorrenciasRegional]
+  // );
 
-  const dataRequerente: CommonData[] = useMemo(
-    () => groupCount(ocorrenciasRegional, getRequester).slice(0, 20),
-    [ocorrenciasRegional]
-  );
+  // const dataRequerente: CommonData[] = useMemo(
+  //   () => groupCount(ocorrenciasRegional, getRequester).slice(0, 20),
+  //   [ocorrenciasRegional]
+  // );
 
-  const kpis = useMemo(() => {
-    const total = ocorrenciasRegional.length;
-    const emExecucao = ocorrenciasRegional.filter(o => o.status === "em_execucao").length;
-    const concluidas = ocorrenciasRegional.filter(o => ["executada", "concluida"].includes(o.status)).length;
-    const pendentes = ocorrenciasRegional.filter(o => ["criada", "agendada", "encaminhada", "autorizada"].includes(o.status)).length;
-    return { total, emExecucao, concluidas, pendentes };
-  }, [ocorrenciasRegional]);
+  // const kpis = useMemo(() => {
+  //   const total = ocorrenciasRegional.length;
+  //   const emExecucao = ocorrenciasRegional.filter(o => o.status === "em_execucao").length;
+  //   const concluidas = ocorrenciasRegional.filter(o => ["executada", "concluida"].includes(o.status)).length;
+  //   const pendentes = ocorrenciasRegional.filter(o => ["criada", "agendada", "encaminhada", "autorizada"].includes(o.status)).length;
+  //   return { total, emExecucao, concluidas, pendentes };
+  // }, [ocorrenciasRegional]);
 
-  const exportarCSV = () => alert("Exportando relatório em CSV…");
+  // const exportarCSV = () => alert("Exportando relatório em CSV…");
 
   return (
     <div className="space-y-6">
@@ -99,12 +132,12 @@ export default function DashboardRegional() {
           <h1 className="text-3xl font-bold text-gray-900">{tituloPainel}</h1>
           <p className="text-gray-600">Somente dados da sua regional</p>
         </div>
-        <div className="flex items-center gap-4">
+        {/* <div className="flex items-center gap-4">
           <Button onClick={exportarCSV} variant="outline" className="flex items-center gap-2">
             <Download className="w-4 h-4" />
             Exportar CSV
           </Button>
-        </div>
+        </div> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -125,7 +158,7 @@ export default function DashboardRegional() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{kpis.emExecucao}</div>
+            <div className="text-2xl font-bold">{kpis.em_execucao}</div>
             <p className="text-xs text-muted-foreground">Sendo executadas</p>
           </CardContent>
         </Card>
@@ -156,18 +189,18 @@ export default function DashboardRegional() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <ChartTipoEquipamentoPie data={dataEquipamento} />
 
-        <ChartOcorrenciasPorBairro data={dataBairro} />
+        <ChartOcorrenciasPorBairro data={ocorrenciasPorBairro} />
 
-        <ChartStatusBar data={dataStatus} />
+        <ChartStatusDonut data={statusData} />
+
+        <ChartPrioridadePie data={ocorrenciasPorPrioridade} />
+
+        {/* <ChartOrigemDemanda data={dataOrigem} /> */}
 
 
-
-        <ChartOrigemDemanda data={dataOrigem} />
-
-
-        <div className="xl:col-span-2">
+        {/* <div className="xl:col-span-2">
           <ChartServicosPorRequerente data={dataRequerente} />
-        </div>
+        </div> */}
       </div>
     </div>
   );
