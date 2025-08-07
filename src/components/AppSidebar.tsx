@@ -43,34 +43,7 @@ import {
 import logoPmf from "@/assets/images/logo-pmf-2025.png";
 import logoCitinova from "@/assets/images/logo-citinova-color.png";
 
-const menuItems = [
-  {
-    title: "Cadastros",
-    icon: Settings,
-    role: ["adm", "cegor"],
-    subrole: ["gerente"],
-    items: [
-      { title: "Regionais", url: "/cadastros/regionais", icon: Building, role: ["adm"] },
-      { title: "Bairros", url: "/cadastros/bairros", icon: MapPin, role: ["adm"], },
-      { title: "Territórios", url: "/cadastros/territorios", icon: MapPin, role: ["adm"], },
-      { title: "Fiscais", url: "/cadastros/fiscais", icon: Shield, role: ["adm"] },
-      { title: "Equipamentos", url: "/cadastros/equipamentos", icon: Building, role: ["adm"] },
-      { title: "Empresas", url: "/cadastros/empresas", icon: Building, role: ["adm"] },
-      { title: "Equipes", url: "/cadastros/equipes", icon: Users, role: ["cegor"], subrole: ["gerente"] },
-      { title: "Lista de equipes", url: "/cadastros/equipes/lista", icon: List, role: ["cegor"], subrole: ["gerente"] }
-    ],
-  },
-  // {
-  //   title: 'Cadastros Regionais',
-  //   icon: Settings,
-  //   role: ['regional'],
-  //   subrole: ['gestor'],
-  //   items: [
-  //     { title: 'Territórios', url: '/cadastros/territorios', icon: MapPin, role: ['regional'], subrole: ['gestor'] },
-  //     { title: 'Fiscais', url: '/cadastros/fiscais', icon: Shield, role: ['regional'], subrole: ['gestor'] },
-  //     { title: 'Equipamentos', url: '/cadastros/equipamentos', icon: Building, role: ['regional'], subrole: ['gestor'] },
-  //   ]
-  // },
+const menuItems = [  
   {
     title: "Ocorrências",
     icon: AlertCircle,
@@ -91,6 +64,31 @@ const menuItems = [
       },
     ],
   },
+  {
+    title: "Equipes",
+    icon: AlertCircle,
+    role: ["adm", "cegor"],
+    subrole: ["gerente"],
+    items: [
+      { title: "Lista", url: "/equipes", icon: FileText },
+      { title: "Registrar", url: "/equipes/cadastro", icon: StickyNote, role: ["regional", "cegor"], subrole: ["operador", "gerente"] },
+    ],
+  },
+  {
+    title: "Cadastros",
+    icon: Settings,
+    role: ["adm", "cegor"],
+    subrole: ["adm"],
+    items: [
+      { title: "Regionais", url: "/cadastros/regionais", icon: Building, role: ["adm"] },
+      { title: "Bairros", url: "/cadastros/bairros", icon: MapPin, role: ["adm"], },
+      { title: "Territórios", url: "/cadastros/territorios", icon: MapPin, role: ["adm"], },
+      { title: "Fiscais", url: "/cadastros/fiscais", icon: Shield, role: ["adm"] },
+      { title: "Equipamentos", url: "/cadastros/equipamentos", icon: Building, role: ["adm"] },
+      { title: "Empresas", url: "/cadastros/empresas", icon: Building, role: ["adm"] },
+    ],
+  },
+
   {
     title: "Relatórios",
     icon: BarChart3,
