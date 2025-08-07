@@ -35,6 +35,8 @@ import ServicosEmpresa from "./pages/relatorios/ServicosEmpresa";
 import MapaOcorrencias from "./pages/relatorios/MapaOcorrencias";
 import HistoricoOcorrencias from "./pages/relatorios/HistoricoOcorrencias";
 import TempoExecucao from "./pages/relatorios/TempoExecucao";
+import ListaEquipes from "./pages/equipes/Lista";
+import CadastroEquipes from "./pages/equipes/Cadastro";
 
 const queryClient = new QueryClient();
 
@@ -58,9 +60,7 @@ const App = () => (
             <Route path="/cadastros/fiscais" element={<Layout><Fiscais /></Layout>} />
             <Route path="/cadastros/equipamentos" element={<Layout><Equipamentos /></Layout>} />
             <Route path="/cadastros/empresas" element={<Layout><Empresas /></Layout>} />
-            <Route path="/cadastros/equipes" element={<Layout><Equipes /></Layout>} />
-            <Route path="/cadastros/equipes/lista" element={<Layout><EquipesLista /></Layout>} />
-
+            
             {/* Rotas de ocorrências - todas usando Layout */}
             <Route path="/ocorrencias" element={<Layout><ListaOcorrencias /></Layout>} />
             <Route path="/ocorrencias/nova" element={<Layout><VisualizarOcorrencia /></Layout>} />
@@ -79,6 +79,10 @@ const App = () => (
             <Route path="/relatorios/mapa" element={<Layout><MapaOcorrencias /></Layout>} />
             <Route path="/relatorios/historico" element={<Layout><HistoricoOcorrencias /></Layout>} />
             <Route path="/relatorios/tempo" element={<Layout><TempoExecucao /></Layout>} />
+
+            {/* Rotas de equipes - todas usando Layout */}
+            <Route path="/equipes" element={<Layout><ListaEquipes /></Layout>} />
+            <Route path="/equipes/cadastro" element={<Layout><CadastroEquipes /></Layout>} />
 
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
