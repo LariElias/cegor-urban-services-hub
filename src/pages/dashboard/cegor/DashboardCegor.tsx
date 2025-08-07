@@ -38,6 +38,10 @@ import ChartTipoEquipamentoPie from "@/components/charts/ChartTipoEquipamentoPie
 import ChartOrigemDemanda from "@/components/charts/ChartOrigemdemanda";
 import ChartServicosPorRequerente from "@/components/charts/ChartServicosPorRequerente";
 
+import ChartDistribuicaoRegional, { RegionalData } from "@/components/charts/ChartDistribuicaoRegional";
+import ChartPrioridadePie, { PrioridadeData } from "@/components/charts/ChartPrioridadePie";
+import ChartStatusDonut, { StatusData } from "@/components/charts/ChartStatusDonut";
+
 import EquipesEmCampoCard, { buildEquipesOcupadas } from "@/components/dashboard/EquipesEmCampoCard";
 import { mockOcorrencias } from "@/pages/ocorrencias/ListaOcorrencias";
 import { useNavigate } from "react-router-dom";
@@ -156,6 +160,28 @@ export default function Dashboard() {
     pendenteAprovacao: 23,
   };
 
+
+  const ocorrenciasPorRegional: RegionalData[] = [
+    { regional: "Regional 1", total: 50 },
+    { regional: "Regional 2", total: 30 },
+    { regional: "Regional 3", total: 76 },
+  ];
+
+  const ocorrenciasPorBairro: { name: string; value: number }[] = [
+    { name: "Centro", value: 34 },
+    { name: "Savassi", value: 22 },
+    { name: "Funcionários", value: 18 },
+    { name: "Lourdes", value: 16 },
+    { name: "Barro Preto", value: 14 },
+  ];
+
+
+  const ocorrenciasPorPrioridade: PrioridadeData[] = [
+    { prioridade: "Alta", total: 60 },
+    { prioridade: "Média", total: 50 },
+    { prioridade: "Baixa", total: 46 },
+  ];
+
   const demandaRegionalData = [
     { name: 'Regional 1', demandas: 45 },
     { name: 'Regional 2', demandas: 38 },
@@ -184,9 +210,9 @@ export default function Dashboard() {
     );
   };
 
-  const exportarCSV = () => {
-    alert('Exportando relatório em CSV...');
-  };
+  // const exportarCSV = () => {
+  //   alert('Exportando relatório em CSV...');
+  // };
 
 
   return (
@@ -198,14 +224,14 @@ export default function Dashboard() {
             {user?.role === 'regional' ? 'Painel da Regional' : 'Visão geral do sistema CEGOR'}
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        {/* <div className="flex items-center gap-4">
           {isCegorGestor(user) && (
-            <Button onClick={exportarCSV} variant="outline" className="flex items-center gap-2">
-              <Download className="w-4 h-4" />
-              Exportar CSV
-            </Button>
+            // <Button onClick={exportarCSV} variant="outline" className="flex items-center gap-2">
+            //   <Download className="w-4 h-4" />
+            //   Exportar CSV
+            // </Button>
           )}
-        </div>
+        </div> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -286,9 +312,10 @@ export default function Dashboard() {
         <ChartOcorrenciasPorBairro data={bairroData} />
         <ChartTipoEquipamentoPie data={equipamentoData} />
         <ChartOrigemDemanda data={origemData} />
-        <div className="xl:col-span-2">
-          <ChartServicosPorRequerente data={requerenteData} />
-        </div>
+        <ChartDistribuicaoRegional data={ocorrenciasPorRegional} />
+        <ChartOcorrenciasPorBairro data={ocorrenciasPorBairro} />
+        <ChartPrioridadePie data={ocorrenciasPorPrioridade} />
+        <ChartStatusDonut data={statusData} />
       </div>
 
     </div>
