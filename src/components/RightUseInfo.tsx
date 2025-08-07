@@ -11,11 +11,11 @@ export function RightUseInfo() {
       <span className="text-sm text-gray-500 mx-1">Bem-vindo,</span>
      
       <div className="text-xs text-gray-900 mx-2 flex justify-start items-center"> 
-        <CircleUser /> <span className='px-1'>{user?.name}</span> 
-      </div>
-      <span className="text-xs text-gray-500 capitalize mx-1">
+        <CircleUser />       
+        <span className="text-xs text-gray-500 capitalize mx-1">
         {user?.role} {user?.subrole && `- ${user.subrole}`}
       </span>
+      </div>
       <button
               onClick={logout}
               className="p-2 hover:bg-white/10 rounded-lg transition-colors"

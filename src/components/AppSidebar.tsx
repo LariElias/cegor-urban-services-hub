@@ -163,8 +163,8 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r-0">
       <SidebarContent className="bg-gray-200 text-white">
         <div className="p-4 border-b border-white/20">
-          <NavLink to="/" className="flex items-center gap-3">
-            <div className=" h-10flex items-center justify-center"></div>
+          <NavLink to="/" className="flex items-center justify-center gap-3">
+
             {!isCollapsed && (
               <div>
                 <img
@@ -176,25 +176,26 @@ export function AppSidebar() {
             )}
           </NavLink>
         </div>
-
-        <div className="p-4">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <NavLink to="/" className={getNavCls}>
-                  <Home className="w-5 h-5" />
-                  {!isCollapsed && <span>Dashboard</span>}
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </div>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/" className={getNavCls}>
+                    <Home className="w-5 h-5" />
+                    {!isCollapsed && <span>Início</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
         {menuItems.map(
           (group) =>
             hasPermission(group.role, group.subrole) && (
               <SidebarGroup key={group.title}>
-                <SidebarGroupLabel className="text-gray-500 px-4">
+                <SidebarGroupLabel className="text-gray-500">
                   {!isCollapsed && group.title}
                 </SidebarGroupLabel>
                 <SidebarGroupContent>
@@ -219,7 +220,7 @@ export function AppSidebar() {
         )}
 
         <div className="mt-auto p-4 border-t border-white/20">
-          <div className="flex items-center">
+          <div className="flex flex items-center justify-center gap-3">
             {/* <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
               <span className="text-sm font-bold text-white">
                 {user?.name.charAt(0).toUpperCase()}

@@ -38,7 +38,7 @@ export function Breadcrumb() {
   };
 
   return (
-    <nav className="flex items-center space-x-2 text-sm text-gray-600 justify-between">
+    <nav className="hidden md:flex items-center space-x-2 text-sm text-gray-600 justify-between">
       <Link 
         to="/" 
         className="flex items-center hover:text-[#0B5CF0] transition-colors p-1 rounded-md hover:bg-gray-100"
