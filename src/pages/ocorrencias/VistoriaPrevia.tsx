@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { z } from 'zod';
-import { ArrowLeft, Upload, X, Camera, AlertCircle, FileText, MapPin, Tag, Star } from 'lucide-react';
+import { ArrowLeft, Upload, X, Camera, AlertCircle, FileText, MapPin, Tag, Star, Info } from 'lucide-react'; // Adicione 'Info' aqui
 import { Checkbox } from '@/components/ui/checkbox';
 import Select from 'react-select';
 
@@ -78,10 +79,10 @@ const vistoriaSchema = z.object({
   equipe: z.string().optional(),
   ponto_inicial: z.string().optional(),
   ponto_final: z.string().optional(),
-  medicao: z.string().optional(),
+  medicaoLinear: z.number({ coerce: true }).optional(), // Adicionado 'coerce' para conversão automática
   cannot_execute: z.boolean().default(false),
   cannot_execute_reason: z.string().optional(),
-  quantCanteiro: z.number().optional(),
+  medicaoReal: z.number().optional(),
   hasCanteiroCentral: z.boolean().optional(), // --- ADICIONADO ---
 }).superRefine((data, ctx) => {
   if (data.cannot_execute && !data.cannot_execute_reason?.trim()) {
@@ -103,6 +104,7 @@ const vistoriaSchema = z.object({
   }
 });
 
+
 type VistoriaFormData = z.infer<typeof vistoriaSchema>;
 
 
@@ -111,7 +113,7 @@ export default function VistoriaPreviaRefatorado() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [photos, setPhotos] = useState<string[]>([]);
-
+  
   const {
     register,
     handleSubmit,
@@ -128,7 +130,9 @@ export default function VistoriaPreviaRefatorado() {
       hasCanteiroCentral: false, // --- ADICIONADO ---
     }
   });
+  
 
+  const medicaoLinear = watch('medicaoLinear');
   const cannotExecute = watch('cannot_execute');
   const watchedActivities = watch('activity');
   const hasCanteiroCentral = watch('hasCanteiroCentral'); // --- ADICIONADO ---
@@ -143,6 +147,16 @@ export default function VistoriaPreviaRefatorado() {
       setValue('equipe', '', { shouldValidate: true });
     }
   }, [showEquipeField, setValue]);
+
+
+  useEffect(() => {
+    const linearValue = Number(medicaoLinear) || 0; 
+    
+    const realValue = hasCanteiroCentral ? linearValue * 4 : linearValue * 2;
+
+    setValue('medicaoReal', realValue, { shouldValidate: true });
+
+  }, [medicaoLinear, hasCanteiroCentral, setValue]); 
 
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -299,6 +313,19 @@ export default function VistoriaPreviaRefatorado() {
                 )}             
               </div>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="md:col-span-2">
+                      <Alert>
+                          <Info className="h-4 w-4" />
+                          <AlertTitle>Como a Medição Real é Calculada</AlertTitle>
+                          <AlertDescription>
+                              O valor da Medição Real é preenchido automaticamente com base na existência de um canteiro central:
+                              <ul className="list-disc pl-5 mt-2 text-sm">
+                                  <li><b>Sem canteiro central:</b> Medição Real = Medição Linear x 2.</li>
+                                  <li><b>Com canteiro central:</b> Medição Real = Medição Linear x 4.</li>
+                              </ul>
+                          </AlertDescription>
+                      </Alert>
+                  </div>
                 <div className="md:col-span-2 flex items-center gap-3 pt-2">
                     <Checkbox
                         id="hasCanteiroCentral"
@@ -310,15 +337,18 @@ export default function VistoriaPreviaRefatorado() {
                     </Label>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="quantCanteiro">Quantidade de canteiros</Label>
-                  <Input id="quantCanteiro" {...register('quantCanteiro')} 
+                  <Label htmlFor="medicaoLinear">Medição Linear</Label>
+                  <Input id="medicaoLinear" type="number" 
+                  {...register('medicaoLinear', { valueAsNumber: true })}
+                  placeholder="Metros" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="medicaoReal">Medição real</Label>
+                  <Input disabled type="number" id="medicaoReal" {...register('medicaoReal')} 
                   placeholder="Número de canteiros" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="medicao">Medição do serviço</Label>
-                  <Input id="medicao" {...register('medicao')} 
-                  placeholder="Metros ou Km" />
-                </div>
+
 
                 <div className="space-y-2">
                   <Label htmlFor="ponto_inicial">Ponto Inicial</Label>
