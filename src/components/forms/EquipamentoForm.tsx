@@ -17,7 +17,7 @@ interface EquipamentoFormProps {
 export const EquipamentoForm = ({ equipamento, onClose, onSave, onCancel }: EquipamentoFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   const [formData, setFormData] = useState({
     codigo: equipamento?.codigo || '',
     nome: equipamento?.nome || '',
@@ -26,16 +26,17 @@ export const EquipamentoForm = ({ equipamento, onClose, onSave, onCancel }: Equi
     endereco: equipamento?.endereco || '',
     numero: equipamento?.numero || '',
     bairro_id: equipamento?.bairro_id || '',
-    latitude: equipamento?.latitude || '',
-    longitude: equipamento?.longitude || '',
+    cep: equipamento?.cep || '',
+    // latitude: equipamento?.latitude || '',
+    // longitude: equipamento?.longitude || '',
     regional_id: equipamento?.regional_id || user?.regional_id || '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validation
-    if (!formData.codigo || !formData.nome || !formData.tipo || !formData.endereco || !formData.bairro_id || !formData.regional_id) {
+    if (!formData.nome || !formData.tipo || !formData.endereco || !formData.bairro_id || !formData.regional_id) {
       toast({
         title: "Erro",
         description: "Preencha todos os campos obrigatórios",
@@ -45,12 +46,12 @@ export const EquipamentoForm = ({ equipamento, onClose, onSave, onCancel }: Equi
     }
 
     console.log('Salvando equipamento:', formData);
-    
+
     toast({
       title: "Sucesso",
       description: `Equipamento ${equipamento ? 'atualizado' : 'criado'} com sucesso!`,
     });
-    
+
     // Call the appropriate callback
     if (onSave) {
       onSave(formData);
@@ -157,7 +158,17 @@ export const EquipamentoForm = ({ equipamento, onClose, onSave, onCancel }: Equi
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-2">
+        <Label htmlFor="cep">CEP</Label>
+        <Input
+          id="cep"
+          value={formData.cep}
+          onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
+          placeholder="00000-000"
+        />
+      </div>
+
+      {/* <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="latitude">Latitude</Label>
           <Input
@@ -180,7 +191,7 @@ export const EquipamentoForm = ({ equipamento, onClose, onSave, onCancel }: Equi
             placeholder="-43.9378"
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="space-y-2">
         <Label htmlFor="regional">Regional *</Label>

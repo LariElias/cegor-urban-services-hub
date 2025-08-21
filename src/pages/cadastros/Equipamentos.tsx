@@ -44,6 +44,7 @@ import {
   isCegorOperador,
   isRegionalGestor,
   isSuperAdm,
+  isCegorGerente
 } from "@/types";
 
 // Mock data com 10 equipamentos para uma melhor visualização
@@ -56,8 +57,6 @@ const mockEquipamentos = [
     tipo: "Praça",
     endereco: "Rua Floriano Peixoto, s/n",
     bairro_nome: "Centro",
-    latitude: -3.725,
-    longitude: -38.528,
     regional_id: "1",
     regional_nome: "Regional 01",
   },
@@ -277,12 +276,12 @@ const GridView = ({ equipamentos, handleEdit, handleDelete }) => (
           <p className="text-sm text-gray-600">
             <strong>Regional:</strong> {equip.regional_nome}
           </p>
-          {equip.latitude && (
+          {/* {equip.latitude && (
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <MapPin className="w-3 h-3" /> {equip.latitude.toFixed(4)},{" "}
               {equip.longitude.toFixed(4)}
             </div>
-          )}
+          )} */}
         </CardContent>
         <div className="flex gap-2 p-4 pt-0">
           <Button
@@ -323,6 +322,7 @@ const Equipamentos = () => {
     isCegorGestor(user) ||
     isCegorOperador(user) ||
     isRegionalGestor(user) ||
+    isCegorGerente ||
     isSuperAdm(user);
   const canCreate = canEdit;
   const showRegionalFilter =
