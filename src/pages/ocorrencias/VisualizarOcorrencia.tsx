@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, Printer, CheckCircle, MapPin, Calendar, User, FileText, Camera, AlertCircle, Upload, X } from 'lucide-react';
+import { ArrowLeft, Printer, CheckCircle, MapPin, Calendar, User, FileText, Camera, AlertCircle, Upload, X, Terminal, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Ocorrencia } from '@/types';
 import TimelineItem from '@/components/ocorrencias/TimelineItem';
 import GalleryItem from '@/components/ocorrencias/GalleryItem';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // Schema do Zod com validação condicional
 const ocorrenciaSchema = z.object({
@@ -26,6 +27,7 @@ const ocorrenciaSchema = z.object({
   special_schedule_date: z.string().optional(), // Novo campo
   origin: z.string().min(1, 'Origem é obrigatória'),
   origin_number: z.string().min(1, 'Número de origem é obrigatório'),
+  is_inside_equipment: z.boolean().optional(),
   public_equipment_id: z.string().min(1, 'Equipamento público é obrigatório'),
   territory_id: z.string().optional(),
   fiscal_id: z.string().min(1, 'É obrigatório selecionar um fiscal'),
@@ -93,6 +95,7 @@ export default function OcorrenciaFormPage() {
   const [equipmentSelected, setEquipmentSelected] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showSpecialAlert, setShowSpecialAlert] = useState(false);
 
   const {
     register,
@@ -112,6 +115,16 @@ export default function OcorrenciaFormPage() {
 
   const shouldSchedule = watch('should_schedule');
   const occurrenceType = watch('occurrence_type');
+  const isInsideEquipment = watch('is_inside_equipment');
+
+  // ✨ NOVO CÓDIGO AQUI ✨
+  useEffect(() => {
+    if (occurrenceType === 'Especial') {
+      setShowSpecialAlert(true);
+    } else {
+      setShowSpecialAlert(false); // Esconde o alerta se o usuário mudar para outra opção
+    }
+  }, [occurrenceType]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -231,6 +244,17 @@ export default function OcorrenciaFormPage() {
             <Card>
               <CardHeader><CardTitle className="flex items-center gap-2"><FileText />Dados da Ocorrência</CardTitle></CardHeader>
               <CardContent>
+                  {showSpecialAlert && (
+                    <div className="lg:col-span-12"> {/* Ocupa toda a largura da linha no grid */}
+                      <Alert>
+                        <Info className="h-4 w-4" />
+                        <AlertTitle>Atenção: Tipo Especial Selecionado</AlertTitle>
+                        <AlertDescription>
+                          Ao selecionar "Especial", o fiscal designado poderá fazer o direcionamento da equipe diretamente.
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="origin">Origem *</Label>
@@ -249,9 +273,6 @@ export default function OcorrenciaFormPage() {
                     {errors.origin_number && <p className="text-sm text-red-500">{errors.origin_number.message}</p>}
                    </div>
                   <div className="space-y-2">
-                    <Label htmlFor="occurrence_date">Data da Ocorrência *</Label>
-                    <Input id="occurrence_date" type="date" {...register('occurrence_date')} disabled={isViewMode} />
-                    {errors.occurrence_date && <p className="text-sm text-red-500">{errors.occurrence_date.message}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="occurrence_type">Tipo de Ocorrência *</Label>
@@ -296,9 +317,8 @@ export default function OcorrenciaFormPage() {
               <CardHeader><CardTitle className="flex items-center gap-2"><MapPin />Localização</CardTitle></CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="space-y-2">
+                   <div className="space-y-2">
                       <Label htmlFor="equipamento-publico">Essa ocorrência é em um equip. público</Label>
-
                         <RadioGroup 
                           value={equipamentoPublico}
                           onValueChange={setEquipamentoPublico}
@@ -317,26 +337,40 @@ export default function OcorrenciaFormPage() {
                       </RadioGroup>
                     </div>
                     {equipamentoPublico === "sim" && (
-                      <div className="space-y-2 lg:col-span-3">
-                        <Label htmlFor="public_equipment_id">Equipamento Público *</Label>
-                        <select
-                          id="public_equipment_id"
-                          {...register("public_equipment_id")}
-                          disabled={isViewMode}
-                          onChange={(e) => handleEquipmentChange(e.target.value)}
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          <option value="">Selecione o equipamento ou preencha o endereço</option>
-                          {publicEquipments.map((eq) => (
-                            <option key={eq.id} value={eq.id}>
-                              {eq.name}
-                            </option>
-                          ))}
-                        </select>
-                        {errors.public_equipment_id && (
-                          <p className="text-sm text-red-500">{errors.public_equipment_id.message}</p>
-                        )}
-                      </div>
+                      <>
+                        <div className="space-y-2 lg:col-span-3">
+                          <Label htmlFor="public_equipment_id">Equipamento Público *</Label>
+                          <select
+                            id="public_equipment_id"
+                            {...register("public_equipment_id")}
+                            disabled={isViewMode}
+                            onChange={(e) => handleEquipmentChange(e.target.value)}
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <option value="">Selecione o equipamento</option>
+                            {publicEquipments.map((eq) => (
+                              <option key={eq.id} value={eq.id}>
+                                {eq.name}
+                              </option>
+                            ))}
+                          </select>
+                          {errors.public_equipment_id && (
+                            <p className="text-sm text-red-500">{errors.public_equipment_id.message}</p>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 lg:col-span-3">
+                          <Checkbox
+                            id="is_inside_equipment"
+                            checked={isInsideEquipment}
+                            onCheckedChange={(checked) => setValue('is_inside_equipment', Boolean(checked))}
+                            disabled={isViewMode}
+                          />
+                          <Label htmlFor="is_inside_equipment" className="font-normal">
+                            A ocorrência é DENTRO do equipamento público? (Marque se for dentro)
+                          </Label>
+                        </div>
+                      </>
                     )}
                     <div className="space-y-2">
                         <Label htmlFor="territory_id">Território</Label>
