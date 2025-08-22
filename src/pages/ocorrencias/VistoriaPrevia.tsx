@@ -35,26 +35,10 @@ const activities = [
     { id: '6', name: 'Serviço varrição em pavimentação asfáltica' },
     { id: '7', name: 'Serviço varrição em pavimentação poliédrica' },
     { id: '8', name: 'Serviço varrição sem pavimentação (terra natural)' },
-    { id: '9', name: 'Serviço varrição em vias costeira e calçadões da orla marítima' },
-    { id: '10', name: 'Serviço de varrição (ciscada) de praia na faixa de areia' },
     { id: '11', name: 'Serviços Especiais extraordinários' },
     { id: '12', name: 'Serviço de limpeza e desobstrução nas Bocas de Lobo com remoção' },
     { id: '13', name: 'Serviço de limpeza manual em recursos hídricos' },
-    { id: '14', name: 'Serviço de limpeza mecanizado em recursos hídricos a céu aberto com retroescavadeira de pneus' },
-    { id: '15', name: 'Serviço de limpeza mecanizado em recursos hídricos a céu aberto com escavadeira de esteira' },
-    { id: '16', name: 'Coleta e transporte dos Resíduos Sólidos oriundos da varrição vias costeiras e calçadões' },
-    { id: '17', name: 'Coleta e transporte dos resíduos da varrição nas vias e logradouros públicos, com veículo equipado com caçamba basculante' },
-    { id: '18', name: 'Coleta e transporte dos Resíduos Sólidos oriundos da Capinação' },
-    { id: '19', name: 'Coleta e transporte dos Resíduos Sólidos oriundos da limpeza manual de recursos hídricos' },
-    { id: '20', name: 'Coleta e transporte dos Resíduos Sólidos oriundos dos serviços de limpeza mecanizada em recursos hídricos a céu aberto' },
-    { id: '21', name: 'Coleta e Transporte dos Resíduos sólidos oriundos da limpeza de praias com trator' },
-    { id: '22', name: 'Coleta e Transporte dos Resíduos sólidos oriundos da limpeza de praias com roll on roll off' },
-    { id: '23', name: 'Coleta e Transporte dos resíduos oriundos dos serviços especiais extraordinários' },
-    { id: '24', name: 'Fornecimento de veículo para o acompanhamento dos serviços de limpeza (fiscalização)' },
-    { id: '25', name: 'Serviço de higienização de mobiliário e logradouros públicos' },
-    { id: '26', name: 'Serviço com apoio do Multijato na desobstrução de boca de lobo' },
     { id: '27', name: 'Serviço com apoio do Munck na remoção de animais mortos, toros vegetais, etc' },
-    { id: '28', name: 'Serviço de Apoio ao contratante' },
 ];
 
 const equipes = [
@@ -74,7 +58,6 @@ const ACTIVITIES_REQUIRING_EQUIPE = [
 // --- Schema de Validação ATUALIZADO ---
 const vistoriaSchema = z.object({
   photos: z.array(z.string()).min(1, 'Pelo menos uma foto é obrigatória.'),
-  inspection_date: z.string().min(1, 'Data da vistoria é obrigatória.'),
   activity: z.array(z.string()).min(1, { message: 'Pelo menos uma atividade é obrigatória.' }),
   equipe: z.string().optional(),
   ponto_inicial: z.string().optional(),
@@ -266,12 +249,6 @@ export default function VistoriaPreviaRefatorado() {
 
               {/* Campos do Formulário */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="inspection_date">Data da Vistoria *</Label>
-                  <Input id="inspection_date" type="date" {...register('inspection_date')} />
-                  {errors.inspection_date && <p className="text-sm text-red-600">{errors.inspection_date.message}</p>}
-                </div>
-
                 <div className="space-y-2 md:col-span-3">
                   <Label htmlFor="activity">Atividade(s) *</Label>
                   <Select
