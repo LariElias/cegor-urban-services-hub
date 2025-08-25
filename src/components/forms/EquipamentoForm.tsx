@@ -78,6 +78,7 @@ export const EquipamentoForm = ({ equipamento, onClose, onSave, onCancel }: Equi
             value={formData.codigo}
             onChange={(e) => setFormData({ ...formData, codigo: e.target.value })}
             placeholder="EQP001"
+            disabled={!!equipamento} 
           />
         </div>
         <div className="space-y-2">
@@ -203,8 +204,10 @@ export const EquipamentoForm = ({ equipamento, onClose, onSave, onCancel }: Equi
           disabled={user?.role === 'regional'}
         >
           <option value="">Selecione uma regional</option>
-          <option value="1">Centro-Sul</option>
-          <option value="2">Norte</option>
+          <option value="1">Regional I</option>
+          <option value="2">Regional II</option>
+          <option value="2">Regional III</option>
+          <option value="2">Regional IV</option>
         </select>
       </div>
 
