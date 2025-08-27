@@ -1,0 +1,1091 @@
+[
+  {
+    "id": 77,
+    "Nome": "Rachel de Queiroz",
+    "codBairro": 77,
+    "area": 196.88,
+    "regional": "Secretaria Executiva Regional 8",
+    "codRegional": "VI",
+    "territorio": 19
+  },
+  {
+    "id": 23,
+    "Nome": "José Bonifácio",
+    "codBairro": 23,
+    "area": 88.9,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 15
+  },
+  {
+    "id": 40,
+    "Nome": "Antônio Bezerra",
+    "codBairro": 40,
+    "area": 219.69,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 11
+  },
+  {
+    "id": 44,
+    "Nome": "Genibaú",
+    "codBairro": 44,
+    "area": 215.8,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 38
+  },
+  {
+    "id": 57,
+    "Nome": "Edson Queiroz",
+    "codBairro": 57,
+    "area": 1384.82,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 25
+  },
+  {
+    "id": 8,
+    "Nome": "Bom Futuro",
+    "codBairro": 8,
+    "area": 38.39,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 16
+  },
+  {
+    "id": 73,
+    "Nome": "Bonsucesso",
+    "codBairro": 73,
+    "area": 253.32,
+    "regional": "Secretaria Executiva Regional 5",
+    "codRegional": "XII",
+    "territorio": 39
+  },
+  {
+    "id": 96,
+    "Nome": "Demócrito Rocha",
+    "codBairro": 97,
+    "area": 80.36,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 36
+  },
+  {
+    "id": 97,
+    "Nome": "Dias Macedo",
+    "codBairro": 98,
+    "area": 173.35,
+    "regional": "Secretaria Executiva Regional 8",
+    "codRegional": "VI",
+    "territorio": 20
+  },
+  {
+    "id": 99,
+    "Nome": "Itaperi",
+    "codBairro": 100,
+    "area": 254.87,
+    "regional": "Secretaria Executiva Regional 8",
+    "codRegional": "VI",
+    "territorio": 19
+  },
+  {
+    "id": 9,
+    "Nome": "Carlito Pamplona",
+    "codBairro": 9,
+    "area": 135.35,
+    "regional": "Secretaria Executiva Regional 1",
+    "codRegional": "II",
+    "territorio": 5
+  },
+  {
+    "id": 1,
+    "Nome": "São Gerardo",
+    "codBairro": 1,
+    "area": 147.55,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 13
+  },
+  {
+    "id": 5,
+    "Nome": "Moura Brasil",
+    "codBairro": 5,
+    "area": 42.43,
+    "regional": "Secretaria Executiva Regional 12",
+    "codRegional": "I",
+    "territorio": 1
+  },
+  {
+    "id": 2,
+    "Nome": "Aldeota",
+    "codBairro": 2,
+    "area": 387.83,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 7
+  },
+  {
+    "id": 4,
+    "Nome": "Amadeu Furtado",
+    "codBairro": 4,
+    "area": 93.49,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 14
+  },
+  {
+    "id": 6,
+    "Nome": "Barra do Ceará",
+    "codBairro": 6,
+    "area": 428.22,
+    "regional": "Secretaria Executiva Regional 1",
+    "codRegional": "II",
+    "territorio": 3
+  },
+  {
+    "id": 7,
+    "Nome": "Benfica",
+    "codBairro": 7,
+    "area": 145.88,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 15
+  },
+  {
+    "id": 10,
+    "Nome": "Centro",
+    "codBairro": 10,
+    "area": 489.33,
+    "regional": "Secretaria Executiva Regional 12",
+    "codRegional": "I",
+    "territorio": 1
+  },
+  {
+    "id": 20,
+    "Nome": "Jardim Guanabara",
+    "codBairro": 20,
+    "area": 73.4,
+    "regional": "Secretaria Executiva Regional 1",
+    "codRegional": "II",
+    "territorio": 2
+  },
+  {
+    "id": 26,
+    "Nome": "Mucuripe",
+    "codBairro": 26,
+    "area": 87.12,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 9
+  },
+  {
+    "id": 11,
+    "Nome": "Cocó",
+    "codBairro": 11,
+    "area": 327.33,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 23
+  },
+  {
+    "id": 12,
+    "Nome": "Cristo Redentor",
+    "codBairro": 12,
+    "area": 118.92,
+    "regional": "Secretaria Executiva Regional 1",
+    "codRegional": "II",
+    "territorio": 4
+  },
+  {
+    "id": 76,
+    "Nome": "Conjunto Esperança",
+    "codBairro": 76,
+    "area": 97.81,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 34
+  },
+  {
+    "id": 13,
+    "Nome": "Damas",
+    "codBairro": 13,
+    "area": 89.74,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 16
+  },
+  {
+    "id": 14,
+    "Nome": "Dionísio Torres",
+    "codBairro": 14,
+    "area": 172.37,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 10
+  },
+  {
+    "id": 15,
+    "Nome": "Farias Brito",
+    "codBairro": 15,
+    "area": 93.07,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 13
+  },
+  {
+    "id": 17,
+    "Nome": "Floresta",
+    "codBairro": 17,
+    "area": 171.54,
+    "regional": "Secretaria Executiva Regional 1",
+    "codRegional": "II",
+    "territorio": 6
+  },
+  {
+    "id": 19,
+    "Nome": "Jardim América",
+    "codBairro": 19,
+    "area": 77.17,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 16
+  },
+  {
+    "id": 21,
+    "Nome": "Jardim Iracema",
+    "codBairro": 21,
+    "area": 110.29,
+    "regional": "Secretaria Executiva Regional 1",
+    "codRegional": "II",
+    "territorio": 6
+  },
+  {
+    "id": 16,
+    "Nome": "Fátima",
+    "codBairro": 16,
+    "area": 286.31,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 15
+  },
+  {
+    "id": 18,
+    "Nome": "Jacarecanga",
+    "codBairro": 18,
+    "area": 126.28,
+    "regional": "Secretaria Executiva Regional 1",
+    "codRegional": "II",
+    "territorio": 5
+  },
+  {
+    "id": 22,
+    "Nome": "Joaquim Távora",
+    "codBairro": 22,
+    "area": 196.46,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 10
+  },
+  {
+    "id": 24,
+    "Nome": "Meireles",
+    "codBairro": 24,
+    "area": 265.22,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 7
+  },
+  {
+    "id": 30,
+    "Nome": "Parreão",
+    "codBairro": 30,
+    "area": 101.7,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 18
+  },
+  {
+    "id": 34,
+    "Nome": "Rodolfo Teófilo",
+    "codBairro": 34,
+    "area": 170.4,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 14
+  },
+  {
+    "id": 25,
+    "Nome": "Monte Castelo",
+    "codBairro": 25,
+    "area": 77.76,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 13
+  },
+  {
+    "id": 69,
+    "Nome": "Pedras",
+    "codBairro": 69,
+    "area": 712.72,
+    "regional": "Secretaria Executiva Regional 9",
+    "codRegional": "IX",
+    "territorio": 33
+  },
+  {
+    "id": 31,
+    "Nome": "Pirambu",
+    "codBairro": 31,
+    "area": 56.65,
+    "regional": "Secretaria Executiva Regional 1",
+    "codRegional": "II",
+    "territorio": 4
+  },
+  {
+    "id": 32,
+    "Nome": "Praia de Iracema",
+    "codBairro": 32,
+    "area": 53.36,
+    "regional": "Secretaria Executiva Regional 12",
+    "codRegional": "I",
+    "territorio": 1
+  },
+  {
+    "id": 27,
+    "Nome": "Papicu",
+    "codBairro": 27,
+    "area": 210.53,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 8
+  },
+  {
+    "id": 28,
+    "Nome": "Parque Araxá",
+    "codBairro": 28,
+    "area": 47.72,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 14
+  },
+  {
+    "id": 29,
+    "Nome": "Parquelândia",
+    "codBairro": 29,
+    "area": 123.68,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 14
+  },
+  {
+    "id": 33,
+    "Nome": "Presidente Kennedy",
+    "codBairro": 33,
+    "area": 171.6,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 12
+  },
+  {
+    "id": 53,
+    "Nome": "Cambeba",
+    "codBairro": 53,
+    "area": 273.82,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 28
+  },
+  {
+    "id": 43,
+    "Nome": "Dom Lustosa",
+    "codBairro": 43,
+    "area": 119.8,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 37
+  },
+  {
+    "id": 36,
+    "Nome": "Varjota",
+    "codBairro": 36,
+    "area": 53.2,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 8
+  },
+  {
+    "id": 52,
+    "Nome": "Cajazeiras",
+    "codBairro": 52,
+    "area": 341.11,
+    "regional": "Secretaria Executiva Regional 9",
+    "codRegional": "IX",
+    "territorio": 31
+  },
+  {
+    "id": 80,
+    "Nome": "Jardim Cearense",
+    "codBairro": 80,
+    "area": 85.9,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 35
+  },
+  {
+    "id": 38,
+    "Nome": "Ellery",
+    "codBairro": 38,
+    "area": 46.27,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 13
+  },
+  {
+    "id": 39,
+    "Nome": "Vila Velha",
+    "codBairro": 39,
+    "area": 714.88,
+    "regional": "Secretaria Executiva Regional 1",
+    "codRegional": "II",
+    "territorio": 2
+  },
+  {
+    "id": 41,
+    "Nome": "Autran Nunes",
+    "codBairro": 41,
+    "area": 97.51,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 37
+  },
+  {
+    "id": 55,
+    "Nome": "Coaçu",
+    "codBairro": 55,
+    "area": 171.18,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 30
+  },
+  {
+    "id": 45,
+    "Nome": "Henrique Jorge",
+    "codBairro": 45,
+    "area": 194.64,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 37
+  },
+  {
+    "id": 46,
+    "Nome": "João XXIII",
+    "codBairro": 46,
+    "area": 117.7,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 37
+  },
+  {
+    "id": 49,
+    "Nome": "José de Alencar",
+    "codBairro": 49,
+    "area": 311.45,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 29
+  },
+  {
+    "id": 54,
+    "Nome": "Cidade dos Funcionários",
+    "codBairro": 54,
+    "area": 278.89,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 27
+  },
+  {
+    "id": 47,
+    "Nome": "Padre Andrade",
+    "codBairro": 47,
+    "area": 126.4,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 12
+  },
+  {
+    "id": 48,
+    "Nome": "Quintino Cunha",
+    "codBairro": 48,
+    "area": 213.46,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 11
+  },
+  {
+    "id": 50,
+    "Nome": "Ancuri",
+    "codBairro": 50,
+    "area": 218.1,
+    "regional": "Secretaria Executiva Regional 9",
+    "codRegional": "IX",
+    "territorio": 33
+  },
+  {
+    "id": 51,
+    "Nome": "Barroso",
+    "codBairro": 51,
+    "area": 344.2,
+    "regional": "Secretaria Executiva Regional 9",
+    "codRegional": "IX",
+    "territorio": 31
+  },
+  {
+    "id": 56,
+    "Nome": "Curió",
+    "codBairro": 56,
+    "area": 64.43,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 29
+  },
+  {
+    "id": 120,
+    "Nome": "Aracapé",
+    "codBairro": 124,
+    "area": 217.94,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 34
+  },
+  {
+    "id": 60,
+    "Nome": "Guararapes",
+    "codBairro": 60,
+    "area": 136.44,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 24
+  },
+  {
+    "id": 67,
+    "Nome": "Parque Manibura",
+    "codBairro": 67,
+    "area": 126.86,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 27
+  },
+  {
+    "id": 68,
+    "Nome": "Paupina",
+    "codBairro": 68,
+    "area": 541.39,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 30
+  },
+  {
+    "id": 62,
+    "Nome": "Jardim das Oliveiras",
+    "codBairro": 62,
+    "area": 238.89,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 27
+  },
+  {
+    "id": 61,
+    "Nome": "Jangurussu",
+    "codBairro": 61,
+    "area": 801.06,
+    "regional": "Secretaria Executiva Regional 9",
+    "codRegional": "IX",
+    "territorio": 32
+  },
+  {
+    "id": 63,
+    "Nome": "Lagoa Redonda",
+    "codBairro": 63,
+    "area": 1150.81,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 29
+  },
+  {
+    "id": 98,
+    "Nome": "Itaoca",
+    "codBairro": 99,
+    "area": 74.13,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 17
+  },
+  {
+    "id": 65,
+    "Nome": "Messejana",
+    "codBairro": 65,
+    "area": 605.38,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 28
+  },
+  {
+    "id": 66,
+    "Nome": "Parque Iracema",
+    "codBairro": 66,
+    "area": 156.81,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 28
+  },
+  {
+    "id": 70,
+    "Nome": "Sabiaguaba",
+    "codBairro": 70,
+    "area": 1011.24,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 25
+  },
+  {
+    "id": 72,
+    "Nome": "Bom Jardim",
+    "codBairro": 72,
+    "area": 244.19,
+    "regional": "Secretaria Executiva Regional 5",
+    "codRegional": "XII",
+    "territorio": 39
+  },
+  {
+    "id": 71,
+    "Nome": "Salinas",
+    "codBairro": 71,
+    "area": 254.64,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 24
+  },
+  {
+    "id": 74,
+    "Nome": "Canindezinho",
+    "codBairro": 74,
+    "area": 371.43,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 34
+  },
+  {
+    "id": 78,
+    "Nome": "Granja Lisboa",
+    "codBairro": 78,
+    "area": 520.8,
+    "regional": "Secretaria Executiva Regional 5",
+    "codRegional": "XII",
+    "territorio": 39
+  },
+  {
+    "id": 94,
+    "Nome": "Bela Vista",
+    "codBairro": 94,
+    "area": 98.22,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 36
+  },
+  {
+    "id": 95,
+    "Nome": "Couto Fernandes",
+    "codBairro": 96,
+    "area": 32.14,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 36
+  },
+  {
+    "id": 79,
+    "Nome": "Granja Portugal",
+    "codBairro": 79,
+    "area": 252.41,
+    "regional": "Secretaria Executiva Regional 5",
+    "codRegional": "XII",
+    "territorio": 39
+  },
+  {
+    "id": 82,
+    "Nome": "Maraponga",
+    "codBairro": 82,
+    "area": 169.87,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 35
+  },
+  {
+    "id": 87,
+    "Nome": "Parque Santa Rosa",
+    "codBairro": 87,
+    "area": 100.19,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 34
+  },
+  {
+    "id": 88,
+    "Nome": "Passaré",
+    "codBairro": 88,
+    "area": 718.53,
+    "regional": "Secretaria Executiva Regional 8",
+    "codRegional": "VI",
+    "territorio": 20
+  },
+  {
+    "id": 83,
+    "Nome": "Mondubim",
+    "codBairro": 83,
+    "area": 712.99,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 35
+  },
+  {
+    "id": 86,
+    "Nome": "Parque São José",
+    "codBairro": 86,
+    "area": 59.65,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 34
+  },
+  {
+    "id": 84,
+    "Nome": "Parque Dois Irmãos",
+    "codBairro": 84,
+    "area": 437.92,
+    "regional": "Secretaria Executiva Regional 8",
+    "codRegional": "VI",
+    "territorio": 20
+  },
+  {
+    "id": 102,
+    "Nome": "Panamericano",
+    "codBairro": 104,
+    "area": 55.22,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 36
+  },
+  {
+    "id": 93,
+    "Nome": "Alto da Balança",
+    "codBairro": 93,
+    "area": 90.37,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 26
+  },
+  {
+    "id": 90,
+    "Nome": "Siqueira",
+    "codBairro": 90,
+    "area": 635.67,
+    "regional": "Secretaria Executiva Regional 5",
+    "codRegional": "XII",
+    "territorio": 39
+  },
+  {
+    "id": 91,
+    "Nome": "Aerolândia",
+    "codBairro": 91,
+    "area": 110.49,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 26
+  },
+  {
+    "id": 92,
+    "Nome": "Aeroporto",
+    "codBairro": 92,
+    "area": 623.27,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 18
+  },
+  {
+    "id": 100,
+    "Nome": "Jóquei Clube",
+    "codBairro": 101,
+    "area": 170.1,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 37
+  },
+  {
+    "id": 101,
+    "Nome": "Montese",
+    "codBairro": 103,
+    "area": 191.15,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 16
+  },
+  {
+    "id": 105,
+    "Nome": "Serrinha",
+    "codBairro": 107,
+    "area": 294.96,
+    "regional": "Secretaria Executiva Regional 8",
+    "codRegional": "VI",
+    "territorio": 19
+  },
+  {
+    "id": 106,
+    "Nome": "Vila Peri",
+    "codBairro": 108,
+    "area": 148.92,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 17
+  },
+  {
+    "id": 107,
+    "Nome": "Vila União",
+    "codBairro": 109,
+    "area": 140.01,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 18
+  },
+  {
+    "id": 3,
+    "Nome": "Álvaro Weyne",
+    "codBairro": 3,
+    "area": 142.18,
+    "regional": "Secretaria Executiva Regional 1",
+    "codRegional": "II",
+    "territorio": 6
+  },
+  {
+    "id": 103,
+    "Nome": "Parangaba",
+    "codBairro": 105,
+    "area": 404.67,
+    "regional": "Secretaria Executiva Regional 4",
+    "codRegional": "V",
+    "territorio": 17
+  },
+  {
+    "id": 104,
+    "Nome": "Pici",
+    "codBairro": 106,
+    "area": 374.03,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 36
+  },
+  {
+    "id": 111,
+    "Nome": "Praia do Futuro I",
+    "codBairro": 113,
+    "area": 173.32,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 22
+  },
+  {
+    "id": 108,
+    "Nome": "Cais do Porto",
+    "codBairro": 110,
+    "area": 273.35,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 9
+  },
+  {
+    "id": 109,
+    "Nome": "Cidade 2000",
+    "codBairro": 111,
+    "area": 49.83,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 23
+  },
+  {
+    "id": 110,
+    "Nome": "Manuel Dias Branco",
+    "codBairro": 112,
+    "area": 445.46,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 23
+  },
+  {
+    "id": 112,
+    "Nome": "Praia do Futuro II",
+    "codBairro": 114,
+    "area": 316.56,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 22
+  },
+  {
+    "id": 114,
+    "Nome": "Planalto Ayrton Senna",
+    "codBairro": 116,
+    "area": 338.52,
+    "regional": "Secretaria Executiva Regional 8",
+    "codRegional": "VI",
+    "territorio": 21
+  },
+  {
+    "id": 113,
+    "Nome": "De Lourdes",
+    "codBairro": 115,
+    "area": 136.61,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 8
+  },
+  {
+    "id": 118,
+    "Nome": "Olavo Oliveira",
+    "codBairro": 122,
+    "area": 71.17,
+    "regional": "Secretaria Executiva Regional 3",
+    "codRegional": "IV",
+    "territorio": 11
+  },
+  {
+    "id": 115,
+    "Nome": "Conjunto Palmeiras",
+    "codBairro": 118,
+    "area": 549.59,
+    "regional": "Secretaria Executiva Regional 9",
+    "codRegional": "IX",
+    "territorio": 32
+  },
+  {
+    "id": 116,
+    "Nome": "São Bento",
+    "codBairro": 119,
+    "area": 219.33,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 30
+  },
+  {
+    "id": 117,
+    "Nome": "Novo Mondubim",
+    "codBairro": 121,
+    "area": 175.45,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 34
+  },
+  {
+    "id": 37,
+    "Nome": "Vicente Pinzón",
+    "codBairro": 37,
+    "area": 313.39,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 9
+  },
+  {
+    "id": 121,
+    "Nome": "Boa Vista \/ Castelão",
+    "codBairro": 125,
+    "area": 295.75,
+    "regional": "Secretaria Executiva Regional 8",
+    "codRegional": "VI",
+    "territorio": 20
+  },
+  {
+    "id": 81,
+    "Nome": "Manoel Sátiro",
+    "codBairro": 81,
+    "area": 143.16,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 35
+  },
+  {
+    "id": 42,
+    "Nome": "Conjunto Ceará I",
+    "codBairro": 42,
+    "area": 159.73,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 38
+  },
+  {
+    "id": 75,
+    "Nome": "Conjunto Ceará II",
+    "codBairro": 75,
+    "area": 182.54,
+    "regional": "Secretaria Executiva Regional 11",
+    "codRegional": "XI",
+    "territorio": 38
+  },
+  {
+    "id": 85,
+    "Nome": "Parque Presidente Vargas",
+    "codBairro": 85,
+    "area": 154.49,
+    "regional": "Secretaria Executiva Regional 10",
+    "codRegional": "X",
+    "territorio": 34
+  },
+  {
+    "id": 58,
+    "Nome": "Engenheiro Luciano Cavalcante",
+    "codBairro": 58,
+    "area": 387.02,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 24
+  },
+  {
+    "id": 59,
+    "Nome": "Guajeru",
+    "codBairro": 59,
+    "area": 107.4,
+    "regional": "Secretaria Executiva Regional 6",
+    "codRegional": "VIII",
+    "territorio": 29
+  },
+  {
+    "id": 89,
+    "Nome": "Prefeito José Walter",
+    "codBairro": 89,
+    "area": 844.5,
+    "regional": "Secretaria Executiva Regional 8",
+    "codRegional": "VI",
+    "territorio": 21
+  },
+  {
+    "id": 119,
+    "Nome": "Parque Santa Maria",
+    "codBairro": 123,
+    "area": 196.96,
+    "regional": "Secretaria Executiva Regional 9",
+    "codRegional": "IX",
+    "territorio": 33
+  },
+  {
+    "id": 35,
+    "Nome": "Tauape",
+    "codBairro": 35,
+    "area": 249.28,
+    "regional": "Secretaria Executiva Regional 2",
+    "codRegional": "III",
+    "territorio": 10
+  },
+  {
+    "id": 64,
+    "Nome": "Sapiranga \/ Coité",
+    "codBairro": 64,
+    "area": 477.2,
+    "regional": "Secretaria Executiva Regional 7",
+    "codRegional": "VII",
+    "territorio": 25
+  }
+]
