@@ -1,6 +1,6 @@
-/*  src/pages/cadastros/EquipeLista.tsx  */
+/* src/pages/cadastros/EquipeLista.tsx  */
 import React, { useMemo, useState } from "react";
-import { LayoutGrid, List } from "lucide-react";
+import { LayoutGrid, List, Pencil, Briefcase, TrafficCone } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -28,6 +28,9 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Ocorrencia } from "@/types";
 import { mockOcorrencias } from "@/pages/ocorrencias/ListaOcorrencias";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+
 
 const getStatusColor = (s: string) =>
 ({ disponivel: "bg-green-100 text-green-800", alocada: "bg-blue-100 text-blue-800" }[
@@ -81,7 +84,7 @@ const useTeamSnapshots = () =>
   }, []);
 
 /* ---------- ListView ---------- */
-const ListView = ({ teams }: { teams: TeamSnapshot[] }) => {
+const ListView = ({ teams, onStatusClick }: { teams: TeamSnapshot[], onStatusClick: (team: TeamSnapshot) => void }) => {
   const navigate = useNavigate();
 
   return (
@@ -90,8 +93,8 @@ const ListView = ({ teams }: { teams: TeamSnapshot[] }) => {
         <TableHeader>
           <TableRow>
             <TableHead>Equipe</TableHead>
-            <TableHead>Atividade</TableHead>
-            <TableHead>#Pessoas</TableHead>
+            <TableHead>Especilidade</TableHead>
+            <TableHead>Pessoas</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
@@ -108,14 +111,17 @@ const ListView = ({ teams }: { teams: TeamSnapshot[] }) => {
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
-                {t.status === "alocada" && (
-                  <Button
-                    size="sm"
-                    onClick={() => navigate(`/ocorrencias/${t.ocorrencia!.id}/visualizar`)}
-                  >
-                    Ocorrência
-                  </Button>
-                )}
+                <div className="flex items-center justify-end gap-2">
+                    <Button variant="outline" size="icon" onClick={() => navigate(`/cadastros/equipes/${t.equipe}`)}>
+                        <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => onStatusClick(t)}>
+                        <Briefcase className="w-4 h-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => navigate(t.ocorrencia ? `/ocorrencias/${t.ocorrencia.id}/visualizar` : '#')} disabled={!t.ocorrencia}>
+                        <TrafficCone className="w-4 h-4" />
+                    </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -126,7 +132,7 @@ const ListView = ({ teams }: { teams: TeamSnapshot[] }) => {
 };
 
 /* ---------- GridView ---------- */
-const GridView = ({ teams }: { teams: TeamSnapshot[] }) => {
+const GridView = ({ teams, onStatusClick }: { teams: TeamSnapshot[], onStatusClick: (team: TeamSnapshot) => void }) => {
   const navigate = useNavigate();
 
   return (
@@ -145,16 +151,19 @@ const GridView = ({ teams }: { teams: TeamSnapshot[] }) => {
             </p>
           </CardHeader>
 
-          {t.status === "alocada" && (
-            <CardContent className="mt-auto flex justify-end">
-              <Button
-                size="sm"
-                onClick={() => navigate(`/ocorrencias/${t.ocorrencia!.id}`)}
-              >
-                Ocorrência
-              </Button>
-            </CardContent>
-          )}
+          <CardContent className="mt-auto flex justify-end">
+             <div className="flex items-center justify-end gap-2">
+                <Button variant="outline" size="icon" onClick={() => navigate(`/cadastros/equipes/${t.equipe}`)}>
+                    <Pencil className="w-4 h-4" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={() => onStatusClick(t)}>
+                    <Briefcase className="w-4 h-4" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={() => navigate(t.ocorrencia ? `/ocorrencias/${t.ocorrencia.id}/visualizar` : '#')} disabled={!t.ocorrencia}>
+                    <TrafficCone className="w-4 h-4" />
+                </Button>
+            </div>
+          </CardContent>
         </Card>
       ))}
     </div>
@@ -163,20 +172,22 @@ const GridView = ({ teams }: { teams: TeamSnapshot[] }) => {
 
 /* ---------- página principal ---------- */
 export default function ListaEquipes() {
-  const teamSnapshots = useTeamSnapshots();
-
+  const initialTeams = useTeamSnapshots();
+  const [teams, setTeams] = useState(initialTeams);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<TeamSnapshot | null>(null);
 
   const itemsPerPage = viewMode === "list" ? 10 : 8;
 
   const filtered = useMemo(() => {
     const term = searchTerm.toLowerCase();
-    return teamSnapshots.filter((t) =>
+    return teams.filter((t) =>
       t.equipe.toLowerCase().includes(term)
     );
-  }, [teamSnapshots, searchTerm]);
+  }, [teams, searchTerm]);
 
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -184,6 +195,29 @@ export default function ListaEquipes() {
   }, [filtered, currentPage, itemsPerPage]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+  
+  const handleOpenStatusDialog = (team: TeamSnapshot) => {
+    setSelectedTeam(team);
+    setIsStatusDialogOpen(true);
+  };
+
+  const handleStatusChange = () => {
+    if (!selectedTeam) return;
+    
+    // Inverte o status atual
+    const newStatus = selectedTeam.status === 'alocada' ? 'disponivel' : 'alocada';
+
+    // Atualiza o estado da lista de equipes
+    setTeams(currentTeams => 
+        currentTeams.map(team => 
+            team.equipe === selectedTeam.equipe ? { ...team, status: newStatus } : team
+        )
+    );
+    
+    console.log(`Status da equipe ${selectedTeam.equipe} alterado para ${newStatus}`);
+    setIsStatusDialogOpen(false);
+    setSelectedTeam(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -226,9 +260,9 @@ export default function ListaEquipes() {
       </div>
 
       {viewMode === "list" ? (
-        <ListView teams={paginated} />
+        <ListView teams={paginated} onStatusClick={handleOpenStatusDialog} />
       ) : (
-        <GridView teams={paginated} />
+        <GridView teams={paginated} onStatusClick={handleOpenStatusDialog} />
       )}
 
       {totalPages > 1 && (
@@ -279,6 +313,34 @@ export default function ListaEquipes() {
           </PaginationContent>
         </Pagination>
       )}
+
+      <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mudar Status da Equipe: {selectedTeam?.equipe}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="dialog-status">Selecione o novo status</Label>
+            <select
+              id="dialog-status"
+              defaultValue={selectedTeam?.status}
+              onChange={(e) => {
+                if(selectedTeam){
+                    setSelectedTeam({...selectedTeam, status: e.target.value as 'alocada' | 'disponivel'})
+                }
+              }}
+              className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+            >
+              <option value="disponivel">Disponível</option>
+              <option value="alocada">Alocada</option>
+            </select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsStatusDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleStatusChange}>Salvar Status</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
