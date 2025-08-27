@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,47 +11,51 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/AuthContext';
 
+// Esquema atualizado sem o campo 'Unidade' que não está no formulário
 const EquipeSchema = z.object({
   Nome: z.string().min(1, 'Nome é obrigatório'),
   Especialidade: z.string().min(1, 'Especialidade é obrigatória'),
-  Unidade: z.string().min(1, 'Unidade é obrigatória'),
   QuantidadePessoas: z.string().min(1, 'Quantidade é obrigatória'),
   Empresa: z.string().min(1, 'Empresa é obrigatória'),
   Regional: z.string().min(1, 'Regional é obrigatória'),
+  status: z.enum(['ativo', 'inativo'], { required_error: 'Status é obrigatório' }),
   observations: z.string().optional(),
-  ativo: z.boolean().default(true),
   attachments: z.array(z.string()).optional(),
 });
 
 type EquipeFormData = z.infer<typeof EquipeSchema>;
 
 const especialidades = [
-  'Elétrica',
-  'Hidráulica',
-  'Pavimentação',
-  'Saneamento',
-  'Alvenaria',
+  'Capina',
+  'Varrição',
+  'Limpeza de canal',
+  'Retirada de animais',
+  'Limpeza de boca de lobo',
   'Pintura',
-  'Jardinagem',
-  'Outros'
 ];
 
 const regionais = [
-  'Regional I',
-  'Regional II',
-  'Regional III',
-  'Regional IV',
-  'Regional V',
-  'Regional VI',
-  'Regional Centro',
-  'CEGOR'
+  'Regional 1',
+  'Regional 2',
+  'Regional 3',
+  'Regional 4',
+  'Regional 5',
+  'Regional 6',
+  'Regional 7',
+  'Regional 8',
+  'Regional 9',
+  'Regional 10',
+  'Regional 11',
+  'Regional 12',
+  'CEGOR 00'
 ];
 
 const empresas = [
-  'Empresa I',
-  'Empresa II',
-  'Empresa III'
-]
+  'Marquise',
+  'Samarco',
+  'Emlurb'
+];
+
 export default function CadastroEquipes() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -66,7 +70,37 @@ export default function CadastroEquipes() {
     formState: { errors },
   } = useForm<EquipeFormData>({
     resolver: zodResolver(EquipeSchema),
+    defaultValues: {
+        status: 'ativo',
+    }
   });
+
+  // Observa as mudanças nos campos que compõem o nome da equipe
+  const watchedEmpresa = watch('Empresa');
+  const watchedEspecialidade = watch('Especialidade');
+  const watchedRegional = watch('Regional');
+
+  // Efeito para gerar o nome da equipe dinamicamente
+  useEffect(() => {
+    if (watchedEmpresa && watchedEspecialidade && watchedRegional) {
+      const empresaSigla = watchedEmpresa.substring(0, 3).toUpperCase();
+      const especialidadeSigla = watchedEspecialidade.substring(0, 3).toUpperCase();
+      
+      // Extrai apenas os números da string da regional
+      const regionalNumeroMatch = watchedRegional.match(/\d+/);
+      let regionalNumero = '00'; // Valor padrão caso não encontre número
+      if (regionalNumeroMatch) {
+        // Garante que o número tenha sempre dois dígitos (ex: 1 -> 01)
+        regionalNumero = regionalNumeroMatch[0].padStart(2, '0');
+      }
+
+      const nomeGerado = `${empresaSigla}-${especialidadeSigla}-${regionalNumero}`;
+      setValue('Nome', nomeGerado);
+    } else {
+      setValue('Nome', ''); // Limpa o nome se algum campo estiver vazio
+    }
+  }, [watchedEmpresa, watchedEspecialidade, watchedRegional, setValue]);
+
 
   const onSubmit = (data: EquipeFormData) => {
     console.log('Detalhamento salvo:', data);
@@ -104,18 +138,20 @@ export default function CadastroEquipes() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-              {/* Nome */}
+              {/* Empresa */}
               <div className="space-y-2">
-                <Label htmlFor="Nome">Nome do time</Label>
-                <Input id="Nome" type="text" {...register('Nome')} />
-                {errors.Nome && <p className="text-sm text-red-500">{errors.Nome.message}</p>}
-              </div>
-
-              {/* Quantidade */}
-              <div className="space-y-2">
-                <Label htmlFor="QuantidadePessoas">Quantidade de Pessoas</Label>
-                <Input id="QuantidadePessoas" type="number" {...register('QuantidadePessoas')} />
-                {errors.QuantidadePessoas && <p className="text-sm text-red-500">{errors.QuantidadePessoas.message}</p>}
+                <Label htmlFor="Empresa">Empresa</Label>
+                <select
+                  id="Empresa"
+                  {...register('Empresa')}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">Selecione uma empresa</option>
+                  {empresas.map((reg, i) => (
+                    <option key={i} value={reg}>{reg}</option>
+                  ))}
+                </select>
+                {errors.Empresa && <p className="text-sm text-red-500">{errors.Empresa.message}</p>}
               </div>
 
               {/* Especialidade */}
@@ -134,22 +170,6 @@ export default function CadastroEquipes() {
                 {errors.Especialidade && <p className="text-sm text-red-500">{errors.Especialidade.message}</p>}
               </div>
 
-              {/* Empresa */}
-              <div className="space-y-2">
-                <Label htmlFor="Empresa">Empresa</Label>
-                <select
-                  id="Empresa"
-                  {...register('Empresa')}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  <option value="">Selecione uma empresa</option>
-                  {empresas.map((reg, i) => (
-                    <option key={i} value={reg}>{reg}</option>
-                  ))}
-                </select>
-                {errors.Empresa && <p className="text-sm text-red-500">{errors.Empresa.message}</p>}
-              </div>
-
               {/* Regional */}
               <div className="space-y-2">
                 <Label htmlFor="Regional">Regional</Label>
@@ -166,12 +186,34 @@ export default function CadastroEquipes() {
                 {errors.Regional && <p className="text-sm text-red-500">{errors.Regional.message}</p>}
               </div>
 
-              {/* Unidade */}
-              {/* <div className="space-y-2">
-                <Label htmlFor="Unidade">Nome da Unidade</Label>
-                <Input id="Unidade" type="text" {...register('Unidade')} placeholder="Empresa/Unidade" />
-                {errors.Unidade && <p className="text-sm text-red-500">{errors.Unidade.message}</p>}
-              </div> */}
+              {/* Nome (Desabilitado) */}
+              <div className="space-y-2">
+                <Label htmlFor="Nome">Nome do time</Label>
+                <Input id="Nome" type="text" {...register('Nome')} disabled className="bg-gray-100" />
+                {errors.Nome && <p className="text-sm text-red-500">{errors.Nome.message}</p>}
+              </div>
+
+              {/* Quantidade */}
+              <div className="space-y-2">
+                <Label htmlFor="QuantidadePessoas">Quantidade de Pessoas</Label>
+                <Input id="QuantidadePessoas" type="number" {...register('QuantidadePessoas')} />
+                {errors.QuantidadePessoas && <p className="text-sm text-red-500">{errors.QuantidadePessoas.message}</p>}
+              </div>
+
+              {/* Status da Equipe */}
+              <div className="space-y-2">
+                <Label htmlFor="status">Status da Equipe</Label>
+                <select
+                  id="status"
+                  {...register('status')}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="ativo">Ativo</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+                {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
+              </div>
+
             </div>
 
             {/* Observações */}
@@ -215,7 +257,7 @@ export default function CadastroEquipes() {
               <Button type="button" variant="outline" onClick={() => navigate('/')}>
                 Cancelar
               </Button>
-              <Button type="submit">Concluir Execução</Button>
+              <Button type="submit">Salvar Equipe</Button>
             </div>
           </form>
         </CardContent>
