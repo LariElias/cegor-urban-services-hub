@@ -283,14 +283,19 @@ export const getPermittedStatus = (
 ): string[] => {
   const permissionsStatus: Record<string, Record<string, string[]>> = {
     pausada: {
-      gerente: ["retomar_ocorrencia", "direcionar_ocorrencia"],
+      gerente: ["retomar_ocorrencia"],
       fiscal: ["realizar_vistoria_supervisor"],
     },
     em_execucao: {
       gerente: ["pausar_execucao"]
     },
+    autorizada: {
+      fiscal: ["realizar_vistoria_supervisor"],
+      gerente: ["direcionar_ocorrencia"]
+    },
     executada: {
-      fiscal: ["realizar_vistoria_supervisor"]
+      fiscal: ["realizar_vistoria_supervisor"],
+      gerente: ["direcionar_ocorrencia"]
     },
     criada: {
       fiscal: ["realizar_vistoria"]
