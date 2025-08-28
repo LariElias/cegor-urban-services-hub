@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { date, z } from 'zod';
 import { ArrowLeft, Camera, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -218,21 +218,26 @@ export default function VistoriaFinal() {
               
               {/* Seção de Datas */}
               <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                           <Label htmlFor="inspection_date">Data da vistoria *</Label>
-                          <Input id="inspection_date" type="date" {...register('inspection_date')} />
+                          <Input id="inspection_date" value={new Date().toISOString().split('T')[0]} disabled readOnly
+                          type="date" {...register('inspection_date')} className='bg-gray-300'/>
                           {errors.inspection_date && <p className="text-sm text-red-500">{errors.inspection_date.message}</p>}
                       </div>
+                 </div>
+                  <div className="grid grid-cols-2 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                           <Label htmlFor="real_start_date">Data real do início *</Label>
-                          <Input id="real_start_date" type="date" {...register('real_start_date')} />
+                          <Input id="real_start_date" disabled className='bg-gray-300' 
+                          type="date" {...register('real_start_date')} value={new Date().toISOString().split('T')[0]} />
                           {errors.real_start_date && <p className="text-sm text-red-500">{errors.real_start_date.message}</p>}
                       </div>
-                      <div className="space-y-2 md:col-span-2">
-                          <Label htmlFor="real_end_date">Data real do Fim *</Label>
-                          <Input id="real_end_date" type="date" {...register('real_end_date')} />
-                          {errors.real_end_date && <p className="text-sm text-red-500">{errors.real_end_date.message}</p>}
+                      <div className="space-y-2">
+                          <Label htmlFor="real_end_date">Data real do início *</Label>
+                          <Input id="real_end_date" disabled className='bg-gray-300' 
+                          type="date" {...register('real_end_date')} value={new Date().toISOString().split('T')[0]} />
+                          {errors.real_start_date && <p className="text-sm text-red-500">{errors.real_start_date.message}</p>}
                       </div>
                   </div>
               </div>
@@ -267,10 +272,22 @@ export default function VistoriaFinal() {
                           Existe diferença entre a metragem final e a metragem inicial?
                       </Label>
                   </div>
-
+              </div>
+               <div className="grid grid-cols-2 md:grid-cols-2 gap-4 text-sm mb-6">
+                    <div className="pl-8 animate-in fade-in-50 duration-300">
+                        <Label htmlFor="metragemInicial">Metragem Inicial ( Metros )</Label>
+                        <Input
+                            id="metragemInicial"
+                            placeholder="Ex: 1500m"
+                            className="mt-2 bg-gray-300"
+                            value={"1800"}
+                            disabled
+                            readOnly
+                        />
+                    </div>
                   {hasMetragemDifference && (
                       <div className="pl-8 animate-in fade-in-50 duration-300">
-                          <Label htmlFor="metragemFinal">Metragem Final *</Label>
+                          <Label htmlFor="metragemFinal">Metragem Final ( Metros )*</Label>
                           <Input
                               id="metragemFinal"
                               {...register('metragemFinal')}
@@ -280,9 +297,7 @@ export default function VistoriaFinal() {
                           {errors.metragemFinal && <p className="text-sm text-red-500 mt-1">{errors.metragemFinal.message}</p>}
                       </div>
                   )}
-
-
-              </div>
+               </div>
 
               <hr />
 

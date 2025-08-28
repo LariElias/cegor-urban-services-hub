@@ -12,11 +12,11 @@ import { ArrowLeft, Upload, X, Camera, AlertCircle, FileText, MapPin, Tag, Star,
 import { Checkbox } from '@/components/ui/checkbox';
 import Select from 'react-select';
 
+import activitiesData from '@/utils/atividades.json';
 // Simulação de um hook de navegação e autenticação
 const useNavigate = () => (path) => console.log(`Navegando para: ${path}`);
 const useParams = () => ({ id: 'PROTOCOLO-12345' });
 const useAuth = () => ({ user: { name: 'Fiscal Padrão' } });
-
 
 // --- Dados Mockados ---
 const occurrenceData = {
@@ -25,21 +25,6 @@ const occurrenceData = {
     bairro: 'Centro',
     prioridade: 'Alta',
 };
-
-const activities = [
-    { id: '1', name: 'Serviço Capinação em pavimentação asfáltica' },
-    { id: '2', name: 'Serviço Capinação em pavimentação poliédrica' },
-    { id: '3', name: 'Serviço Capinação sem pavimentação (terra natural)' },
-    { id: '4', name: 'Pintura de meio fio' },
-    { id: '5', name: 'Roço em áreas abertas com roçadeira costal' },
-    { id: '6', name: 'Serviço varrição em pavimentação asfáltica' },
-    { id: '7', name: 'Serviço varrição em pavimentação poliédrica' },
-    { id: '8', name: 'Serviço varrição sem pavimentação (terra natural)' },
-    { id: '11', name: 'Serviços Especiais extraordinários' },
-    { id: '12', name: 'Serviço de limpeza e desobstrução nas Bocas de Lobo com remoção' },
-    { id: '13', name: 'Serviço de limpeza manual em recursos hídricos' },
-    { id: '27', name: 'Serviço com apoio do Munck na remoção de animais mortos, toros vegetais, etc' },
-];
 
 const equipes = [
     { id: 'eq1', name: 'Equipe Alpha' },
@@ -55,18 +40,18 @@ const ACTIVITIES_REQUIRING_EQUIPE = [
   'Pintura de meio fio',
 ];
 
-// --- Schema de Validação ATUALIZADO ---
+// --- Schema de Validação (Sem alterações) ---
 const vistoriaSchema = z.object({
   photos: z.array(z.string()).min(1, 'Pelo menos uma foto é obrigatória.'),
   activity: z.array(z.string()).min(1, { message: 'Pelo menos uma atividade é obrigatória.' }),
   equipe: z.string().optional(),
   ponto_inicial: z.string().optional(),
   ponto_final: z.string().optional(),
-  medicaoLinear: z.number({ coerce: true }).optional(), // Adicionado 'coerce' para conversão automática
+  medicaoLinear: z.number({ coerce: true }).optional(),
   cannot_execute: z.boolean().default(false),
   cannot_execute_reason: z.string().optional(),
   medicaoReal: z.number().optional(),
-  hasCanteiroCentral: z.boolean().optional(), // --- ADICIONADO ---
+  hasCanteiroCentral: z.boolean().optional(),
 }).superRefine((data, ctx) => {
   if (data.cannot_execute && !data.cannot_execute_reason?.trim()) {
     ctx.addIssue({
@@ -75,9 +60,7 @@ const vistoriaSchema = z.object({
       path: ['cannot_execute_reason'],
     });
   }
-
   const equipeIsRequired = data.activity?.some(activity => ACTIVITIES_REQUIRING_EQUIPE.includes(activity));
-
   if (equipeIsRequired && !data.equipe) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -87,9 +70,7 @@ const vistoriaSchema = z.object({
   }
 });
 
-
 type VistoriaFormData = z.infer<typeof vistoriaSchema>;
-
 
 // --- Componente Principal ---
 export default function VistoriaPreviaRefatorado() {
@@ -110,15 +91,14 @@ export default function VistoriaPreviaRefatorado() {
       photos: [],
       activity: [],
       equipe: '',
-      hasCanteiroCentral: false, // --- ADICIONADO ---
+      hasCanteiroCentral: false,
     }
   });
   
-
   const medicaoLinear = watch('medicaoLinear');
   const cannotExecute = watch('cannot_execute');
   const watchedActivities = watch('activity');
-  const hasCanteiroCentral = watch('hasCanteiroCentral'); // --- ADICIONADO ---
+  const hasCanteiroCentral = watch('hasCanteiroCentral');
 
   const showEquipeField = React.useMemo(() => {
     if (!watchedActivities || watchedActivities.length === 0) return false;
@@ -131,16 +111,11 @@ export default function VistoriaPreviaRefatorado() {
     }
   }, [showEquipeField, setValue]);
 
-
   useEffect(() => {
     const linearValue = Number(medicaoLinear) || 0; 
-    
     const realValue = hasCanteiroCentral ? linearValue * 4 : linearValue * 2;
-
     setValue('medicaoReal', realValue, { shouldValidate: true });
-
   }, [medicaoLinear, hasCanteiroCentral, setValue]); 
-
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -164,7 +139,8 @@ export default function VistoriaPreviaRefatorado() {
     navigate('/ocorrencias');
   };
 
-  const activityOptions = activities.map((a) => ({
+  // --- 2. ALTERADO: Usando 'activitiesData' do JSON importado ---
+  const activityOptions = activitiesData.map((a) => ({
     label: a.name,
     value: a.name,
   }));
@@ -212,7 +188,6 @@ export default function VistoriaPreviaRefatorado() {
                 </div>
             </CardContent>
         </Card>
-
 
         {/* Formulário de Vistoria */}
         <Card className="bg-white">
@@ -325,7 +300,6 @@ export default function VistoriaPreviaRefatorado() {
                   <Input disabled type="number" id="medicaoReal" {...register('medicaoReal')} 
                   placeholder="Número de canteiros" />
                 </div>
-
 
                 <div className="space-y-2">
                   <Label htmlFor="ponto_inicial">Ponto Inicial</Label>
