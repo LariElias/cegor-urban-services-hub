@@ -1,0 +1,14 @@
+[
+  { "id": "1", "name": "Serviço Capinação em pavimentação asfáltica" },
+  { "id": "2", "name": "Serviço Capinação em pavimentação poliédrica" },
+  { "id": "3", "name": "Serviço Capinação sem pavimentação (terra natural)" },
+  { "id": "4", "name": "Pintura de meio fio" },
+  { "id": "5", "name": "Roço em áreas abertas com roçadeira costal" },
+  { "id": "6", "name": "Serviço varrição em pavimentação asfáltica" },
+  { "id": "7", "name": "Serviço varrição em pavimentação poliédrica" },
+  { "id": "8", "name": "Serviço varrição sem pavimentação (terra natural)" },
+  { "id": "11", "name": "Serviços Especiais extraordinários" },
+  { "id": "12", "name": "Serviço de limpeza e desobstrução nas Bocas de Lobo com remoção" },
+  { "id": "13", "name": "Serviço de limpeza manual em recursos hídricos" },
+  { "id": "27", "name": "Serviço com apoio do Munck na remoção de animais mortos, toros vegetais, etc" }
+]
