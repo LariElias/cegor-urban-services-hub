@@ -171,7 +171,7 @@ export default function VistoriaPreviaRefatorado() {
                         <span className="text-slate-800 font-medium">{occurrenceData.protocolo}</span>
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-semibold text-slate-500">TIPO DE SERVIÇO</span>
+                        <span className="font-semibold text-slate-500">TIPO DE OCORRENCIA</span>
                         <span className="text-slate-800 font-medium">{occurrenceData.tipoServico}</span>
                     </div>
                     <div className="flex flex-col">
