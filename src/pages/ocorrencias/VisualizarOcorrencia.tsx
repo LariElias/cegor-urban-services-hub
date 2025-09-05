@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form'; // Importando Controller
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css'; // Importando o CSS do Leaflet
+import L from 'leaflet';
+import axios from 'axios'; // Importando axios para requisições HTTP
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Select from 'react-select'; // Importando react-select
@@ -13,7 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'; // Adicionado para o novo alerta
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/context/AuthContext';
 import { Ocorrencia } from '@/types';
@@ -21,7 +25,17 @@ import TimelineItem from '@/components/ocorrencias/TimelineItem';
 import GalleryItem from '@/components/ocorrencias/GalleryItem';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import ocorrenciasData from '@/utils/ocorrencias.json';
+import regionaisGeoData from '@/utils/regionais_cordenadas.json';
 import equipamentosPubData from '@/utils/equip_pub_pmf.json';
+
+// Corrigindo o caminho do ícone padrão do Leaflet
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Corrigindo o caminho do ícone padrão do Leaflet
+
+let DefaultIcon = L.icon({ iconUrl: icon, shadowUrl: iconShadow, iconAnchor: [12, 41] });
+L.Marker.prototype.options.icon = DefaultIcon;
 
 // Schema do Zod com validação condicional
 const ocorrenciaSchema = z.object({
@@ -38,6 +52,8 @@ const ocorrenciaSchema = z.object({
   street_name: z.string().optional(),
   street_number: z.string().optional(),
   complement: z.string().optional(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
   cep: z.string().optional(),
   neighborhood: z.string().optional(),
   priority: z.enum(['baixa', 'media', 'alta'], { errorMap: () => ({ message: "Selecione uma prioridade" }) }),
@@ -112,6 +128,8 @@ export default function OcorrenciaFormPage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showSpecialAlert, setShowSpecialAlert] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [locationAlert, setLocationAlert] = useState<{ type: 'error' | 'warning' | 'success'; message: string } | null>(null);
 
   const {
     register,
@@ -119,6 +137,7 @@ export default function OcorrenciaFormPage() {
     watch,
     setValue,
     reset,
+    getValues,
     control, // Adicionando control para o Controller
     formState: { errors },
   } = useForm<OcorrenciaFormData>({
@@ -133,6 +152,16 @@ export default function OcorrenciaFormPage() {
   const shouldSchedule = watch('should_schedule');
   const occurrenceType = watch('occurrence_type');
   const isInsideEquipment = watch('is_inside_equipment');
+
+  // Observar os campos de endereço para a geocodificação
+  const streetName = watch('street_name');
+  const streetNumber = watch('street_number');
+  const neighborhood = watch('neighborhood');
+
+  // Observar latitude e longitude para o mapa
+  const latitude = watch('latitude');
+  const longitude = watch('longitude');
+  const mapPosition: [number, number] | null = latitude && longitude ? [parseFloat(latitude), parseFloat(longitude)] : null;
 
   useEffect(() => {
     if (occurrenceType === 'Especial') {
@@ -188,6 +217,39 @@ export default function OcorrenciaFormPage() {
 
   const removeAttachment = (index: number) => {
     setAttachments(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleGeocode = async () => {
+    setLocationAlert(null); // Limpa o alerta anterior
+    const { street_name, street_number, neighborhood } = getValues();
+    if (!street_name || !neighborhood) {
+      return;
+    }
+
+    setIsGeocoding(true);
+    const addressQuery = `${street_name}, ${street_number || ''}, ${neighborhood}, Fortaleza, Ceará, Brazil`;
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressQuery)}&addressdetails=1`;
+
+    try {
+      const response = await axios.get(url);
+      if (response.data && response.data.length > 0) {
+        const result = response.data[0];
+        const lat = parseFloat(result.lat).toFixed(7);
+        const lng = parseFloat(result.lon).toFixed(7);
+
+        console.log(`Coordenadas encontradas: Latitude ${lat}, Longitude ${lng}`);
+
+        setValue('latitude', lat);
+        setValue('longitude', lng);
+        setLocationAlert({ type: 'success', message: 'Coordenadas encontradas com sucesso!' });
+      } else {
+        setLocationAlert({ type: 'warning', message: 'Endereço não encontrado na região metropolitana de Fortaleza.' });
+      }
+    } catch (error) {
+      setLocationAlert({ type: 'error', message: 'Ocorreu um erro ao buscar as coordenadas. Tente novamente.' });
+    } finally {
+      setIsGeocoding(false);
+    }
   };
 
   const onSubmit = (data: OcorrenciaFormData) => {
@@ -330,6 +392,15 @@ export default function OcorrenciaFormPage() {
             <Card>
               <CardHeader><CardTitle className="flex items-center gap-2"><MapPin />Localização</CardTitle></CardHeader>
               <CardContent>
+                {locationAlert && (
+                  <Alert variant={locationAlert.type === 'error' ? 'destructive' : 'default'} className="mb-6">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>{locationAlert.type === 'error' ? 'Erro de Localização' : 'Aviso'}</AlertTitle>
+                    <AlertDescription>
+                      {locationAlert.message}
+                    </AlertDescription>
+                  </Alert>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                    <div className="space-y-2">
                      <Label htmlFor="equipamento-publico">Essa ocorrência é em um equip. público</Label>
@@ -411,23 +482,31 @@ export default function OcorrenciaFormPage() {
                    </div>
                    <div className="space-y-2">
                        <Label htmlFor="street_name">Logradouro</Label>
-                       <Input id="street_name" {...register('street_name')} disabled={isViewMode || equipmentSelected} placeholder="Nome do logradouro" />
+                       <Input id="street_name" {...register('street_name')} disabled={isViewMode || equipmentSelected} placeholder="Nome do logradouro" onBlur={handleGeocode} />
                    </div>
                    <div className="space-y-2">
                        <Label htmlFor="street_number">Número</Label>
-                       <Input id="street_number" {...register('street_number')} disabled={isViewMode || equipmentSelected} placeholder="Número" />
+                       <Input id="street_number" {...register('street_number')} disabled={isViewMode || equipmentSelected} placeholder="Número" onBlur={handleGeocode} />
                    </div>
                    <div className="space-y-2">
                        <Label htmlFor="cep">CEP</Label>
-                       <Input id="cep" {...register('cep')} disabled={isViewMode || equipmentSelected} placeholder="00000-000" />
+                       <Input id="cep" {...register('cep')} disabled={isViewMode || equipmentSelected} placeholder="00000-000" onBlur={handleGeocode} />
                    </div>
                    <div className="space-y-2">
                        <Label htmlFor="neighborhood">Bairro</Label>
-                       <Input id="neighborhood" {...register('neighborhood')} disabled={isViewMode || equipmentSelected} placeholder="Bairro" />
+                       <Input id="neighborhood" {...register('neighborhood')} disabled={isViewMode || equipmentSelected} placeholder="Bairro" onBlur={handleGeocode} />
                    </div>
                    <div className="space-y-2">
                        <Label htmlFor="complement">Complemento</Label>
-                       <Input id="complement" {...register('complement')} disabled={isViewMode || equipmentSelected} placeholder="Complemento" />
+                       <Input id="complement" {...register('complement')} disabled={isViewMode || equipmentSelected} placeholder="Complemento"/>
+                   </div>
+                   <div className="space-y-2">
+                       <Label htmlFor="latitude">Latitude</Label>
+                       <Input id="latitude" {...register('latitude')} disabled placeholder={isGeocoding ? "Buscando..." : "Preenchido automaticamente"} className="bg-gray-100" />
+                   </div>
+                   <div className="space-y-2">
+                       <Label htmlFor="longitude">Longitude</Label>
+                       <Input id="longitude" {...register('longitude')} disabled placeholder={isGeocoding ? "Buscando..." : "Preenchido automaticamente"} className="bg-gray-100" />
                    </div>
                 </div>
               </CardContent>
